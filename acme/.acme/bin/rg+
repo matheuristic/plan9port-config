@@ -1,0 +1,6 @@
+#!/usr/bin/env rc
+
+# Run rg with Acme right-click (button 3) parsable output format
+# Requires ripgrep be installed on the system
+
+rg --no-heading --color=never -n $*

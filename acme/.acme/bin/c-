@@ -1,0 +1,7 @@
+#!/usr/bin/env rc
+
+# Uncomment STDIN or piped text using argument as the leading comment string
+# (default comment string is '#')
+commentchar=$1
+if (~ $#commentchar 0) commentchar='#'
+9 sed 's/^([	 ]*)'^$commentchar^' ?(.*)/\1\2/'

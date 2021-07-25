@@ -1,0 +1,47 @@
+#!/usr/bin/env rc
+# acmeed is a stand-in application designed to be used as $EDITOR; it is designed to integrate with (p9p) acme on *nix systems.
+# When invoked by a command such as `git commit`, acme creates a new row displaying the temporary file for editing.
+# 'Putdel' confirms the write and deletes the window. 'Del' cancels the operation.
+#
+# Author: mvk <mvk@moriendi.org>
+#
+# This is free and unencumbered software released into the public domain. See https://moriendi.org/tools/_LICENSE
+. $PLAN9/lib/acme.rc
+
+tmpfile=$1
+if(! test -f $"tmpfile) exit 1;
+
+fn event {
+	switch($1$2) {
+	case Mx MX # button2; $9 = button2'd command
+	{
+		switch($9) {
+		case Putdel
+		{
+			winctl clean
+			winread body > $"tmpfile
+			windel sure
+			exit
+		}
+		case *
+			winwriteevent $*
+		}
+	}
+	case Ml ML # button3 passback
+		winwriteevent $*
+	}
+}
+
+newwindow
+echo -n 'Undo Putdel'	| winwrite tag
+winctl name $"tmpfile
+winctl mark
+
+echo -n '0'			| winwrite addr
+cat $"tmpfile			| winwrite body
+winctl clean
+winctl 'dot=addr'
+winctl show
+
+wineventloop
+

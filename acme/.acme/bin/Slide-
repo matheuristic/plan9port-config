@@ -1,0 +1,37 @@
+#!/usr/bin/env rc
+
+# Backtracks to the previous "slide"
+
+# Calling this Slide+ script will look inside the ./index file
+# in the current directory, and load the file in ./index that
+# is listed before the current file using Slide
+
+# Adapted from Russ Cox's "A Tour of Acme" video
+# Source: https://research.swtch.com/acme
+
+if(test ! -r index) {
+	9 echo no slide index
+	exit 1
+}
+
+name=$%
+current=`{9 basename $name}
+currentx=`{9 grep -n '^'$current'([ 	]|$)' index | 9 sed 's/:.*//'}
+
+if(~ $#currentx 0) {
+	9 echo not in slideshow
+	exit 1
+}
+
+pagex=`{9 echo $currentx - 1 | 9 hoc}
+if(~ $pagex 0){
+	9 echo at first page
+	exit 0
+}
+page=`{9 sed -n $pagex^p index | 9 awk '{print $1}'}
+if(~ $#page 0){
+	9 echo at first page
+	exit 0
+}
+
+Slide $page

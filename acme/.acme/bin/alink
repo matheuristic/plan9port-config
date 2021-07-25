@@ -1,0 +1,29 @@
+#!/usr/bin/env rc
+# alink spawns a new row 'name', and executes 'cmd' in it. Windows are marked clean and scrolled up once 'cmd' exits.
+#
+# Author: mvk <mvk@moriendi.org>
+#
+# This is free and unencumbered software released into the public domain. See https://moriendi.org/tools/_LICENSE
+. $PLAN9/lib/acme.rc
+prog=`{echo $"0 | xargs basename}
+
+if (test $#* '-lt' 2) {
+	echo 'usage: '$prog' win_name cmd [arguments...]' >[1=2]
+	exit 1
+}
+
+name=$1
+shift 1
+cmd=$"*
+
+newwindow
+winctl nomark
+
+winname '/cve/'$name
+rc -c $cmd	| winwrite body
+winctl clean
+
+echo -n '0' | winwrite addr
+winctl 'dot=addr'
+winctl show
+

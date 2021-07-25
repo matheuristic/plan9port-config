@@ -1,0 +1,50 @@
+#!/usr/bin/env rc
+
+# Loads "slide" file given by argument from the current dir
+# (the first slide in ./index is loaded if there is no arg)
+
+# Calling this Slide script will modify the filename in the
+# the current window's tag to the specified file, clear the
+# current window's contents and get the new file's contents
+
+# This should be run in a slideshow directory that contains:
+# - plain text files to be used as slides
+# - a file named index containing filenames of plain text
+#   files from the same directory in the sequence they
+#   should appear in the slideshow with one file per line
+#   and no empty lines
+
+# Example slideshow directory structure:
+#    .
+#    ├── body
+#    ├── conclusion
+#    ├── index
+#    └── introduction
+
+# Example index file contents:
+#    introduction
+#    body
+#    conclusion
+
+# Adapted from Russ Cox's "A Tour of Acme" video
+# Source: https://research.swtch.com/acme
+
+if (test ! -r index) {
+	9 echo no slide index
+	exit 1
+}
+
+name=$1
+if (~ $#name 0) {
+	name=`{sed -n 1p index | awk '{print $1}'}
+}
+
+file=`{pwd}^/$name
+if(test ! -r $file) {
+	9 echo $file not found
+	exit 1
+}
+
+9 echo name $file | 9p write acme/$winid/ctl
+9 echo clean | 9p write acme/$winid/ctl
+9 echo get | 9p write acme/$winid/ctl

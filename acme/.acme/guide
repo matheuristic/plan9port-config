@@ -1,0 +1,80 @@
+# ~/.acme/guide - master guide file with examples
+
+## Notes
+
+- Wrap the full commands in parentheses to make them selectable by
+  double-clicking just to the right of the left parenthesis, e.g.
+  (Edit =)
+
+---
+
+## General
+
+- Commands in the second block requires custom scripts in ~/.acme/bin
+
+Edit =                  (current line number)
+Edit ,|grep -n '.*'     (add line numbers)
+Edit ,s/^[0-9]+://g     (remove line numbers)
+Edit ,|sort -r          (reverse sort all lines in file)
+Edit ,|wc -c            (count num characters in file)
+
+|c+ [commentchar]       (comment selection, commentchar is # if not specified)
+|c- [commentchar]       (uncomment selection, commentchar is # if not specified)
+|i+ [indentstring]      (indent selection, indentstring is a single tab char if not specified)
+|i- [indentstring]      (unindent selection, indentstring is a single tab char if not specified)
+|w+ [width]             (wrap selection, width is 70 if not specified)
+|w-                     (unwrap selection / join lines)
+|upper                  (uppercase selection)
+|lower                  (lowercase selection)
+|surround [bracketchar] (surround selection, bracketchar is left paren if not specified)
+Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
+rg+ [regexp]            (search files in current dir and its subdirs using ripgrep)
+
+---
+
+## Slideshow
+
+- Slideshows are directories with a index file ./index and multiple text files
+  whose filenames without leading directories appear in the index file
+- There should be no empty lines in the index file and the order of the
+  filenames indicate the order of the slides
+- Commands require custom scripts in ~/.acme/bin
+
+Slide                   (start or restart slideshow in current directory)
+Slide+                  (next slide)
+Slide-                  (previous slide)
+
+---
+
+## acme-lsp
+
+- Requires acme-lsp be installed and started
+- Use the -v command-line option for verbose output
+- https://pkg.go.dev/github.com/fhs/acme-lsp/cmd/L
+
+L comp                  (completion candidates, add -e to automatically apply if only one)
+L def                   (find definition and plumb, add -p to print only)
+L fmt                   (format buffer and organize imports)
+L hov                   (show hover info for symbol at cursor)
+L impls                 (list implementation locations)
+L refs                  (list references to symbol at cursor)
+L rn newname            (rename symbol at cursor to newname)
+L sig                   (show signature for function at cursor)
+L syms                  (list symbols in the current file)
+L type                  (find symbol type and plumb, add -p to print only)
+L ws                    (list current workspace dirs)
+L ws+ [dir1] ...        (add workspace dirs, use current if none specified)
+L ws- [dir1] ...        (remove workspace dirs, use current if none specified)
+L -showconfig           (show config values)k
+
+---
+
+## Python
+
+- runfc and condarun are custom scripts in ~/.acme/bin
+
+Edit ,|runfc black      (format file using black)
+condaenv=envname condarun pylint --output=parseable $%
+                        (lint file using pylint in conda environment envname)
+condaenv=envname condarun python3 -m pdb $%
+                        (run current file in conda env envname, debug with pdb on abnormal exit)

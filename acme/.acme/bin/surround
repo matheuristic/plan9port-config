@@ -1,0 +1,46 @@
+#!/usr/bin/env rc
+
+# Surround STDIN or piped text with brackets of given type
+# - If no args are given, uses '(' and ')'
+# - If one arg is given, uses it as the left bracket and uses a pre-defined
+#   right bracket for the left bracket
+# - If two args are given, uses the first arg as the left bracket and the
+#   second arg as the right bracket
+
+leftbracket=$1
+if (~ $#leftbracket 0) leftbracket='('
+
+rightbracket=$2
+if (~ $#rightbracket 0) {
+  switch($leftbracket) {
+    case '('
+      rightbracket=')'
+    case '{'
+      rightbracket='}'
+    case '['
+      rightbracket=']'
+    case '<'
+      rightbracket='>'
+    case '"'
+      rightbracket='"'
+    case `{echo ''''}
+      rightbracket=''''
+    case '*'
+      rightbracket='*'
+    case '**'
+      rightbracket='**'
+    case '_'
+      rightbracket='_'
+    case '`'
+      rightbracket='`'
+    case '/'
+      rightbracket='/'
+    case '$'
+      rightbracket='$'
+    case *
+      9 echo 'No pre-defined right bracket for left bracket '^$leftbracket >[1=2]
+      exit 1
+  }
+}
+
+9 echo -n $leftbracket && 9 echo -n `{cat} && 9 echo -n $rightbracket

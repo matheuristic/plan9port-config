@@ -1,0 +1,42 @@
+#!/usr/bin/env rc
+
+# Run argument command in $condaenv environment for Conda installed at $condahome
+
+# Check that at least one argument command is provided
+if (test $#* -eq 0) {
+  echo Usage: $0 command arg1 arg2 ...
+  exit 1
+}
+
+# Find root directory of the Conda installation, either it is set
+if ((test $#condahome -eq 0) && (test $#CONDA_EXE -ne 0)) condahome=`{dirname `{dirname $CONDA_EXE}}
+if ((test $#condahome -eq 0) && (test -d $home/miniforge3)) condahome=$home/miniforge3
+if ((test $#condahome -eq 0) && (test -d $home/miniconda3)) condahome=$home/miniconda3
+if (~ $#condahome 0) {
+  echo 'condahome environment var not set and unable to autodetect' >[1=2]
+  exit 1
+}
+if (test ! -d $condahome) {
+  echo 'Expected conda install at '^$condahome^' but not found' >[1=2]
+  exit 1
+}
+
+# Defaults for target Conda environment to run command in, if not defined
+if ((test $#condaenv -eq 0) && (test $#CONDA_DEFAULT_ENV -eq 0)) condaenv=$CONDA_DEFAULT_ENV
+if (~ $#condaenv 0) condaenv=base
+
+# Derive directory with Conda environment binaries
+if (test $condaenv = 'base') condabin=$condahome/bin
+if not {
+  condabin=$condahome/envs/$condaenv/bin
+  if (test ! -d $condabin) {
+    echo 'Target environment '^$condaenv^' not found in Conda install at '^$condahome >[1=2]
+    exit 1
+  }
+}
+
+# Add Conda environment binaries directory to front of path so it has highest priority
+path=($condabin $path)
+
+# Run command
+$*

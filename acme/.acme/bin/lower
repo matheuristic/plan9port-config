@@ -1,0 +1,4 @@
+#!/usr/bin/env rc
+
+# Covert STDIN or piped text to lower case
+9 tr A-Z a-z

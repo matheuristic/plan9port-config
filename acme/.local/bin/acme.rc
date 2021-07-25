@@ -1,0 +1,76 @@
+#!/usr/bin/env rc
+
+# ~/.local/bin/acme.rc - Launcher for plan9port Acme text editor
+#
+# To set fonts (run '9p ls font' to see available non-9p fonts), run acme with
+#   -f $font   : Set variable font ( default: $PLAN9/font/lucsans/euro.8.font )
+#   -F $lfont  : Set fixed font ( default: $PLAN9/font/lucm/unicode.9.font )
+# Plan 9 fonts have the path $PLAN9/font/<FONTNAME>/<FONTFILE>
+# Non-Plan 9 fonts served by fontsrv have the path /mnt/font/<FONTNAME>/<FONTSIZE>a/font
+# E.g.
+#   acme -f /mnt/font/Iosevka-Slab/21a/font -F /mnt/font/Iosevka-Fixed-Slab/21a/font
+#
+# To display labels of pressed buttons, set environment variable visibleclicks=1
+# E.g.
+#   visibleclicks=1 acme
+#
+# To use a given shell (not the user's default) in win, set the SHELL environment variable
+# E.g.
+#   SHELL=rc acme
+#
+# To use a given shell for button 2 execution, set the acmeshell environment variable
+# E.g.
+#   acmeshell=/bin/bash acme
+#
+# This launcher can be used as a drop-in replacement for acme that
+# automatically starts fontsrv and plumber if they are not running, sets some
+# environment variables to necessary values and load the default dump file
+# $HOME/acme.dump if it exists
+#
+# Example command using this launcher
+#   visibleclicks=1 SHELL=rc acme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
+
+# Default width of a tab in 0 glyph width multiples
+if (~ $#tabstop 0) tabstop=4
+
+# Set specific win environment variables
+TERM=dumb
+PAGER=nobs
+
+# Add some directories to the search path if they exist
+# - $home/.acme/bin : Acme helper scripts
+# - $home/go/bin : Go compiled binaries
+# - /opt/local/bin
+# - /usr/local/bin
+for (d in /usr/local/bin \
+          /opt/local/bin \
+          $home/go/bin \
+          $home/.local/bin \
+          $home/.acme/bin \
+    ) {
+  if (test -d $d) PATH=$d:$PATH
+}
+
+# Use Acme as the default editor through a helper script
+# Requires the acmeed script from https://moriendi.org/tools/acme/
+if (test -x $home/.acme/bin/acmeed) EDITOR=acmeed
+
+# Update tag line current dir when using cd in win windows
+fn cd { builtin cd $1 && awd $sysname }
+
+# Run only a single instance of plumber
+p=`{pgrep plumber}
+if (~ $#p 0) plumber
+
+# Run only a single instance of fontsrv
+f=`{pgrep fontsrv}
+if (~ $#f 0) fontsrv &
+
+# Load ~/acme.dump if it exists
+loaddump=`{test -e $home/acme.dump && echo -l $home/acme.dump}
+
+# This seems to work around some random stalls when starting up Acme
+sleep 0.1
+
+# Run Acme text editor with command line params
+acme $loaddump $*

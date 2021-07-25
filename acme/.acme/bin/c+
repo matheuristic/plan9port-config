@@ -1,0 +1,7 @@
+#!/usr/bin/env rc
+
+# Comment STDIN or piped text using argument as the leading comment string
+# (default comment string is '#')
+comment=$1
+if (~ $#comment 0) comment='#'
+9 sed 's/.*/'^$comment^' &/'

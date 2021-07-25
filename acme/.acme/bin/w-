@@ -1,0 +1,11 @@
+#!/usr/bin/env rc
+
+# Unwrap STDIN or piped text, joining multiline text into a single line
+# Adapted from the "Branching example: joining lines" section of
+# https://www.gnu.org/software/sed/manual/html_node/Branching-and-flow-control.html
+# Note that the N command behavior in GNU sed differs from most versions of sed
+# (including that of plan9port) when called on the last line of the input where
+# GNU sed prints the pattern space before exiting by default unless the --posix
+# flag is used while most sed do not, see "N command on the last line" in
+# https://www.gnu.org/software/sed/manual/html_node/Reporting-Bugs.html
+9 sed -e ':x;$!N;s/[	 ]*\n[	 ]*/ /g;tx'

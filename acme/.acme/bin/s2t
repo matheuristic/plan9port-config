@@ -1,0 +1,11 @@
+#!/usr/bin/env rc
+
+# Change spaces to tabs for STDIN or piped text, where each argument length
+# sequence of leading spaces is converted to a tab (default is $tabstop or 4)
+# Also see https://stackoverflow.com/questions/9222281/replace-leading-whitespace-with-sed-or-similar
+tw=$1
+if (~ $#tw 0) tw=$tabstop
+if (~ $#tw 0) tw=4
+spacespertab=''
+for(i in `{seq 1 $tw}) spacespertab=$spacespertab^' '
+9 sed ':a;s/^(('^$spacespertab^')*)'^$spacespertab^'/\1	/;ta'

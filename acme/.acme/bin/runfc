@@ -1,0 +1,25 @@
+#!/usr/bin/env rc
+
+# ~/.acme/bin/runfc - run file-based command
+#
+# Run STDIN or piped text through a command that modifies a file in-place and
+# print the result to STDOUT
+
+cmd=`{basename $0}
+
+# Check if a command is provided
+if (~ $#* 0) {
+  echo usage: $cmd command arg1 arg2 ...
+  exit 1
+}
+
+# Create a temp file and automatically delete it on exit
+temp=/tmp/runfc.tmp.$USER.$pid.`{9 date -n}
+fn sigexit {
+  rm -f $temp
+}
+
+# Read STDIN into temp file, run command on it and print the result
+9 cat > $temp
+$* $temp
+9 cat $temp
