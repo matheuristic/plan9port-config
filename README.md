@@ -81,9 +81,9 @@ This will create the symlinks:
   path by default.
 - `~/.local/bin/acme.rc`: Launcher for Acme.
 - `~/.local/bin/sample-acme.sh`: Sample wrapper to run `acme.rc` via
-  `rc.sh`. Copy this to `~/.local/bin/acme.sh` and modify as needed.
+  `rc.sh`. Copy contents to `~/.local/bin/acme.sh`, modify as needed.
 - `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
-`rc.sh`. Copy to `~/.local/bin/sam.sh` and modify as needed.
+`rc.sh`. Copy contents to `~/.local/bin/sam.sh`, modify as needed.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
 ## Acme
@@ -235,6 +235,8 @@ interact with it. Seems buggy at the moment on macOS
   work sessions. The corresponding `Dump` and `Load` commands (with
   the appropriate dump file path) can be added to that project's guide
   file or to the main Acme tag.
+- Mouse 2-1 chords can be used to evaluate selections in REPLs running
+  in win windows.
 
 ## Sam
 
