@@ -2,7 +2,11 @@
 
 ## Notes
 
-- Wrap the full commands in parentheses to make them selectable by
+- Nomenclature:
+  - BOLD are args that should be replaced with the appropriate string
+  - [SQUAREBRACKETED] args are optional
+  - ... indicate multiple args can be provided
+- Wrap the commands in parentheses to make them selectable by
   double-clicking just to the right of the left parenthesis, e.g.
   (Edit =)
 
@@ -18,17 +22,33 @@ Edit ,s/^[0-9]+://g     (remove line numbers)
 Edit ,|sort -r          (reverse sort all lines in file)
 Edit ,|wc -c            (count num characters in file)
 
-|c+ [commentchar]       (comment selection, commentchar is # if not specified)
-|c- [commentchar]       (uncomment selection, commentchar is # if not specified)
-|i+ [indentstring]      (indent selection, indentstring is a single tab char if not specified)
-|i- [indentstring]      (unindent selection, indentstring is a single tab char if not specified)
-|w+ [width]             (wrap selection, width is 70 if not specified)
+|c+ [COMMENTCHAR]       (comment selection, COMMENTCHAR is # if not specified)
+|c- [COMMENTCHAR]       (uncomment selection, COMMENTCHAR is # if not specified)
+|i+ [INDENTSTRING]      (indent selection, INDENTSTRING is a single tab char if not specified)
+|i- [INDENTSTRING]      (unindent selection, INDENTSTRING is a single tab char if not specified)
+|w+ [WIDTH]             (wrap selection, WIDTH is 70 if not specified)
 |w-                     (unwrap selection / join lines)
 |upper                  (uppercase selection)
 |lower                  (lowercase selection)
-|surround [bracketchar] (surround selection, bracketchar is left paren if not specified)
+|surround [BRACKETCHAR] (surround selection, BRACKETCHAR is left paren if not specified)
 Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
-rg+ [regexp]            (search files in current dir and its subdirs using ripgrep)
+rg+ [REGEXP]            (find lines in current dirtree files matching REGEXP using ripgrep)
+rg --files|rg [REGEXP]  (find files with filename matching REGEXP using ripgrep)
+
+---
+
+## Unicode
+
+- Requires the uni tool be installed on the system
+  https://github.com/arp242/uni
+- The easiest way to enter unicode characters is to search by
+  description, and copy-paste the desired character
+
+>uni i `{cat}           (identify chars in a string)
+uni s DESCRIPTION       (search for unicode chars matching DESCRIPTION)
+uni p CODEPOINT         (print unicode char(s) at CODEPOINT, which can be a code like U+2042 , a
+                         range like 2042..2044 , a category like Po or a block like 'box drawing')
+uni e DESCRIPTION       (print emoji matching DESCRIPTION)
 
 ---
 
@@ -52,20 +72,20 @@ Slide-                  (previous slide)
 - Use the -v command-line option for verbose output
 - https://pkg.go.dev/github.com/fhs/acme-lsp/cmd/L
 
-L comp                  (completion candidates, add -e to automatically apply if only one)
-L def                   (find definition and plumb, add -p to print only)
+L comp [-e]             (completion candidates, add -e to automatically apply if only one)
+L def [-p]              (find definition and plumb, add -p to print only)
 L fmt                   (format buffer and organize imports)
 L hov                   (show hover info for symbol at cursor)
 L impls                 (list implementation locations)
 L refs                  (list references to symbol at cursor)
-L rn newname            (rename symbol at cursor to newname)
+L rn NEWNAME            (rename symbol at cursor to NEWNAME)
 L sig                   (show signature for function at cursor)
 L syms                  (list symbols in the current file)
 L type                  (find symbol type and plumb, add -p to print only)
 L ws                    (list current workspace dirs)
-L ws+ [dir1] ...        (add workspace dirs, use current if none specified)
-L ws- [dir1] ...        (remove workspace dirs, use current if none specified)
-L -showconfig           (show config values)k
+L ws+ [DIR1] ...        (add workspace dirs, use current if none specified)
+L ws- [DIR1] ...        (remove workspace dirs, use current if none specified)
+L -showconfig           (show config values)
 
 ---
 
@@ -74,7 +94,7 @@ L -showconfig           (show config values)k
 - runfc and condarun are custom scripts in ~/.acme/bin
 
 Edit ,|runfc black      (format file using black)
-condaenv=envname condarun pylint --output=parseable $%
-                        (lint file using pylint in conda environment envname)
-condaenv=envname condarun python3 -m pdb $%
-                        (run current file in conda env envname, debug with pdb on abnormal exit)
+condaenv=ENVNAME condarun pylint --output=parseable $%
+                        (lint file using pylint in conda environment ENVNAME)
+condaenv=ENVNAME condarun python3 -m pdb $%
+                        (run current file in conda env ENVNAME under control of the pdb debugger)

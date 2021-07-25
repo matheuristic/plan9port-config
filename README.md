@@ -13,6 +13,9 @@ Most of this configuration will be built around
 [Acme](http://acme.cat-v.org/) and [Sam](http://sam.cat-v.org/),
 the two Plan 9 text editors.
 
+The shell commands here are for a POSIX-compatible shell or similar
+(e.g. Bash or ZSH).
+
 ## Installing plan9port and configuring it
 
 ### Compiling plan9port
@@ -211,6 +214,14 @@ if [ "$winid" ]; then
     alias cd=_acme_cd
 fi
 ```
+
+### FUSE
+
+TODO: General overview of the experimental `-m` option to have FUSE
+mount itself at the given mountpoint so other programs that don't have
+or don't allow direct access to the shell (i.e. cannot call `9p`) can
+interact with it. Seems buggy at the moment on macOS
+([link](https://github.com/9fans/plan9port/issues/136)).
 
 ### Usage tips
 
