@@ -3,37 +3,6 @@
 [Plan 9 from User Space](https://9fans.github.io/plan9port/)
 (plan9port, p9p) configuration
 
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
-**Table of Contents**
-
-- [plan9port-config](#plan9port-config)
-    - [About](#about)
-    - [Installing plan9port and configuring it](#installing-plan9port-and-configuring-it)
-        - [Compiling plan9port](#compiling-plan9port)
-        - [Setting up base configuration files](#setting-up-base-configuration-files)
-    - [Acme](#acme)
-        - [Fonts](#fonts)
-        - [Saving and loading sessions](#saving-and-loading-sessions)
-        - [Guide file](#guide-file)
-        - [Helper scripts](#helper-scripts)
-        - [Optional tools](#optional-tools)
-        - [Using POSIX-compatible shells like Bash and Zsh with win](#using-posix-compatible-shells-like-bash-and-zsh-with-win)
-        - [Usage tips](#usage-tips)
-    - [Sam](#sam)
-    - [Plumber](#plumber)
-    - [Fonts](#fonts-1)
-    - [Keyboard bindings](#keyboard-bindings)
-    - [macOS](#macos)
-        - [Bindings](#bindings)
-        - [Dock icons](#dock-icons)
-        - [Tips](#tips)
-    - [Unix notes](#unix-notes)
-        - [Bindings](#bindings-1)
-        - [Desktop icons](#desktop-icons)
-            - [Acme](#acme-1)
-
-<!-- markdown-toc end -->
-
 ## About
 
 This repository contains a configuration for Plan 9 from User Space,
