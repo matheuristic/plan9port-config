@@ -12,15 +12,28 @@
 
 ---
 
-## General
+## Sam commands
 
-- Commands in the second block requires custom scripts in ~/.acme/bin
+- Sam commands can be run in Acme by using the Edit command
+- See the Sam manpage for more details on the Sam editing language
 
 Edit =                  (current line number)
 Edit ,|grep -n '.*'     (add line numbers)
 Edit ,s/^[0-9]+://g     (remove line numbers)
 Edit ,|sort -r          (reverse sort all lines in file)
 Edit ,|wc -c            (count num characters in file)
+
+Edit ,x/LNREGEXP/ s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT to all lines matching LNREGEXP)
+Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT across the entirety of buffers matching BUFREGEXP,
+                        e.g. Edit X/.*/ ,s/xx/yy/g changes all xx occurrences to yy in all buffers)
+
+---
+
+## Text manipulation
+
+- Commands require custom scripts in ~/.acme/bin
 
 |c+ [COMMENTCHAR]       (comment selection, COMMENTCHAR is # if not specified)
 |c- [COMMENTCHAR]       (uncomment selection, COMMENTCHAR is # if not specified)
@@ -32,8 +45,19 @@ Edit ,|wc -c            (count num characters in file)
 |lower                  (lowercase selection)
 |surround [BRACKETCHAR] (surround selection, BRACKETCHAR is left paren if not specified)
 Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
-rg+ [REGEXP]            (find lines in current dirtree files matching REGEXP using ripgrep)
-rg --files|rg [REGEXP]  (find files with filename matching REGEXP using ripgrep)
+
+---
+
+## Search
+
+- Commands starting with : are run with Button3 (right-click, plumb)
+  instead of the regular Button2 (middle-click)
+- rg+ requires custom script in ~/.acme/bin
+
+:+/REGEXP               (REGEXP search forward, right-click to run)
+:-/REGEXP               (REGEXP search backward, right-click to run)
+rg+ REGEXP              (find lines in current dirtree files matching REGEXP using ripgrep)
+rg --files|rg REGEXP    (find files with filename matching REGEXP using ripgrep)
 
 ---
 
