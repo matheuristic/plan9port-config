@@ -51,10 +51,12 @@ Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
 ## Search
 
 - Commands starting with : are run with Button3 (right-click, plumb)
-  instead of the regular Button2 (middle-click)
+  instead of the regular Button2 (middle-click, execute)
+- When right-clicking on symbols that don't match a plumbing rule,
+  a forward search is done in that buffer using that symbol
 - rg+ requires custom script in ~/.acme/bin
 
-:+/REGEXP               (REGEXP search forward, right-click to run)
+:+/REGEXP               (REGEXP search forward, right-click to run, + optional)
 :-/REGEXP               (REGEXP search backward, right-click to run)
 rg+ REGEXP              (find lines in current dirtree files matching REGEXP using ripgrep)
 rg --files|rg REGEXP    (find files with filename matching REGEXP using ripgrep)
