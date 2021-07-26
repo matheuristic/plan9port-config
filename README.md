@@ -235,8 +235,8 @@ interact with it. Seems buggy at the moment on macOS
   work sessions. The corresponding `Dump` and `Load` commands (with
   the appropriate dump file path) can be added to that project's guide
   file or to the main Acme tag.
-- Mouse 2-1 chords can be used to evaluate selections in REPLs running
-  in win windows.
+- To evaluate selections in REPLs running in win windows, Snarf
+  (1-2-3 chord) the selection, then execute Send in the REPL window.
 
 ## Sam
 
