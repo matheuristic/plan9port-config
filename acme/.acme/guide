@@ -15,16 +15,23 @@
 ## Sam commands
 
 - Sam commands can be run in Acme by using the Edit command
-- See the Sam manpage for more details on the Sam editing language
+- See the Sam manpage for more information or Sam cheatsheet for idioms
+  https://9fans.github.io/plan9port/man/man1/sam.html
+  http://sam.cat-v.org/cheatsheet/
 
 Edit =                  (current line number)
 Edit ,|grep -n '.*'     (add line numbers)
 Edit ,s/^[0-9]+://g     (remove line numbers)
 Edit ,|sort -r          (reverse sort all lines in file)
 Edit ,|wc -c            (count num characters in file)
-
-Edit ,x/LNREGEXP/ s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT to all lines matching LNREGEXP)
+Edit 0 < date           (insert date at start of file)
+Edit -/{/,+/}/          (select contents of current { ... } block, including the enclosing braces)
+Edit s/"([ˆ"]*)"/‘‘1’’/ (replace straight-quoted "word" with open-close quoted ‘‘word’’)
+Edit x/ˆ/ .,/0d         (remove C comments from selection)
+Edit ,x/^PREFIX/ .,/$/ s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT to each line that starts with PREFIX)
+Edit ,x/REGIONREGEXP/ s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT to each region matching REGIONREGEXP)
 Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
                         (apply REGEXP REPLACEMENT across the entirety of buffers matching BUFREGEXP,
                         e.g. Edit X/.*/ ,s/xx/yy/g changes all xx occurrences to yy in all buffers)
