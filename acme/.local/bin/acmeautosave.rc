@@ -5,45 +5,37 @@
 # a file whose name is the modified file's path but with slashes replaced by
 # percent characters.
 
+# Runtime configuration is controlled by the following environment variables
+#    acmeautosavedir - autosave directory ( default: ~/.acme/autosave )
+#    acmeautosaveinterval - autosave time interval in seconds ( default : 30 )
+
 # This script does not check if another instance is already
 # running, so make sure to check before running.
 
-# Usage: acmeautosave.rc [directory] [interval]
-#    directory (optional)
-#        autosave directory
-#        default: ~/.acme/autosave
-#    interval (optional)
-#        time interval between autosaves in seconds, optional
-#        default: 30
-
-# Autosave directory
-autosd=$1
-if(~ $#autosd 0) autosd=$home/.acme/autosave
-if(test ! -d $autosd) {
-	echo Autosave directory does not exist: $autosd
+if(~ $#acmeautosavedir 0) acmeautosavedir=$home/.acme/autosave
+if(test ! -d $acmeautosavedir) {
+	echo Autosave directory does not exist: $acmeautosavedir
 	exit 1
 }
 
-# Autosave intervals in seconds
-baksecs=$2
-if(~ $#baksecs 0) baksecs=30
+if(~ $#acmeautosaveinterval 0) acmeautosaveinterval=30
 
-# Autosave loop
 while() {
-	# Skip this iteration if Acme is not running
+	# Check if Acme is running
 	if (9p ls acme >[2]/dev/null >[1=2]) {
 		# Loop over Acme buffer windows (these have number window ids)
 		for(wid in `{9p ls acme | 9 grep -e [0-9]+}) {
-			# Get backup filename, change slashes to percents
-			fname=`{9p read acme/$wid/tag | 9 awk '{print $1}' | 9 sed -e 's|/|%|g'}
 			# Get flags for if window is a directory and if window is modified
 			isdir_ismod=`{9p read acme/$wid/ctl | 9 awk '{print $4$5}'}
 			# Backup window contents if not a directory and is modified
 			if (test $isdir_ismod == '01') {
-				9p read acme/$wid/body > $autosd/$fname
+				# Backup filename is the original with slashes changed to percents
+				fname=`{9p read acme/$wid/tag | 9 awk '{print $1}' | 9 sed -e 's|/|%|g'}
+				# Save contents to file
+				9p read acme/$wid/body > $acmeautosavedir/$fname
 			}
 		}
 	}
-	# Wait for given interval time before next iteration
-	sleep $baksecs
+	# Wait before proceeding to next iteration
+	sleep $acmeautosaveinterval
 }

@@ -27,6 +27,11 @@
 # environment variables to necessary values and load the default dump file
 # $HOME/acme.dump if it exists
 #
+# If the ~/.local/bin/acmeautosave.rc script is available, it is used to
+# autosave modified unsaved files (by default to ~/.acme/autosave/ and every 30
+# seconds), and the behavior can be modified using the $acmeautosavedir and
+# $acmeautosaveinterval environment variables
+#
 # Example command using this launcher
 #   visibleclicks=1 SHELL=rc acme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
 
@@ -58,7 +63,7 @@ if (test -x $home/.acme/bin/acmeed) EDITOR=acmeed
 # Update tag line current dir when using cd in win windows
 fn cd { builtin cd $1 && awd $sysname }
 
-# Helper function for checking if a given program is running
+# Helper function for checking if a given program is running (or use pgrep)
 fn getprocs {
   9 psu -a | 9 grep $1 | 9 grep -v grep
 }
@@ -74,7 +79,7 @@ if (~ $#f 0) fontsrv &
 # Run only a single instance of acmeautosave.rc if it is installed
 acmeautosavebin=$home/.local/bin/acmeautosave.rc
 if (test -x $acmeautosavebin) {
-  s=`{getprocs `{basename $acmeautosavebin}}
+  s=`{getprocs 'rc '^$acmeautosavebin}
   if (~ $#s 0) $acmeautosavebin &
 }
 
