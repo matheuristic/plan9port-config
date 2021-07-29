@@ -58,13 +58,25 @@ if (test -x $home/.acme/bin/acmeed) EDITOR=acmeed
 # Update tag line current dir when using cd in win windows
 fn cd { builtin cd $1 && awd $sysname }
 
+# Helper function for checking if a given program is running
+fn getprocs {
+  9 psu -a | 9 grep $1 | 9 grep -v grep
+}
+
 # Run only a single instance of plumber
-p=`{pgrep plumber}
+p=`{getprocs plumber}
 if (~ $#p 0) plumber
 
 # Run only a single instance of fontsrv
-f=`{pgrep fontsrv}
+f=`{getprocs fontsrv}
 if (~ $#f 0) fontsrv &
+
+# Run only a single instance of acmeautosave.rc if it is installed
+acmeautosavebin=$home/.local/bin/acmeautosave.rc
+if (test -x $acmeautosavebin) {
+  s=`{getprocs `{basename $acmeautosavebin}}
+  if (~ $#s 0) $acmeautosavebin &
+}
 
 # Load ~/acme.dump if it exists
 loaddump=`{test -e $home/acme.dump && echo -l $home/acme.dump}
