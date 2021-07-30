@@ -24,16 +24,39 @@
 #
 # This launcher can be used as a drop-in replacement for acme that
 # automatically starts fontsrv and plumber if they are not running, sets some
-# environment variables to necessary values and load the default dump file
-# $HOME/acme.dump if it exists
+# environment variables to necessary values and loads the default dump file
+# $HOME/.acme/dump/%NAMESPACE%/acme.dump if it exists, where %NAMESPACE% is the
+# current namespace but with slashes replaced by percents
 #
 # If the ~/.local/bin/acmeautosave.rc script is available, it is used to
-# autosave modified unsaved files (by default to ~/.acme/autosave/ and every 30
+# autosave modified unsaved files (by default to ~/.acme/autosave/ and every 60
 # seconds), and the behavior can be modified using the $acmeautosavedir and
 # $acmeautosaveinterval environment variables
 #
 # Example command using this launcher
 #   visibleclicks=1 SHELL=rc acme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
+#
+# Multiple instances of Acme can be run using different namespaces, e.g.
+#   #!/usr/bin/env rc
+#   flag e +
+#   if(~ $#subnamespace 0) {
+#     NAMESPACE=`{namespace}^-$subnamespace
+#     mkdir -p `{namespace}
+#   }
+#   plumber || true
+#   fontsrv || true
+#   exec acme
+#
+# Example using this launcher
+#   #!/bin/sh
+#   # Usage: acme-launcher [-n N]
+#   # Launch acme via acme.rc and in a sub-namespace if the -n option is specified
+#   if [ "$1" = "-n" ]; then
+#     export NAMESPACE=/tmp/ns.$USER.$DISPLAY-$2
+#     mkdir -p "$NAMESPACE"
+#     shift; shift
+#   fi
+#   $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc "$@"
 
 # Default width of a tab in 0 glyph width multiples
 if (~ $#tabstop 0) tabstop=4
@@ -69,22 +92,31 @@ fn getprocs {
 }
 
 # Run only a single instance of plumber
-p=`{getprocs plumber}
-if (~ $#p 0) plumber
+9p stat plumb >[2]/dev/null >[1=2] || 9 plumber
 
 # Run only a single instance of fontsrv
-f=`{getprocs fontsrv}
-if (~ $#f 0) fontsrv &
+9p stat font >[2]/dev/null >[1=2] || 9 fontsrv &
 
-# Run only a single instance of acmeautosave.rc if it is installed
+# Run only a single instance of acmeautosave.rc per namespace if it's installed
+# acmeautosave.rc does not take any arguments, so use the namespace as an arg
+# so as to disambiguate the namespace of each acmeautosave.rc process
 acmeautosavebin=$home/.local/bin/acmeautosave.rc
 if (test -x $acmeautosavebin) {
-  s=`{getprocs 'rc '^$acmeautosavebin}
-  if (~ $#s 0) $acmeautosavebin &
+  s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}}
+  if (~ $#s 0) $acmeautosavebin `{namespace} &
 }
 
-# Load ~/acme.dump if it exists
-loaddump=`{test -e $home/acme.dump && echo -l $home/acme.dump}
+# Load ~/.acme/dump/%NAMESPACE%/acme.dump if it exists (see file header)
+dumpdir=$home/.acme/dump {
+  if (test -d $dumpdir) {
+    dumpfile=$dumpdir/`{namespace | 9 sed -e 's|/|%|g'}/acme.dump
+    destdir=`{9 basename -d $dumpfile} if (test ! -d $destdir) 9 mkdir -p $destdir
+    loaddump=`{test -e $dumpfile && echo -l $dumpfile}
+  }
+  if not {
+    echo 'Default dump root directory does not exist: '^$dumpdir
+  }
+}
 
 # This seems to work around some random stalls when starting up Acme
 sleep 0.1

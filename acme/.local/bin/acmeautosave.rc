@@ -3,43 +3,53 @@
 # Saves modified (i.e. unsaved) files in the running Acme instance to an
 # autosave directory intermittently. Each modified file's contents are saved to
 # a file whose name is the modified file's path but with slashes replaced by
-# percent characters.
-
+# percent characters, in a subfolder of the autosave directory whose name
+# is the current namespace with slashes replaced by percent characters
+#
 # Runtime configuration is controlled by the following environment variables
 #    acmeautosavedir - autosave directory ( default: ~/.acme/autosave )
-#    acmeautosaveinterval - autosave time interval in seconds ( default : 30 )
-
-# This script does not check if another instance is already
-# running, so make sure to check before running.
+#    acmeautosaveinterval - autosave time interval in seconds ( default : 60 )
+#
+# This script does not check if another instance is already running, so perform
+# a check before running to avoid excessive saves and write conflicts, e.g.
+#    #!/usr/bin/env rc
+#    acmeautosavebin=$home/.local/bin/acmeautosave.rc
+#    if (test -x $acmeautosavebin) {
+#      s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}}
+#      if (~ $#s 0) $acmeautosavebin `{namespace} &
+#    }
 
 if(~ $#acmeautosavedir 0) acmeautosavedir=$home/.acme/autosave
 if(test ! -d $acmeautosavedir) {
 	echo Autosave directory does not exist: $acmeautosavedir
 	exit 1
 }
+autosavedestdir=$acmeautosavedir/`{namespace | 9 sed -e 's|/|%|g'}
+9 mkdir -p $autosavedestdir
 
-if(~ $#acmeautosaveinterval 0) acmeautosaveinterval=30
+if(~ $#acmeautosaveinterval 0) acmeautosaveinterval=60
 
 while() {
 	# Check if Acme is running
 	if (9p ls acme >[2]/dev/null >[1=2]) {
 		# Loop over Acme buffer windows (these have number window ids)
 		for(wid in `{9p ls acme | 9 grep -e [0-9]+}) {
-			# Filename
-			fname=`{9p read acme/$wid/tag | 9 awk '{print $1}'}
+			# Window file name
+			wname=`{9p read acme/$wid/tag | 9 awk '{print $1}'}
 			# Get file basename if not a that of a win window (win filenames start with '-')
-			bname=`{9 basename $fname | 9 grep -v -e '^-'}
+			bname=`{9 basename $wname | 9 grep -v -e '^-'}
 			# Get flags for if window is a directory and if window is modified
 			isdir_ismod=`{9p read acme/$wid/ctl | 9 awk '{print $4$5}'}
 			# Backup window contents if not a win window, and if not a dir and is modified
 			if ((test $#bname -ne 0) && (test $isdir_ismod == '01')) {
 				# Backup filename is the original with slashes changed to percents
-				fname=`{echo $fname | 9 sed -e 's|/|%|g'}
+				fname=`{echo $wname | 9 sed -e 's|/|%|g'}
 				# Save contents to file
-				9p read acme/$wid/body > $acmeautosavedir/$fname
+				9p read acme/$wid/body > $autosavedestdir/$fname
 			}
 		}
 	}
 	# Wait before proceeding to next iteration
-	sleep $acmeautosaveinterval
+	# Using sequences of 1 second sleeps propagates SIGINTS faster
+	for (i in `{seq 1 $acmeautosaveinterval}) 9 sleep 1
 }
