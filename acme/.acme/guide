@@ -131,3 +131,16 @@ condaenv=ENVNAME condarun pylint --output=parseable $%
                         (lint file using pylint in conda environment ENVNAME)
 condaenv=ENVNAME condarun python3 -m pdb $%
                         (run current file in conda env ENVNAME under control of the pdb debugger)
+
+---
+
+## Git
+
+git commit -am 'COMMIT MESSAGE'
+                        (commit with the given COMMIT MESSAGE)
+git push -u origin      (push current local branch to origin)
+git fetch               (fetch changes)
+git merge origin/master (merge changes from origin/master branch)
+git pull                (same as 'git fetch' followed by 'git merge FETCH_HEAD')
+git rebase -i HEAD~3    (rebase interactively starting from 3 commits ago)
+git checkout BRANCH     (checkout BRANCH to work on)
