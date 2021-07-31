@@ -143,4 +143,6 @@ git fetch               (fetch changes)
 git merge origin/master (merge changes from origin/master branch)
 git pull                (same as 'git fetch' followed by 'git merge FETCH_HEAD')
 git rebase -i HEAD~3    (rebase interactively starting from 3 commits ago)
-git checkout BRANCH     (checkout BRANCH to work on)
+git checkout BRANCH     (switch to BRANCH)
+git checkout -b NEWBRANCH
+                        (create a new branch called NEWBRANCH and switch to it)
