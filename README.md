@@ -80,11 +80,27 @@ This will create the symlinks:
   when the plan9port binaries directory is not added to the search
   path by default.
 - `~/.local/bin/acme.rc`: Launcher for Acme.
+- `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows in Acme.
 - `~/.local/bin/sample-acme.sh`: Sample wrapper to run `acme.rc` via
-  `rc.sh`. Copy contents to `~/.local/bin/acme.sh`, modify as needed.
+  `rc.sh`.
 - `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
 `rc.sh`. Copy contents to `~/.local/bin/sam.sh`, modify as needed.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
+
+Create a directory utilized by the autosave script.
+
+```shell
+mkdir -p $HOME/.acme/autosave
+```
+
+Copy `sample-acme.sh` to `~/.local/bin/acme.sh` which can be modified
+to create a customized launcher for Acme.
+
+```shell
+cp acme/.local/bin/sample-acme.sh $HOME/.local/bin/acme.sh
+```
+
+Edit `~/.local/bin/acme.sh` to customize the launcher as desired.
 
 ## Acme
 
@@ -131,6 +147,21 @@ specific session dump file on startup. Example
 ```shell
 acme -l /path/to/project/acme.dump
 ```
+
+### Autosaving
+
+If `stow` was used to symlink the base configuration files, a script
+to help with autosaving modified files that have yet to be written can
+be found at `~/.local/bin/acmeautosave.rc`. This script is
+automatically run by `~/.local/bin/acme.rc`, but only has effect if
+the `~/.acme/autosave` directory exists (which it will if the
+instructions above were followed).
+
+Autosaved modified files are saved to `~/.acme/autosave/%NAMESPACE%/`
+where `%NAMESPACE%` is the current namespace with slashes replaced by
+percents. For example, when Acme and the autosave script run in
+namespace `/tmp/ns.someuser.:0`, autosaves are written into the
+`~/.acme/autosave/%tmp%ns.someuser.:0/` directory.
 
 ### Guide file
 
@@ -217,10 +248,10 @@ fi
 
 ### FUSE
 
-TODO: General overview of the experimental `-m` option to have FUSE
-mount itself at the given mountpoint so other programs that don't have
-or don't allow direct access to the shell (i.e. cannot call `9p`) can
-interact with it. Seems buggy at the moment on macOS
+**TODO**: General overview of the experimental `-m` option to have
+FUSE mount itself at the given mountpoint so other programs that don't
+have or don't allow direct access to the shell (i.e. cannot call `9p`)
+can interact with it. Seems buggy at the moment on macOS
 ([link](https://github.com/9fans/plan9port/issues/136)).
 
 ### Usage tips
@@ -247,11 +278,9 @@ high network latency.
 
 ## Plumber
 
-TODO: Plumber setup
+**TODO**: Plumber setup
 
 ## Fonts
-
-TODO: Fonts using `fontsrv`
 
 plan9port comes with the Plan9 fonts, which are in the `$PLAN9/fonts`
 directory.
