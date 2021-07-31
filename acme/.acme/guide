@@ -19,6 +19,7 @@
   https://9fans.github.io/plan9port/man/man1/sam.html
   http://sam.cat-v.org/cheatsheet/
 
+Edit ,d                 (clear window contents)
 Edit =                  (current line number)
 Edit ,|grep -n '.*'     (add line numbers)
 Edit ,s/^[0-9]+://g     (remove line numbers)
