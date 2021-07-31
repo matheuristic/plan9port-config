@@ -27,7 +27,7 @@ compile-time dependencies need to be installed.
 
 System install (for all users):
 
-```
+```shell
 cd /usr/local
 sudo git clone https://github.com/9fans/plan9port.git plan9
 cd plan9
@@ -93,7 +93,7 @@ works best with a 3-button mouse, although keyboard modifiers can be
 used to simulate secondary mouse buttons on systems without a 3-button
 mouse (like laptops with touchpads).
 
-### Fonts
+### Acme fonts
 
 The default main (variable) font is `$PLAN9/font/lucsans/euro.8.font`
 and alternate (fixed) font is `$PLAN9/font/lucm/unicode.9.font`.
@@ -110,7 +110,7 @@ font listed in `9p ls font` and `<SIZE>` is the size of the font with
 an `a` suffix to use the anti-aliased version) or a file in the Plan 9
 install. Example of running Acme with different fonts:
 
-```
+```shell
 acme -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
 ```
 
@@ -128,7 +128,7 @@ path defaults to `~/acme.dump`.
 Acme can be launched with the `-l /path/to/dump/file` option to load a
 specific session dump file on startup. Example
 
-```
+```shell
 acme -l /path/to/project/acme.dump
 ```
 
@@ -253,6 +253,38 @@ TODO: Plumber setup
 
 TODO: Fonts using `fontsrv`
 
+plan9port comes with the Plan9 fonts, which are in the `$PLAN9/fonts`
+directory.
+
+Fonts from the host system can also be used via `fontsrv`, which makes
+those fonts accessible in the Plan 9 format at a given mountpoint
+(default `/mnt/font` in the Plan 9 filesystem). `fontsrv` should be
+built by default. If not, it can be built by running `9 mk install` in
+the `$PLAN9/src/cmd/fontsrv` directory.
+
+When `fontsrv` is running, available host system fonts can by listing
+the `font` "directory" in the Plan 9 filesystem.
+
+```shell
+fontsrv &
+9p ls font
+```
+
+A font file provided via `fontsrv` has the path
+`/mnt/font/FONTNAME/SIZE[a]/font` where `FONTNAME` is the name of the
+font and `SIZE[a]` is the point size of the font with an `a` suffix
+for the anti-aliased version. For example, the Plan 9 font presented
+by `fontsrv` at the path `/mnt/font/Iosevka/20a/font` is the
+[Iosevka](https://github.com/be5invis/Iosevka) font, Regular weight,
+at point size 20 and anti-aliased.
+
+Several programs, like Sam, use the `$font` variable to determine the
+main font and `$lfont` to determine the alternate font to use.
+
+Acme also supports specification of the main and alternate font when
+running its binary from the command line via the `-f` (main font) and
+`-F` (alternate font) flags, illustrated in an earlier section.
+
 ## Keyboard bindings
 
 Despite the mouse-centricity of the Plan 9 system (so plan9port too),
@@ -268,7 +300,7 @@ it provides a few keyboard bindings applicable to most GUI programs.
 
 Additional notes specific to macOS systems.
 
-### Bindings
+### macOS bindings
 
 When the touchpad is depressed, `Ctrl` acts as Button1, `Option` acts
 as Button2 and `Command` acts as Button3. Holding a modifier while
@@ -292,14 +324,29 @@ macOS has a few additional keybindings:
 - `Command-Shift-z`: Redo- `Fn-Left`: Viewport to start of buffer
 - `Fn-Right`: Viewport to end of buffer
 
-### Dock icons
+### macOS dock icons
 
-TODO
+#### macOS Acme launcher app
 
-- Acme.app
-- Sam.app
+1. Install [Platypus.app](https://github.com/sveinbjornt/Platypus) for
+   creating macOS apps from command-line programs.
+2. Open Platypus.app and create an app for launching Acme with the settings:
+   - **App Name**: Acme
+   - **Script Type**: Shell, `/bin/sh`
+   - **Script Path**: Path to some Acme launcher script (e.g.
+     `sample-acme.sh` or a customized `acme.sh` created from it),
+     needs to be a real file and not a symlink
+   - **Interface**: None
+   - **Checkbox Settings**:
+     - `[ ]` Accept dropped items
+     - `[ ]` Run with root privileges
+     - `[*]` Run in background
+     - `[ ]` Remain running after execution
+   - **Icon**: Set to the `spaceglenda.icns` file in the `$PLAN9/mac/`
+     directory
+3. Move the generated application to the `/Applications` folder
 
-### Tips
+### macOS tips
 
 - See [here](https://www.bytelabs.org/posts/acme-lsp/) for an example
   of how to set up acme-lsp for Acme on macOS. One nice config part is
@@ -310,7 +357,7 @@ TODO
 
 Additional notes specific to Unix systems.
 
-### Bindings
+### Unix bindings
 
 When the touchpad is depressed, `Ctrl` acts as Button2, `Alt` acts
 as Button3 and `Command` acts as Button3. Holding a modifier while
@@ -329,9 +376,9 @@ Unix systems have two additional keybindings:
 - `Super-Left`: Viewport to start of buffer
 - `Super-Right`: Viewport to end of buffer
 
-### Desktop icons
+### Unix desktop icons
 
-#### Acme
+#### Acme freedesktop.org desktop entry specification
 
 Assume that `stow` was used above to symlink scripts and config files.
 Instructions here use the `~/.acme/bin/acme.sh` launcher script.
@@ -344,12 +391,12 @@ desktop entry specification file at
 `~/.local/share/applications/acme.desktop` with the following
 contents (replace `USERNAME` as appropriate).
 
-```
+```desktop
 [Desktop Entry]
 Name=Acme
 Comment=A text editor that is the successor of sam
 GenericName=Text Editor
-Exec=/home/USERNAME/.local/bin/acme.sh -f /mnt/font/GoRegular/21a/font -F /mnt/font/GoMono/21a/font %f
+Exec=/home/USERNAME/.local/bin/acme.sh %f
 TryExec=/home/USERNAME/.local/bin/acme.sh
 Icon=/home/USERNAME/.local/share/icons/spaceglenda240.png
 Categories=Utility;Development;TextEditor;
@@ -359,7 +406,5 @@ Version=1.0
 ```
 
 Note that the above desktop entry specification file uses the Go fonts
-at a fairly large font size.
-
-
-
+at a fairly large font size, which is recommended when running on a
+Linux machine with a HiDPI screen.

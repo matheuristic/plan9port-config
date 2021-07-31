@@ -55,7 +55,7 @@ Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
 
 ---
 
-## Search
+## Search and navigation
 
 - Commands starting with : are run with Button3 (right-click, plumb)
   instead of the regular Button2 (middle-click, execute)
@@ -67,6 +67,11 @@ Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
 :-/REGEXP               (REGEXP search backward, right-click to run)
 rg+ REGEXP              (find lines in current dirtree files matching REGEXP using ripgrep)
 rg --files|rg REGEXP    (find files with filename matching REGEXP using ripgrep)
+
+:1                      (Select first line of buffer)
+:$                      (Select last line of buffer)
+:,                      (Select all lines in buffer)
+:1,8                    (Select lines 1--8 in buffer)
 
 ---
 
@@ -96,6 +101,21 @@ uni e DESCRIPTION       (print emoji matching DESCRIPTION)
 Slide                   (start or restart slideshow in current directory)
 Slide+                  (next slide)
 Slide-                  (previous slide)
+
+---
+
+## Git
+
+git commit -am 'COMMIT MESSAGE'
+                        (commit with the given COMMIT MESSAGE)
+git push -u origin      (push current local branch to origin)
+git fetch               (fetch changes)
+git merge origin/master (merge changes from origin/master branch)
+git pull                (same as 'git fetch' followed by 'git merge FETCH_HEAD')
+git rebase -i HEAD~3    (rebase interactively starting from 3 commits ago)
+git checkout BRANCH     (switch to BRANCH)
+git checkout -b NEWBRANCH
+                        (create a new branch called NEWBRANCH and switch to it)
 
 ---
 
@@ -134,15 +154,12 @@ condaenv=ENVNAME condarun python3 -m pdb $%
 
 ---
 
-## Git
+## Markdown
 
-git commit -am 'COMMIT MESSAGE'
-                        (commit with the given COMMIT MESSAGE)
-git push -u origin      (push current local branch to origin)
-git fetch               (fetch changes)
-git merge origin/master (merge changes from origin/master branch)
-git pull                (same as 'git fetch' followed by 'git merge FETCH_HEAD')
-git rebase -i HEAD~3    (rebase interactively starting from 3 commits ago)
-git checkout BRANCH     (switch to BRANCH)
-git checkout -b NEWBRANCH
-                        (create a new branch called NEWBRANCH and switch to it)
+- Compilation commands require pandoc (for PDF output, also requires a LaTeX distribution like TeXLive)
+- Linting commands require markdownlint-cli installed via NVM in a POSIX-compatible shell like Bash
+
+pandoc -o /tmp/markdown-preview.html $% && { xdg-open /tmp/markdown-preview.html || open /tmp/markdown-preview.html }
+                         (compile current markdown file to html and preview it in reader, Linux or macOS)
+bash -c '. $home/.nvm/nvm.sh && markdownlint '^$%^' && echo "No warnings or errors"'
+                         (lint current markdown file)

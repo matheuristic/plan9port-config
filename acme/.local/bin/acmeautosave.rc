@@ -34,10 +34,11 @@ while() {
 	if (9p ls acme >[2]/dev/null >[1=2]) {
 		# Loop over Acme buffer windows (these have number window ids)
 		for(wid in `{9p ls acme | 9 grep -e [0-9]+}) {
-			# Window file name
+			# Window tag name, i.e. the file path
 			wname=`{9p read acme/$wid/tag | 9 awk '{print $1}'}
-			# Get file basename if not a that of a win window (win filenames start with '-')
-			bname=`{9 basename $wname | 9 grep -v -e '^-'}
+			# Get filename, and filter if it matches a win window (starts with '-')
+                        # or an error output window ('+Error')
+			bname=`{9 basename $wname | 9 grep -v -e '^-' | 9 grep -v -e '^\+Error$'}
 			# Get flags for if window is a directory and if window is modified
 			isdir_ismod=`{9p read acme/$wid/ctl | 9 awk '{print $4$5}'}
 			# Backup window contents if not a win window, and if not a dir and is modified
