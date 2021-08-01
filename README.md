@@ -256,6 +256,27 @@ can interact with it. Seems buggy at the moment on macOS
 
 ### Usage tips
 
+- A start file or a bookmarks file with pre-defined Load lines or
+  paths to specific files can enable quick loading of project workspace
+  dumps. The `sample-acme.sh` sample launcher has comments showing how
+  a launcher can be set up to open this file on launch when no extra
+  options are provided. An example of a start/bookmarks file follows.
+
+  ```shell
+  # Acme start file - ~/.acme/start
+  
+  # Project workspaces
+  
+  (Load /path/to/project1.dump)
+  (Load /path/to/project2.dump)
+  
+  # Bookmarks
+  
+  /path/to/some/folder
+  /path/to/some/commonly/used/file1
+  /path/to/some/commonly/used/file2
+  ```
+
 - For each project to create a project-specific guide file and copy
   into it a subset of the more useful commands for the project from
   the master guide file along with adding other project-specific
