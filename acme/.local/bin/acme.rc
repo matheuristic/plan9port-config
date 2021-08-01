@@ -106,25 +106,7 @@ if (test -x $acmeautosavebin) {
   if (~ $#s 0) $acmeautosavebin `{namespace} &
 }
 
-# Load ~/.acme/dump/%NAMESPACE%/acme.dump if it exists (see file header)
-# and the -l load dump argument was not specified
-loadopt=0 dumpdir=$home/.acme/dump {
-  for (arg in $*) {
-    if (test $arg = '-l') loadopt=1
-  }
-  if (test $loadopt -eq 1) {
-    if (test -d $dumpdir) {
-      dumpfile=$dumpdir/`{namespace | 9 sed -e 's|/|%|g'}/acme.dump
-      destdir=`{9 basename -d $dumpfile} if (test ! -d $destdir) 9 mkdir -p $destdir
-      loaddump=`{test -e $dumpfile && echo -l $dumpfile}
-    }
-    if not {
-      echo 'Default dump root directory does not exist: '^$dumpdir
-    }
-  }
-}
-
-# This seems to work around some random stalls when starting up Acme
+# This seems to help with some random stalls when starting up Acme
 sleep 0.1
 
 # Run Acme text editor with command line params

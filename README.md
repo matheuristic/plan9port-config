@@ -87,11 +87,10 @@ This will create the symlinks:
 `rc.sh`. Copy contents to `~/.local/bin/sam.sh`, modify as needed.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
-Create directories utilized by the autosave and launcher scripts.
+Create directory used by the autosave script.
 
 ```shell
 mkdir -p $HOME/.acme/autosave
-mkdir -p $HOME/.acme/dump
 ```
 
 Copy `sample-acme.sh` to `~/.local/bin/acme.sh` which can be modified
@@ -153,14 +152,6 @@ specific session dump file on startup. Example:
 ```shell
 acme -l /path/to/project/acme.dump
 ```
-
-If `stow` was used to symlink the base configuration files, launching
-via `~/.local/bin/acme.rc` will load, if it exists, the dump file
-`~/.acme/dump/%NAMESPACE%/acme.dump` where `%NAMESPACE%` is the
-current namespace with slashes replaced by percents. This
-functionality requires the `~/.acme/dump/` folder exist, which is true
-if the install instructions above were used. Note that the
-`%NAMESPACE%` subfolder is automatically created when launching.
 
 ### Autosaving
 
@@ -303,7 +294,16 @@ can interact with it. Seems buggy at the moment on macOS
 - Create project-specific dump files so it is easy to save and load
   work sessions. The corresponding `Dump` and `Load` commands (with
   the appropriate dump file path) can be added to that project's guide
-  file or to the main Acme tag.
+  file or to the main Acme tag. These can either be in the project's
+  root directory or in a specific directory like `~/.acme/dump/` where
+  all dump files across projects are consolidated. When working with
+  Git-controlled projects, it is recommended to do the latter to avoid
+  polluting the Git repository with data that is machine-local.
+
+  ```shell
+  mkdir -p $HOME/.acme/dump
+  ```
+
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
 
