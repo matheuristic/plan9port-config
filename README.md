@@ -111,8 +111,10 @@ mouse (like laptops with touchpads).
 
 ### Acme fonts
 
-The default main (variable) font is `$PLAN9/font/lucsans/euro.8.font`
-and alternate (fixed) font is `$PLAN9/font/lucm/unicode.9.font`.
+The default main font is `$PLAN9/font/lucsans/euro.8.font` and
+alternate font is `$PLAN9/font/lucm/unicode.9.font`. Many users
+typically use a proportional width font for the main font and a fixed
+width font for the alternate font.
 
 The following options can be specified when running the `acme` command
 to change the main or alternate fonts:
@@ -179,9 +181,9 @@ there are a number of helper scripts available at `~/.acme/bin`:
   utilize that environment variable will open a new window in Acme to
   edit files (run `Putdel` to confirm the write and delete the window,
   or run `Del` to cancel the edit).
-- `alink` ([source](https://moriendi.org/tools/acme/)): `alink name
-  cmd arg1 ...` creates a new window named `name` and executes `cmd`
-  in it with the given args.
+- `alink` ([source](https://moriendi.org/tools/acme/)):
+  `alink name cmd arg1 ...` creates a new window named `name` and
+  executes `cmd` in it with the given args.
 - `c+`: Comment. Specify an argument to change the comment prefix from
   the default `#`.
 - `c-`: Uncomment, an arg may be specified as in `c+`.
@@ -257,24 +259,27 @@ can interact with it. Seems buggy at the moment on macOS
 ### Usage tips
 
 - A start file or a bookmarks file with pre-defined Load lines or
-  paths to specific files can enable quick loading of project workspace
-  dumps. The `sample-acme.sh` sample launcher has comments showing how
-  a launcher can be set up to open this file on launch when no extra
-  options are provided. An example of a start/bookmarks file follows.
+  paths to specific files can enable quick loading of project
+  workspace dumps. The `sample-acme.sh` sample launcher has comments
+  showing how a launcher can be set up to open this file on launch
+  when no extra options are provided. An example of a start/bookmarks
+  file follows.
 
   ```shell
-  # Acme start file - ~/.acme/start
+  # ~/.acme/start - Acme start file
   
   # Project workspaces
   
-  (Load /path/to/project1.dump)
-  (Load /path/to/project2.dump)
+  Load /path/to/project1.dump
+  Load /path/to/project2.dump
   
   # Bookmarks
   
-  /path/to/some/folder
-  /path/to/some/commonly/used/file1
-  /path/to/some/commonly/used/file2
+  /path/to/folder1/
+  /path/to/folder2/
+  /path/to/file1
+  /path/to/file2
+  /path/to/file2
   ```
 
 - For each project to create a project-specific guide file and copy
@@ -320,16 +325,16 @@ fontsrv &
 9p ls font
 ```
 
-A font file provided via `fontsrv` has the path
-`/mnt/font/FONTNAME/SIZE[a]/font` where `FONTNAME` is the name of the
-font and `SIZE[a]` is the point size of the font with an `a` suffix
-for the anti-aliased version. For example, the Plan 9 font presented
-by `fontsrv` at the path `/mnt/font/Iosevka/20a/font` is the
+`fontsrv` presents fonts at paths `/mnt/font/FONTNAME/SIZE[a]/font`
+where `FONTNAME` is the name of the font, `SIZE` is the point size of
+the font, and where the font is anti-aliased if `SIZE` is suffixed
+with an `a` or non-anti-aliased if it is not. For example, the font
+presented by `fontsrv` at path `/mnt/font/Iosevka/20a/font` is
 [Iosevka](https://github.com/be5invis/Iosevka) font, Regular weight,
 at point size 20 and anti-aliased.
 
-Several programs, like Sam, use the `$font` variable to determine the
-main font and `$lfont` to determine the alternate font to use.
+Several programs, like Sam, use the `$font` variable to determine
+which font to use.
 
 Acme also supports specification of the main and alternate font when
 running its binary from the command line via the `-f` (main font) and
