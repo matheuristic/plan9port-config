@@ -9,7 +9,7 @@
 # a start file if no extra options are specified when calling this script.
 #    startparams="$@"
 #    if [ "$startparams" = "" ]; then
-#        startparams="-c 1 $HOME/acme-start.txt"
+#        startparams="-c 1 $HOME/.acme/start"
 #    fi
 #    $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc $startparams
 #
@@ -22,7 +22,7 @@
 #        mkdir -p "$NAMESPACE"
 #        shift; shift
 #    fi
-# For example, calling 'acme.sh -n 1' lauches an Acme instance in the
+# For example, calling 'acme.sh -n 1' launches an Acme instance in the
 # /tmp/ns.$USER.$DISPLAY-1 namespace.
 #
 # Example script code incorporating the above.
@@ -33,7 +33,7 @@
 #    fi
 #    startparams="$@"
 #    if [ "$startparams" = "" ]; then
-#        startparams="-c 1 $HOME/acme-start.txt"
+#        startparams="-c 1 $HOME/.acme/start"
 #    fi
 #    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc \
 #        -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font \
