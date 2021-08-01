@@ -111,10 +111,12 @@ mouse (like laptops with touchpads).
 
 ### Acme fonts
 
-The default main font is `$PLAN9/font/lucsans/euro.8.font` and
-alternate font is `$PLAN9/font/lucm/unicode.9.font`. Many users
-typically use a proportional width font for the main font and a fixed
-width font for the alternate font.
+The default main font is `/lib/font/bit/lucsans/euro.8.font`
+(corresponding to the file `$PLAN9/font/lucsans/euro.8.font`) and the
+default alternate font is `/lib/font/bit/lucm/unicode.9.font`
+(corresponding to the file `$PLAN9/font/lucm/unicode.9.font`).
+Many users typically use a proportional-width main font and a
+fixed-width alternate font.
 
 The following options can be specified when running the `acme` command
 to change the main or alternate fonts:
@@ -122,20 +124,21 @@ to change the main or alternate fonts:
 - `-f /path/to/main/font` to set the main font.
 - `-F /path/to/alt/font` to set the alternative font.
 
-The font paths can either be mount points created via `fontsrv` (these
-have a path `/mnt/font/<FONTNAME>/<SIZE>/font` where `<FONTNAME>` is a
-font listed in `9p ls font` and `<SIZE>` is the size of the font with
-an `a` suffix to use the anti-aliased version) or a file in the Plan 9
-install. Example of running Acme with different fonts:
+Example of running Acme with different fonts:
 
 ```shell
-acme -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
+acme -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font
 ```
 
-Fonts can also be changed for a given Acme window by running the
-`Font` command in that window. Running `Font` by itself toggles
-between the main and alternate fonts, and `Font /path/to/font` loads
+Fonts can also be changed for a given Acme window by executing the
+`Font` command in that window. Executing `Font` by itself toggles
+between the main and alternate fonts. Executing with a font presented
+by Plan 9 as an argument as in `Font /path/to/presented/font` loads
 the specified font.
+
+See the _Fonts_ section for more information on Plan 9 fonts and how
+they are presented as files in Plan 9 either normally (Plan 9 bitmap
+fonts) with `fontsrv` (host system vector fonts).
 
 ### Saving and loading sessions
 
@@ -308,8 +311,13 @@ high network latency.
 
 ## Fonts
 
-plan9port comes with the Plan9 fonts, which are in the `$PLAN9/fonts`
-directory.
+plan9port comes with the Plan9 bitmap fonts, which are in the
+`$PLAN9/font` directory. When using Plan 9 programs, these are
+presented at the paths `/lib/font/bit/NAME/RANGE.SIZE.font` where
+`NAME`, `RANGE` and `SIZE` should match that of some font in
+`$PLAN9/font/`. For example, `$PLAN9/font/lucsans/unicode.10.font` is
+presented `/lib/font/bit/lucsans/unicode.10.font` for use by Plan 9
+programs. See `9 man font` for more information.
 
 Fonts from the host system can also be used via `fontsrv`, which makes
 those fonts accessible in the Plan 9 format at a given mountpoint

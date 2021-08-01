@@ -36,7 +36,7 @@
 #        startparams="-c 1 $HOME/.acme/start"
 #    fi
 #    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc \
-#        -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font \
+#        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
 #        $startparams
 
 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc "$@"
