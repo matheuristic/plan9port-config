@@ -87,10 +87,11 @@ This will create the symlinks:
 `rc.sh`. Copy contents to `~/.local/bin/sam.sh`, modify as needed.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
-Create a directory utilized by the autosave script.
+Create directories utilized by the autosave and launcher scripts.
 
 ```shell
 mkdir -p $HOME/.acme/autosave
+mkdir -p $HOME/.acme/dump
 ```
 
 Copy `sample-acme.sh` to `~/.local/bin/acme.sh` which can be modified
@@ -147,11 +148,19 @@ and load sessions when in Acme. If a path is not provided, the dump
 path defaults to `~/acme.dump`.
 
 Acme can be launched with the `-l /path/to/dump/file` option to load a
-specific session dump file on startup. Example
+specific session dump file on startup. Example:
 
 ```shell
 acme -l /path/to/project/acme.dump
 ```
+
+If `stow` was used to symlink the base configuration files, launching
+via `~/.local/bin/acme.rc` will load, if it exists, the dump file
+`~/.acme/dump/%NAMESPACE%/acme.dump` where `%NAMESPACE%` is the
+current namespace with slashes replaced by percents. This
+functionality requires the `~/.acme/dump/` folder exist, which is true
+if the install instructions above were used. Note that the
+`%NAMESPACE%` subfolder is automatically created when launching.
 
 ### Autosaving
 
