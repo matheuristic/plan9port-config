@@ -309,6 +309,11 @@ high network latency.
 
 **TODO**: Plumber setup
 
+- `plumber` to start Plumber
+- `cat /path/to/plumbing | 9p write plumb/rules` to update rules
+- See `9 man 7 plumb`
+- See `9 man 1 9p`
+
 ## Fonts
 
 plan9port comes with the Plan9 bitmap fonts, which are in the
@@ -317,7 +322,9 @@ presented at the paths `/lib/font/bit/NAME/RANGE.SIZE.font` where
 `NAME`, `RANGE` and `SIZE` should match that of some font in
 `$PLAN9/font/`. For example, `$PLAN9/font/lucsans/unicode.10.font` is
 presented `/lib/font/bit/lucsans/unicode.10.font` for use by Plan 9
-programs. See `9 man font` for more information.
+programs. Generally, either the real filesystem path or the path
+presented by the Plan 9 system can be used to specify a Plan 9 bitmap
+font. See `9 man font` for more information.
 
 Fonts from the host system can also be used via `fontsrv`, which makes
 those fonts accessible in the Plan 9 format at a given mountpoint
@@ -339,7 +346,7 @@ the font, and where the font is anti-aliased if `SIZE` is suffixed
 with an `a` or non-anti-aliased if it is not. For example, the font
 presented by `fontsrv` at path `/mnt/font/Iosevka/20a/font` is
 [Iosevka](https://github.com/be5invis/Iosevka) font, Regular weight,
-at point size 20 and anti-aliased.
+at point size 20 and anti-aliased. See `9 man fontsrv` for more info.
 
 Several programs, like Sam, use the `$font` variable to determine
 which font to use.
