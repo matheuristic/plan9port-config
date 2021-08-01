@@ -298,12 +298,7 @@ can interact with it. Seems buggy at the moment on macOS
   root directory or in a specific directory like `~/.acme/dump/` where
   all dump files across projects are consolidated. When working with
   Git-controlled projects, it is recommended to do the latter to avoid
-  polluting the Git repository with data that is machine-local.
-
-  ```shell
-  mkdir -p $HOME/.acme/dump
-  ```
-
+  polluting the Git repository with machine-local data.
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
 
