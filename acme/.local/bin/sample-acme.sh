@@ -14,7 +14,7 @@
 #    $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc $startparams
 #
 # The following code simplifies launching multiple Acme instances, enabling the
-# script to take an optional '-n N' flag for launching Acme in the N-th
+# script to take an optional '-n N' flag that launches Acme in a
 # "sub-namespace" /tmp/ns.$USER.$DISPLAY-N (note that the -n flag must
 # be the first option specified when running the script).
 #    if [ "$1" = "-n" ]; then
@@ -22,8 +22,8 @@
 #        mkdir -p "$NAMESPACE"
 #        shift; shift
 #    fi
-# For example, calling 'acme.sh -n 1' launches an Acme instance in the
-# /tmp/ns.$USER.$DISPLAY-1 namespace.
+# For example, calling 'acme.sh -n myproject' launches an Acme instance in the
+# /tmp/ns.$USER.$DISPLAY-myproject namespace.
 #
 # Example script code incorporating the above.
 #    if [ "$1" = "-n" ]; then
