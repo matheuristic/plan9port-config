@@ -1,15 +1,18 @@
 #!/usr/bin/env sh
 
-# Sample wrapper file to launch Acme from environments without the Plan 9 bin
-# directory in their search path. It is recommended to copy this file to
-# ~/.local/bin/acme.sh and configure the launch command with the desired
-# default settings.
+# Sample wrapper file to launch Acme from environments without the Plan 9 from
+# User Space (i.e., plan9port) bin directory in their search path. It is
+# recommended to copy this file to ~/.local/bin/acme.sh for customization with
+# the desired default settings, and to launch Acme with it.
 #
 # The following code is an example of how to modify this script to launch into
 # a start file if no extra options are specified when calling this script.
 #    startparams="$@"
-#    if [ "$startparams" = "" ]; then
-#        startparams="-c 1 $HOME/.acme/start"
+#    startfile=$HOME/.acme/start
+#    if [ "$startparams" = "" -a -f "$startfile" ]; then
+#        startparams="-c 1 $startfile"
+#    else
+#        echo "Start file does not exist, skipping load: $startfile" 1>&2
 #    fi
 #    $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc $startparams
 #
@@ -32,8 +35,11 @@
 #        shift; shift
 #    fi
 #    startparams="$@"
-#    if [ "$startparams" = "" ]; then
-#        startparams="-c 1 $HOME/.acme/start"
+#    startfile=$HOME/.acme/start
+#    if [ "$startparams" = "" -a -f "$startfile" ]; then
+#        startparams="-c 1 $startfile"
+#    else
+#        echo "Start file does not exist, skipping load: $startfile" 1>&2
 #    fi
 #    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc \
 #        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
