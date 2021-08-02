@@ -416,7 +416,8 @@ macOS has a few additional keybindings:
 
 1. Install [Platypus.app](https://github.com/sveinbjornt/Platypus) for
    creating macOS apps from command-line programs.
-2. Open Platypus.app and create an app for launching Acme with the settings:
+2. Open Platypus.app and configure an app for launching Acme with the
+   following settings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
    - **Script Path**: Path to some Acme launcher script (e.g.
@@ -430,7 +431,14 @@ macOS has a few additional keybindings:
      - `[ ]` Remain running after execution
    - **Icon**: Set to the `spaceglenda.icns` file in the `$PLAN9/mac/`
      directory
-3. Move the generated application to the `/Applications` folder
+3. Click _Create App_ to bring up a save to file dialog, make sure
+   that "Create symlink to script and bundled files" is unchecked,
+   select the destination folder, modify the application name as
+   needed, and click _Create_ to create the application
+4. Move the generated application to the `/Applications` folder
+5. Drag the application from the `/Applications` folder to the dock to
+   keep it in the dock (this is a launcher app, different from the
+   launched app which is a `drawterm` app running Acme)
 
 ### macOS tips
 
