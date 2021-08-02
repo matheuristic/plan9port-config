@@ -294,11 +294,11 @@ can interact with it. Seems buggy at the moment on macOS
 - Create project-specific dump files so it is easy to save and load
   work sessions. The corresponding `Dump` and `Load` commands (with
   the appropriate dump file path) can be added to that project's guide
-  file or to the main Acme tag. These can either be in the project's
-  root directory or in a specific directory like `~/.acme/dump/` where
-  all dump files across projects are consolidated. When working with
-  Git-controlled projects, it is recommended to do the latter to avoid
-  polluting the Git repository with machine-local data.
+  file or to the main Acme tag. It is recommended to store dump files
+  either in the project directory or in a separate directory like
+  `~/.acme/dump/` that consolidates dump files across projects. When
+  working with Git-controlled projects, the latter is better as it
+  avoids polluting the Git repository with machine-local data.
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
 
@@ -311,12 +311,19 @@ high network latency.
 
 ## Plumber
 
-**TODO**: Plumber setup
+**TODO**: Expand section, create sample `plumbing` file
 
-- `plumber` to start Plumber
-- `cat /path/to/plumbing | 9p write plumb/rules` to update rules
+- Plumbing is a message passing mechanism in Plan 9, and Plumber
+  performs the message processing and dispatch
+- Run `plumber` to start Plumber
+- Run `cat /path/to/plumbing | 9p write plumb/rules` to update rules
 - See `9 man 7 plumb`
 - See `9 man 1 9p`
+- Some plumbing examples
+  - [Plan 9 Wiki](https://9p.io/wiki/plan9/plumbing_examples/index.html)
+  - [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
+  - [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
+  - [Plan 9 Desktop Guide > Basics > Plumbing](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html#plumbing)
 
 ## Fonts
 
