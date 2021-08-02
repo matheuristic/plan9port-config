@@ -328,14 +328,19 @@ high network latency.
 ## Fonts
 
 plan9port comes with the Plan9 bitmap fonts, which are in the
-`$PLAN9/font` directory. When using Plan 9 programs, these are
-presented at the paths `/lib/font/bit/NAME/RANGE.SIZE.font` where
-`NAME`, `RANGE` and `SIZE` should match that of some font in
-`$PLAN9/font/`. For example, `$PLAN9/font/lucsans/unicode.10.font` is
-presented `/lib/font/bit/lucsans/unicode.10.font` for use by Plan 9
-programs. Generally, either the real filesystem path or the path
-presented by the Plan 9 system can be used to specify a Plan 9 bitmap
-font. See `9 man font` for more information.
+`$PLAN9/font` directory. For backwards-compatibility with Plan 9
+scripts, plan9port automatically translates paths beginning with
+`/lib/font/bit` to paths `$PLAN9/font`. Font paths typically follow
+the convention `$PLAN9/font/NAME/RANGE.SIZE.font` or
+`/lib/font/bit/NAME/RANGE.SIZE.font` where `NAME` is some name for the
+font, `RANGE` gives an indication of the available characters and
+`SIZE` is the approximate height of the font in pixels. For example,
+`$PLAN9/font/lucsans/unicode.10.font` or
+`/lib/font/bit/lucsans/unicode.10.font` is the `lucsans` font for the
+Unicode character set at a size of around 10 pixels high. Generally,
+either the real filesystem path or backwards-compatible Plan 9 path
+can be used to specify a Plan 9 bitmap font. See `9 man font` for more
+information.
 
 Fonts from the host system can also be used via `fontsrv`, which makes
 those fonts accessible in the Plan 9 format at a given mountpoint
