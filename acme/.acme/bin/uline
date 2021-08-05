@@ -1,0 +1,10 @@
+#!/usr/bin/env rc
+
+# Underline STDIN or piped text with argument character (default is '-')
+
+ulinechar=$1
+if(~ $#ulinechar 0) ulinechar='-'
+
+ulinechar=`{echo $ulinechar | sed -e 's/"/\\"/g'} # escape double-quotes
+
+9 awk '{print;gsub(/./,"'^$ulinechar^'");print}'
