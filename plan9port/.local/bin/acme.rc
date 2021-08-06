@@ -106,8 +106,5 @@ if (test -x $acmeautosavebin) {
   if (~ $#s 0) $acmeautosavebin `{namespace} &
 }
 
-# This seems to help with some random stalls when starting up Acme
-sleep 0.1
-
 # Run Acme text editor with command line params
 acme $loaddump $*

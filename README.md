@@ -69,9 +69,7 @@ the base configuration files and helper scripts to the corresponding
 user config locations.
 
 ```shell
-stow -t $HOME --no-folding acme
-stow -t $HOME --no-folding rc
-stow -t $HOME --no-folding sam
+stow -t $HOME --no-folding plan9port
 ```
 
 This will create the symlinks:
