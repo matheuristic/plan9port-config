@@ -102,9 +102,10 @@ fn getprocs {
 # so as to disambiguate the namespace of each acmeautosave.rc process
 acmeautosavebin=$home/.local/bin/acmeautosave.rc
 if (test -x $acmeautosavebin) {
-  s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}}
-  if (~ $#s 0) $acmeautosavebin `{namespace} &
+  s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}} {
+    if (~ $#s 0) $acmeautosavebin `{namespace} &
+  }
 }
 
 # Run Acme text editor with command line params
-acme $loaddump $*
+acme $*

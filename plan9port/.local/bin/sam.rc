@@ -14,11 +14,9 @@
 #    font=/mnt/font/GoMono/16a/font sam.rc
 
 # Run only a single instance of plumber
-p=`{pgrep plumber}
-if (~ $#p 0) plumber
+9p stat plumb >[2]/dev/null >[1=2] || 9 plumber
 
 # Run only a single instance of fontsrv
-f=`{pgrep fontsrv}
-if (~ $#f 0) fontsrv &
+9p stat font >[2]/dev/null >[1=2] || 9 fontsrv &
 
 sam $*
