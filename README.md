@@ -126,7 +126,7 @@ to change the main or alternate fonts:
 Example of running Acme with different fonts:
 
 ```shell
-acme -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font
+acme -f 2*/lib/font/bit/pelm/unicode.8.font -F /mnt/font/GoMono/20a/font
 ```
 
 Fonts can also be changed for a given Acme window by executing the
@@ -279,6 +279,7 @@ can interact with it. Seems buggy at the moment on macOS
   
   # Bookmarks
   
+  /path/to/guide
   /path/to/folder1/
   /path/to/folder2/
   /path/to/file1
@@ -305,13 +306,13 @@ can interact with it. Seems buggy at the moment on macOS
   can be aliased, e.g. for Bash
 
   ```shell
-  alias a='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/20a/font -F /mnt/font/GoMono/20a/font'
+  alias a='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font'
   ```
 
   or for rc
 
   ```shell
-  fn a { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/20a/font -F /mnt/font/GoMono/20a/font }
+  fn a { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font }
   ```
 
 ## Sam
@@ -424,6 +425,26 @@ which font to use.
 Acme also supports specification of the main and alternate font when
 running its binary from the command line via the `-f` (main font) and
 `-F` (alternate font) flags, illustrated in an earlier section.
+
+Notes:
+
+- If the specified font has format `SCALE*FONT` where `SCALE` is some
+  integer, `FONT` is used scaled by pixel repetition. This can be
+  helpful for high DPI Linux systems where fonts are not automatically
+  scaled (unliked in macOS, where they are). Example:
+
+  ```shell
+  acme -f 2*/lib/font/bit/lucsans/unicode.8.font
+  ```
+
+- If the specified font has the format FONT1,FONT2 then FONT1 is used
+  on low DPI screens and FONT2 is used on high DPI screens. This is
+  useful in multi-screen environments where some screens are high DPI
+  while other screens are low DPI. Example:
+
+  ```shell
+  acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
+  ```
 
 ## Keyboard bindings
 
