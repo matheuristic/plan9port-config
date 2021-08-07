@@ -79,10 +79,8 @@ This will create the symlinks:
   path by default.
 - `~/.local/bin/acme.rc`: Launcher for Acme.
 - `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows in Acme.
-- `~/.local/bin/sample-acme.sh`: Sample wrapper to run `acme.rc` via
-  `rc.sh`.
-- `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
-`rc.sh`. Copy contents to `~/.local/bin/sam.sh`, modify as needed.
+- `~/.local/bin/sample-a.sh`: Sample wrapper to run `acme.rc` via `rc.sh`.
+- `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
 Create directory used by the autosave script.
@@ -91,14 +89,17 @@ Create directory used by the autosave script.
 mkdir -p $HOME/.acme/autosave
 ```
 
-Copy `sample-acme.sh` to `~/.local/bin/acme.sh` which can be modified
-to create a customized launcher for Acme.
+Copy `sample-a.sh` and `sample-sam.sh` to `~/.local/bin/a.sh` and
+`~/.local/bin/sam.sh` and modify them to create customized launchers
+for Acme and Sam.
 
 ```shell
-cp acme/.local/bin/sample-acme.sh $HOME/.local/bin/acme.sh
+cp plan9port/.local/bin/sample-a.sh $HOME/.local/bin/a.sh
+cp plan9port/.local/bin/sample.sam.sh $HOME/.local/bin/sam.sh
 ```
 
-Edit `~/.local/bin/acme.sh` to customize the launcher as desired.
+Edit `~/.local/bin/a.sh` and `~/.local/bin/sam.sh` to customize the
+launchers as desired.
 
 ## Acme
 
@@ -217,6 +218,8 @@ there are a number of helper scripts available at `~/.acme/bin`:
   other than the default round parentheses `(` and `)`.
 - `t2s`: Replaces tabs with spaces. Specify an argument to change the
   number of spaces to a tab from the default of `$tabwidth`.
+- `uline`: Underline text selection. Specify an argument to change
+  the character for underlining from the default of '-'.
 - `upper`: Uppercase text selection.
 - `w+`: Wrap (format text so each line is under some width in chars),
   specify an arg for a width other than the default of `70`.
@@ -261,7 +264,7 @@ can interact with it. Seems buggy at the moment on macOS
 
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
-  workspace dumps. The `sample-acme.sh` sample launcher has comments
+  workspace dumps. The `sample-a.sh` sample launcher has comments
   showing how a launcher can be set up to open this file on launch
   when no extra options are provided. An example of a start/bookmarks
   file follows.
@@ -279,7 +282,6 @@ can interact with it. Seems buggy at the moment on macOS
   /path/to/folder1/
   /path/to/folder2/
   /path/to/file1
-  /path/to/file2
   /path/to/file2
   ```
 
@@ -299,6 +301,18 @@ can interact with it. Seems buggy at the moment on macOS
   avoids polluting the Git repository with machine-local data.
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
+- Alternative launchers for Acme (e.g. loading specific fonts) from
+  can be aliased, e.g. for Bash
+
+  ```shell
+  alias a='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/20a/font -F /mnt/font/GoMono/20a/font'
+  ```
+
+  or for rc
+
+  ```shell
+  fn a { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/20a/font -F /mnt/font/GoMono/20a/font }
+  ```
 
 ## Sam
 
@@ -309,19 +323,61 @@ high network latency.
 
 ## Plumber
 
-**TODO**: Expand section, create sample `plumbing` file
+Plan 9 and plan9port has a message passing mechanism called plumbing,
+and `plumber` processes plumbed messages and does dispatching. For
+example, it is what enables Button3 (right-click) presses on compile
+errors in Acme to jump to the corresponding file and line.
 
-- Plumbing is a message passing mechanism in Plan 9, and Plumber
-  performs the message processing and dispatch
-- Run `plumber` to start Plumber
-- Run `cat /path/to/plumbing | 9p write plumb/rules` to update rules
-- See `9 man 7 plumb`
-- See `9 man 1 9p`
-- Some plumbing examples
-  - [Plan 9 Wiki](https://9p.io/wiki/plan9/plumbing_examples/index.html)
-  - [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
-  - [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
-  - [Plan 9 Desktop Guide > Basics > Plumbing](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html#plumbing)
+Plumbing rules should be specified in `$HOME/lib/plumbing`. If it does
+not exist, then the default plumbing rules are loaded from
+`$PLAN9/plumb/initial.plumbing`. An example `plumbing` file is show
+below, and it defines a plumbing rule for navigating to file locations
+in Python errors and also loads the default rules.
+
+```
+# to update: cat $HOME/lib/plumbing | 9p write plumb/rules
+
+editor = acme
+
+# python errors
+type is text
+data matches ' *File "([a-zA-Z¡-￿0-9_\-./]+)", line ([0-9]+).*'
+arg isfile $1
+data set $file
+attr add addr=$2
+plumb to edit
+plumb client $editor
+
+# include basic plumbing rules
+include basic
+```
+
+See `9 man 7 plumb` for more information about plumbing rules.
+
+`plumber` is not started by default in plan9port applications, so it
+has to be started in a launch script or manually. The rc command below
+starts `plumber` if it is not running in the current namespace.
+
+```shell
+9p stat plumb >[2]/dev/null >[1=2] || 9 plumber
+```
+
+See `9 man 4 plumber` for more information about `plumber`.
+
+Plumbing rules can be updated without restarting `plumber` via a Plan
+9 mount point (change `/path/to/plumbing` below as appropriate, e.g.
+`$home/lib/plumbing` to reload user-specific rules after an update).
+
+```shell
+cat /path/to/plumbing | 9p write plumb/rules
+```
+
+References:
+
+- [Plan 9 Wiki](https://9p.io/wiki/plan9/plumbing_examples/index.html)
+- [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
+- [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
+- [Plan 9 Desktop Guide > Basics > Plumbing](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html#plumbing)
 
 ## Fonts
 
@@ -419,7 +475,7 @@ macOS has a few additional keybindings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
    - **Script Path**: Path to some Acme launcher script (e.g.
-     `sample-acme.sh` or a customized `acme.sh` created from it),
+     `sample-a.sh` or a customized `a.sh` created from it),
      needs to be a real file and not a symlink
    - **Interface**: None
    - **Checkbox Settings**:
@@ -473,7 +529,7 @@ Unix systems have two additional keybindings:
 #### Acme freedesktop.org desktop entry specification
 
 Assume that `stow` was used above to symlink scripts and config files.
-Instructions here use the `~/.acme/bin/acme.sh` launcher script.
+Instructions here use the `~/.acme/bin/a.sh` launcher script.
 
 To create a menu item for Acme, create a scaled down version of
 `mac/spaceglenda.png` in the plan9port repository (at resolution
@@ -488,8 +544,8 @@ contents (replace `USERNAME` as appropriate).
 Name=Acme
 Comment=A text editor that is the successor of sam
 GenericName=Text Editor
-Exec=/home/USERNAME/.local/bin/acme.sh %f
-TryExec=/home/USERNAME/.local/bin/acme.sh
+Exec=/home/USERNAME/.local/bin/a.sh %f
+TryExec=/home/USERNAME/.local/bin/a.sh
 Icon=/home/USERNAME/.local/share/icons/spaceglenda240.png
 Categories=Utility;Development;TextEditor;
 Terminal=false
