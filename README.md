@@ -126,7 +126,7 @@ to change the main or alternate fonts:
 Example of running Acme with different fonts:
 
 ```shell
-acme -f 2*/lib/font/bit/pelm/unicode.8.font -F /mnt/font/GoMono/20a/font
+acme -f /lib/font/bit/pelm/unicode.13.font -F /mnt/font/GoMono/18a/font
 ```
 
 Fonts can also be changed for a given Acme window by executing the
