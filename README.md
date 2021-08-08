@@ -573,7 +573,3 @@ Terminal=false
 Type=Application
 Version=1.0
 ```
-
-Note that the above desktop entry specification file uses the Go fonts
-at a fairly large font size, which is recommended when running on a
-Linux machine with a HiDPI screen.
