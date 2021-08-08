@@ -10,10 +10,12 @@
 #
 #    startparams="$@"
 #    startfile=$HOME/.acme/start
-#    if [ "$startparams" = "" -a -f "$startfile" ]; then
-#        startparams="-c 1 $startfile"
-#    else
-#        echo "Start file does not exist, skipping load: $startfile" 1>&2
+#    if [ "$startparams" = "" ]; then
+#        if [ -f "$startfile" ]; then
+#            startparams="-c 1 $startfile"
+#        else
+#            echo "Start file does not exist, skipping load: $startfile" 1>&2
+#        fi
 #    fi
 #    $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc $startparams
 #
@@ -40,10 +42,12 @@
 #    fi
 #    startparams="$@"
 #    startfile=$HOME/.acme/start
-#    if [ "$startparams" = "" -a -f "$startfile" ]; then
-#        startparams="-c 1 $startfile"
-#    else
-#        echo "Start file does not exist, skipping load: $startfile" 1>&2
+#    if [ "$startparams" = "" ]; then
+#        if [ -f "$startfile" ]; then
+#            startparams="-c 1 $startfile"
+#        else
+#            echo "Start file does not exist, skipping load: $startfile" 1>&2
+#        fi
 #    fi
 #    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc \
 #        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \

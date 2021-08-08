@@ -4,7 +4,9 @@
 # autosave directory intermittently. Each modified file's contents are saved to
 # a file whose name is the modified file's path but with slashes replaced by
 # percent characters, in a subfolder of the autosave directory whose name
-# is the current namespace with slashes replaced by percent characters
+# is the current namespace with slashes replaced by percent characters and
+# spaces replaced by plus characters. Also, this script assumes filenames
+# do not contain newline characters
 #
 # Runtime configuration is controlled by the following environment variables
 #    acmeautosavedir - autosave directory ( default: ~/.acme/autosave )
@@ -20,6 +22,10 @@
 #    }
 
 if(~ $#acmeautosavedir 0) acmeautosavedir=$home/.acme/autosave
+if(echo $acmeautosavedir | 9 grep ' ' >[2]/dev/null >[1=2]) {
+	echo Autosave directory must not contain a space: $acmeautosavedir
+	exit 1
+}
 if(test ! -d $acmeautosavedir) {
 	echo Autosave directory does not exist: $acmeautosavedir
 	exit 1
@@ -34,17 +40,22 @@ while() {
 	if (9p ls acme >[2]/dev/null >[1=2]) {
 		# Loop over Acme buffer windows (these have number window ids)
 		for(wid in `{9p ls acme | 9 grep -e [0-9]+}) {
-			# Window tag name, i.e. the file path
-			wname=`{9p read acme/$wid/tag | 9 awk '{print $1}'}
+			# Window tag name, i.e. the file path, which comes before ' Del Snarf'
+			# Assume that filenames don't contain newline characters
+			ifs='
+' {
+				wname=`{9p read acme/$wid/tag | 9 sed -e 's/ Del Snarf.*//g'}
+			}
 			# Get filename, and filter if it matches a win window (starts with '-')
-                        # or an error output window ('+Error')
+			# or an error output window ('+Error')
 			bname=`{9 basename $wname | 9 grep -v -e '^-' | 9 grep -v -e '^\+Error$'}
 			# Get flags for if window is a directory and if window is modified
 			isdir_ismod=`{9p read acme/$wid/ctl | 9 awk '{print $4$5}'}
 			# Backup window contents if not a win window, and if not a dir and is modified
 			if ((test $#bname -ne 0) && (test $isdir_ismod == '01')) {
 				# Backup filename is the original with slashes changed to percents
-				fname=`{echo $wname | 9 sed -e 's|/|%|g'}
+				# and spaces changed to pluses
+				fname=`{echo $wname | 9 sed -e 's|/|%|g' -e 's/ /+/g'}
 				# Save contents to file
 				9p read acme/$wid/body > $autosavedestdir/$fname
 			}
