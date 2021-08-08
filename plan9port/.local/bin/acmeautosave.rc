@@ -44,7 +44,7 @@ while() {
 			# Assume that filenames don't contain newline characters
 			ifs='
 ' {
-				wname=`{9p read acme/$wid/tag | 9 sed -e 's/ Del Snarf.*//g'}
+				wname=`{9p read acme/$wid/tag | 9 awk -F' Del Snarf' '{print $1; exit}'}
 			}
 			# Get filename, and filter if it matches a win window (starts with '-')
 			# or an error output window ('+Error')
