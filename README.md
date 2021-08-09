@@ -446,13 +446,6 @@ running its binary from the command line via the `-f` (main font) and
   acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
   ```
 
-**Additional bitmap fonts in Plan 9 format**:
-
-- [LoupLobet/plan9-fonts](https://github.com/LoupLobet/plan9-fonts)
-
-- [rtrn/plan9fonts](https://github.com/rtrn/plan9fonts)
-  
-
 ## Keyboard bindings
 
 Despite the mouse-centricity of the Plan 9 system (so plan9port too),
