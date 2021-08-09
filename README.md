@@ -426,7 +426,7 @@ Acme also supports specification of the main and alternate font when
 running its binary from the command line via the `-f` (main font) and
 `-F` (alternate font) flags, illustrated in an earlier section.
 
-Notes:
+**Notes**:
 
 - If the specified font has format `SCALE*FONT` where `SCALE` is some
   integer, `FONT` is used scaled by pixel repetition. This can be
@@ -445,6 +445,13 @@ Notes:
   ```shell
   acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
   ```
+
+**Additional bitmap fonts in Plan 9 format**:
+
+- [LoupLobet/plan9-fonts](https://github.com/LoupLobet/plan9-fonts)
+
+- [rtrn/plan9fonts](https://github.com/rtrn/plan9fonts)
+  
 
 ## Keyboard bindings
 
