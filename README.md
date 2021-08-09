@@ -484,6 +484,7 @@ macOS has a few additional keybindings:
 - `Command-z`: Undo
 - `Command-Shift-z`: Redo- `Fn-Left`: Viewport to start of buffer
 - `Fn-Right`: Viewport to end of buffer
+- `Command-r`: Toggle between low DPI and high DPI screen rendering
 
 ### macOS dock icons
 
@@ -521,6 +522,14 @@ macOS has a few additional keybindings:
   of how to set up acme-lsp for Acme on macOS. One nice config part is
   using the hotkey daemon [skhd](https://github.com/koekeishiya/skhd)
   to create Acme-specific keyboard shortcuts to run acme-lsp commands.
+
+- Any required font scaling is detected from window properties
+  (specifically from the value of
+  [backingScaleFactor](https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor))
+  so high-density (e.g. Retina) screens are handled automatically in
+  macOS. Bitmap fonts are scaled by pixel-doubling so they can get
+  jaggy. Therefore, it can be better to use vector fonts presented
+  using `fontsrv` as those are instead scaled by doubling font size.
 
 ## Unix notes
 
