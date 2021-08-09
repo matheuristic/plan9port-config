@@ -25,7 +25,7 @@
 # -n flag must be the first option specified when running the script).
 #
 #    if [ "$1" = "-n" ]; then
-#        export NAMESPACE=/tmp/ns.$USER.$DISPLAY-$2
+#        export NAMESPACE=/tmp/ns.$USER.${DISPLAY-:":0"}-$2
 #        mkdir -p "$NAMESPACE"
 #        shift; shift
 #    fi
@@ -36,7 +36,7 @@
 # Example script code incorporating all elements above.
 #
 #    if [ "$1" = "-n" ]; then
-#        export NAMESPACE=/tmp/ns.$USER.$DISPLAY-$2
+#        export NAMESPACE=/tmp/ns.$USER.${DISPLAY-:":0"}-$2
 #        mkdir -p "$NAMESPACE"
 #        shift; shift
 #    fi
