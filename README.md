@@ -227,12 +227,41 @@ there are a number of helper scripts available at `~/.acme/bin`:
 
 ### Optional tools
 
-- [acme-lsp](https://github.com/fhs/acme-lsp): [Language Server
+- [acme-lsp](https://github.com/fhs/acme-lsp):
+  [Language Server
   Protocol](https://microsoft.github.io/language-server-protocol/)
-  client.
+  client. See its website for how to configure it and use it with LSP
+  servers. Install acme-lsp with:
+
+  ```shell
+  GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/acme-lsp@latest
+  GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/L@latest
+  ```
+
 - [adir](https://github.com/lewis-weinberger/adir) or
   [Xplor](https://git.sr.ht/~mkhl/xplor): Tree-style file explorer for
   Acme.
+
+- [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch):
+  Runs a given command each time any file in the current directory is
+  written and send the output to an Acme window whose name is the
+  current directory with a `/+watch` suffix. Executing `Del` in this
+  new window will close the window and end the Watch process. It also
+  provides `Kill` and `Quit` commands that can be used with the
+  command run by Watch (the command is echoed in the first line of the
+  new window) to stop any Watch commands that stall. Watch is using
+  for automatically linting or running tests when files are written.
+  Install Watch with:
+
+  ```shell
+  GO111MODULE=on go get 9fans.net/go/acme/Watch@latest
+  ```
+
+  To have Watch run a command when a file in the directory of an Acme
+  window, execute `Watch [-r] cmd arg1 ...` in the window (if the `-r`
+  flag is not specified, only the current directory is watched; if the
+  `-r` flag is specified then Watch is run recursively, i.e. all
+  subdirectories are also watched).
 
 ### Using POSIX-compatible shells like Bash and Zsh with win
 
@@ -463,27 +492,27 @@ Additional notes specific to macOS systems.
 
 ### macOS bindings
 
-When the touchpad is depressed, `Ctrl` acts as Button1, `Option` acts
-as Button2 and `Command` acts as Button3. Holding a modifier while
-depressing the touchpad does the same.
+When the touchpad is depressed, `Ctrl` acts as Button1, `Option`
+acts as Button2 and `Command` acts as Button3. Holding a modifier
+while depressing the touchpad does the same.
 
 - `Ctrl-Click`: Button1
 - `Option-Click`: Button2
 - `Command-Click`: Button3
-- `Click-hold` then `Option`: 1-2 chord
-- `Click-hold` then `Command`: 1-3 chord
-- `Option-Click` then `Ctrl`: 2-1 chord
-- `Option-Click` then `Command`: Do nothing
-- `Command-Click` then `Option`: Do nothing
+- `Click-hold` then `Option`: 1-2 chord (Acme)
+- `Click-hold` then `Command`: 1-3 chord (Acme)
+- `Option-Click-hold` then `Ctrl`: 2-1 chord (Acme)
+- `Option-Click-hold` then `Command`: Do nothing (Acme)
+- `Command-Click-hold` then `Option`: Do nothing (Acme)
+- `Command-Click-hold` then `Ctrl`: Do nothing (Acme)
 
-macOS has a few additional keybindings:
+On macOS, there are also additional keybindings:
 
 - `Command-c`: Copy/Snarf
 - `Command-v`: Paste
 - `Command-x`: Cut
-- `Command-z`: Undo
-- `Command-Shift-z`: Redo- `Fn-Left`: Viewport to start of buffer
-- `Fn-Right`: Viewport to end of buffer
+- `Command-z`: Undo (Acme)
+- `Command-Shift-z`: Redo (Acme)
 - `Command-r`: Toggle between low DPI and high DPI screen rendering
 
 ### macOS dock icons
@@ -537,22 +566,17 @@ Additional notes specific to Unix systems.
 
 ### Unix bindings
 
-When the touchpad is depressed, `Ctrl` acts as Button2, `Alt` acts
-as Button3 and `Command` acts as Button3. Holding a modifier while
+When the touchpad is depressed, `Ctrl` acts as Button2, `Alt` acts as
+Button3 and `Command` acts as Button3. Holding a modifier while
 depressing the touchpad does the same. Note that 2-1 chords are not
 possible in *nix system without a mouse.
 
 - `Ctrl-Click`: Button2
 - `Alt-Click`: Button3
-- `Click-hold` then `Ctrl`: 1-2 chord
-- `Click-hold` then `Alt`: 1-3 chord
-- `Ctrl-Click` then `Alt`: Do nothing
-- `Alt-Click` then `Ctrl`: Do nothing
-
-Unix systems have two additional keybindings:
-
-- `Super-Left`: Viewport to start of buffer
-- `Super-Right`: Viewport to end of buffer
+- `Click-hold` then `Ctrl`: 1-2 chord (Acme)
+- `Click-hold` then `Alt`: 1-3 chord (Acme)
+- `Ctrl-Click-hold` then `Alt`: Do nothing (Acme)
+- `Alt-Click-hold` then `Ctrl`: Do nothing (Acme)
 
 ### Unix desktop icons
 
