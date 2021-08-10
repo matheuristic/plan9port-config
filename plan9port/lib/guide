@@ -74,6 +74,11 @@ rg --files|rg REGEXP    (find files with filename matching REGEXP using ripgrep)
 :,                      (Select all lines in buffer)
 :1,8                    (Select lines 1--8 in buffer)
 
+FILENAME:+/REGEXP       (find next occurrence of REGEXP in FILENAME)
+FILENAME:/REGEXP1/,/REGEXP2/
+                        (select region in FILENAME that begins at next REGEXP1
+                        and ends after the following REGEXP2)
+
 ---
 
 ## Unicode
