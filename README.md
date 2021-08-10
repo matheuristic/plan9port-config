@@ -169,9 +169,15 @@ namespace `/tmp/ns.someuser.:0`, autosaves are written into the
 
 ### Guide file
 
+Guide files are text files that contain sample commands for invoking
+commands. When appropriate, the proper command can be looked up from a
+guide file, copied and/or edited as needed, and executed. It is common
+practice to keep a guide file open in a smaller side column window so
+commands that commonly used can be accessed readily.
+
 If `stow` was used to symlink the base configuration files, a master
-guide file will be available at `~/.acme/guide` containing a number of
-useful commands and examples.
+guide file will be available at `~/.acme/guide` containing a wide
+array of commands and examples.
 
 ### Helper scripts
 
@@ -560,7 +566,7 @@ On macOS, there are also additional keybindings:
   jaggy. Therefore, it can be better to use vector fonts presented
   using `fontsrv` as those are instead scaled by doubling font size.
 
-## Unix notes
+## Unix
 
 Additional notes specific to Unix systems.
 
