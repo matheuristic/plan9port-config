@@ -164,3 +164,13 @@ pandoc -o /tmp/markdown-preview.html $% && { xdg-open /tmp/markdown-preview.html
                          (compile current markdown file to html and preview it in reader, Linux or macOS)
 bash -c '. $home/.nvm/nvm.sh && markdownlint '^$%^' && echo "No warnings or errors"'
                          (lint current markdown file)
+
+---
+
+## Other
+
+- Watch commands require the Go 9fans.net/go/acme/Watch package be installed
+
+Watch [-r] COMMAND [ARG1] ...
+                         (watch current dir and run COMMAND with args when
+                          files are written, add -r for recursive watch)
