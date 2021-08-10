@@ -14,7 +14,7 @@ Most of this configuration will be built around
 the two Plan 9 text editors.
 
 The shell commands here are for a POSIX-compatible shell or similar
-(e.g. Bash or ZSH).
+(e.g. Bash or Zsh).
 
 ## Installing plan9port and configuring it
 
@@ -167,7 +167,7 @@ percents. For example, when Acme and the autosave script run in
 namespace `/tmp/ns.someuser.:0`, autosaves are written into the
 `~/.acme/autosave/%tmp%ns.someuser.:0/` directory.
 
-### Guide file
+### Guide files
 
 Guide files are text files that contain sample commands for invoking
 commands. When appropriate, the proper command can be looked up from a
@@ -245,8 +245,8 @@ there are a number of helper scripts available at `~/.acme/bin`:
   ```
 
 - [adir](https://github.com/lewis-weinberger/adir) or
-  [Xplor](https://git.sr.ht/~mkhl/xplor): Tree-style file explorer for
-  Acme.
+  [Xplor](https://git.sr.ht/~mkhl/xplor):
+  Tree-style file explorer for Acme.
 
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch):
   Runs a given command each time any file in the current directory is
@@ -337,17 +337,18 @@ can interact with it. Seems buggy at the moment on macOS
   avoids polluting the Git repository with machine-local data.
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
-- Alternative launchers for Acme (e.g. loading specific fonts) from
-  can be aliased, e.g. for Bash
+- Alternative command-line launchers for Acme (e.g. ones that use
+  specific fonts or loads a given dump file) can be created as
+  aliases, e.g. for Bash
 
   ```shell
-  alias a='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font'
+  alias aproj='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
   ```
 
   or for rc
 
   ```shell
-  fn a { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font }
+  fn aproj { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump }
   ```
 
 ## Sam
