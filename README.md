@@ -244,9 +244,20 @@ there are a number of helper scripts available at `~/.acme/bin`:
   GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
-- [adir](https://github.com/lewis-weinberger/adir) or
-  [Xplor](https://git.sr.ht/~mkhl/xplor):
-  Tree-style file explorer for Acme.
+- [adir](https://github.com/lewis-weinberger/adir):
+  Tree-style file explorer for Acme. Assuming `$PLAN9` and `mk` are
+  on the system path, install adir with:
+
+  ```shell
+  git clone https://github.com/lewis-weinberger/adir.git
+  cd adir
+  mk install BIN=$home/.acme/bin
+  ```
+
+  No need to specify `BIN=$home/.acme/bin` if installing to `$PLAN9/bin`.
+  Alternatives are
+  [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree)
+  and [xplor](https://git.sr.ht/~mkhl/xplor).
 
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch):
   Runs a given command each time any file in the current directory is
