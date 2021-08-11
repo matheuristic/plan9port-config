@@ -1,0 +1,23 @@
+#!/usr/bin/env rc
+
+# Get Plan 9 subf font converted from vector fonts via fontsrv, all available sizes
+# This uses subf_get_1_size.rc (the single size version of this script) so make sure
+# that it is on the system path
+# Source: https://9fans.topicbox.com/groups/9fans/Td0ab6c3112c95493-M4b945fa58f69efff23098167/whats-the-default-font-in-acme
+
+if(test $#* -ne 1) {
+	echo usage: $0 FONTNAME
+	echo example: $0 DejaVuSans-Bold
+	exit 1
+}
+
+ifs='
+'
+name = $1
+sizedirs = `{fontsrv -p $name}
+if(! ~ $status '') exit
+
+for(dir in $sizedirs) {
+	echo $dir >[1=2]
+	subf_get_1_size.rc $1 $dir
+}
