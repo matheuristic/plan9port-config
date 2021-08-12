@@ -103,7 +103,7 @@ uni e DESCRIPTION       (print emoji matching DESCRIPTION)
 
 ---
 
-## Other
+## Automation
 
 - Watch command requires Go 9fans.net/go/acme/Watch be installed
 
