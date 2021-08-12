@@ -6,14 +6,14 @@
   - BOLD are args that should be replaced with the appropriate string
   - [SQUAREBRACKETED] args are optional
   - ... indicate multiple args can be provided
-- Sam commands begin with Edit, e.g. Edit =
-  - See the Sam manpage for more info or Sam cheatsheet for idioms
-    https://9fans.github.io/plan9port/man/man1/sam.html
-    http://sam.cat-v.org/cheatsheet/
 - Commands starting with : are run with Button3 (right-click, plumb)
   instead of the regular Button2 (middle-click, execute)
 - When right-clicking on symbols that don't match a plumbing rule,
   a forward search is done in that window using that symbol
+- Sam commands begin with Edit, e.g. Edit =
+  - See the Sam manpage for more info or Sam cheatsheet for idioms
+    https://9fans.github.io/plan9port/man/man1/sam.html
+    http://sam.cat-v.org/cheatsheet/
 - Wrap the commands in parentheses to make them selectable by
   double-clicking just to the right of the left parenthesis, e.g.
   (Edit =)
@@ -23,7 +23,9 @@
 ## Editing
 
 - Some commands below use scripts from ~/.acme/bin
-- rg (and the ~/.acme/bin/rg+) script assume ripgrep is installed
+- rg (and the ~/.acme/bin/rg+) script require ripgrep be installed
+- fzf commands require the corresponding command be installed
+  - Binaries availabe at https://github.com/junegunn/fzf
 - uni commands require the corresponding command be installed
   - Binaries available at https://github.com/arp242/uni
 
@@ -41,10 +43,14 @@ FILENAME:/REGEXP1/,/REGEXP2/
                         (select region in FILENAME that begins at next
                          REGEXP1 and ends after the following REGEXP2)
 
-rg+ REGEXP              (find lines in current dirtree files matching
-                         REGEXP using ripgrep)
-rg --files|rg REGEXP    (find files with filename matching REGEXP
+rg+ REGEXP              (find lines matching REGEXP in files within
+                         the current dirtree using ripgrep)
+rg --files --hidden|rg REGEXP
+                        (find files with filename matching REGEXP
                          using ripgrep)
+9 du -a|9 awk '{print $2}'|fzf -f QUERY
+                        (find files in current dirtree whose names
+                         fuzzy match QUERY using fzf)
 
 Edit =                  (current line number)
 Edit ,d                 (clear window contents)
@@ -78,10 +84,15 @@ Edit ,|sort -r          (reverse sort all lines in window)
 Edit 0<date             (insert date at start of window)
 Edit x/ˆ/ .,/0d         (remove C comments from selection)
 Edit ,|dtw              (delete trailing whitespace like spaces/tabs)
+Edit ,|grep -n '.*'     (add line numbers, after which executing Undo
+                         will remove the added line numbers)
 Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
-                        (add line numbers, change 4 to another number
-                         N to set starting column of original text to
-                         N+1; execute Undo to remove the line numbers)
+                        (add line numbers with nicer formatting, where
+                         the original text starts at column 6, after
+                         which executing Undo will remove the added
+                         line numbers; changing 4 in %4s to another
+                         number N will set the starting column of the
+                         original text to N+2 instead)
 
 |c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
 |c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')

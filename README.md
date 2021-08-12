@@ -320,8 +320,8 @@ can interact with it. Seems buggy at the moment on macOS
   
   # Project workspaces
   
-  Load /path/to/project1.dump
-  Load /path/to/project2.dump
+  (Load /path/to/project1.dump)
+  (Load /path/to/project2.dump)
   
   # Bookmarks
   
