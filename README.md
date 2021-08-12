@@ -308,6 +308,14 @@ can interact with it. Seems buggy at the moment on macOS
 
 ### Usage tips
 
+- Wrapping commands in parentheses to make them more easily selectable
+  by double-clicking just to the right of the left parenthesis. Useful
+  for easy selection of commands with spaces. For example:
+
+  ```shell
+  (Load /path/to/project.dump)
+  ```
+
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
   workspace dumps. The `sample-a.sh` sample launcher has comments
