@@ -322,7 +322,7 @@ acme -m /tmp/acme
 ```
 
 For more information on Acme mounting and macOS, see the following
-([Github issue](https://github.com/9fans/plan9port/issues/136)).
+[Github issue](https://github.com/9fans/plan9port/issues/136).
 
 ### Usage tips
 
@@ -519,6 +519,11 @@ running its binary from the command line via the `-f` (main font) and
   ```shell
   acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
   ```
+
+- On slower machines, using vector fonts can be slow when rendering
+  many unicode characters outside the basic plane on screen. As a
+  workaround, see the `fontscripts` folder for scripts that leverage
+  `fontsrv` to convert vector fonts to Plan 9 subf format.
 
 ## Keyboard bindings
 
