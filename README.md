@@ -308,9 +308,10 @@ can interact with it. Seems buggy at the moment on macOS
 
 ### Usage tips
 
-- Wrapping commands in parentheses to make them more easily selectable
-  by double-clicking just to the right of the left parenthesis. Useful
-  for easy selection of commands with spaces. For example:
+- Wrap a command with parentheses to make it selectable by
+  double-clicking (Button1 twice) just to the right of the left
+  parenthesis. Useful for easy selection of commands containing
+  spaces. For example:
 
   ```shell
   (Load /path/to/project.dump)
