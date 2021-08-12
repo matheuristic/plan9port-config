@@ -300,11 +300,29 @@ fi
 
 ### FUSE
 
-**TODO**: General overview of the experimental `-m` option to have
-FUSE mount itself at the given mountpoint so other programs that don't
-have or don't allow direct access to the shell (i.e. cannot call `9p`)
-can interact with it. Seems buggy at the moment on macOS
-([link](https://github.com/9fans/plan9port/issues/136)).
+Acme can be called with the `-m` option to have Acme use FUSE to mount
+itself at a given mountpoint. This allows other programs that don't
+have or don't allow direct shell access (i.e. cannot call `9p`) to
+interact with Acme. Example:
+
+```shell
+acme -m /path/to/mtpt
+```
+
+Note that on macOS, mounting Acme at most locations can lead to random
+spawning of empty windows. This is because `fseventsd` will scan
+mounted filesystems periodically, and in this case it reads e.g.
+`/mnt/acme/new/ctl` which spawns a new window. To avoid this, the Acme
+filesystem has to be mounted outside of `/User` with `MNT_DONTBROWSE`
+set on it. Mounting Acme at a directory in `/tmp` satisfies this, so
+mounting Acme on macOS should be done with this in mind. For example:
+
+```shell
+acme -m /tmp/acme
+```
+
+For more information on Acme mounting and macOS, see the following
+([Github issue](https://github.com/9fans/plan9port/issues/136)).
 
 ### Usage tips
 
