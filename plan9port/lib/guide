@@ -1,110 +1,129 @@
-# ~/.acme/guide - master guide file with examples
+# ~/lib/guide - master guide file with examples
 
 ## Notes
 
-- Nomenclature:
+- *Nomenclature*:
   - BOLD are args that should be replaced with the appropriate string
   - [SQUAREBRACKETED] args are optional
   - ... indicate multiple args can be provided
+- Sam commands begin with Edit, e.g. Edit =
+  - See the Sam manpage for more info or Sam cheatsheet for idioms
+    https://9fans.github.io/plan9port/man/man1/sam.html
+    http://sam.cat-v.org/cheatsheet/
+- Commands starting with : are run with Button3 (right-click, plumb)
+  instead of the regular Button2 (middle-click, execute)
+- When right-clicking on symbols that don't match a plumbing rule,
+  a forward search is done in that window using that symbol
 - Wrap the commands in parentheses to make them selectable by
   double-clicking just to the right of the left parenthesis, e.g.
   (Edit =)
 
 ---
 
-## Sam commands
+## Editing
 
-- Sam commands can be run in Acme by using the Edit command
-- See the Sam manpage for more information or Sam cheatsheet for idioms
-  https://9fans.github.io/plan9port/man/man1/sam.html
-  http://sam.cat-v.org/cheatsheet/
+- Some commands below use scripts from ~/.acme/bin
+- rg (and the ~/.acme/bin/rg+) script assume ripgrep is installed
+- uni commands require the corresponding command be installed
+  - Binaries available at https://github.com/arp242/uni
 
-Edit ,d                 (clear window contents)
-Edit =                  (current line number)
-Edit ,|grep -n '.*'     (add line numbers)
-Edit ,s/^[0-9]+://g     (remove line numbers)
-Edit ,|sort -r          (reverse sort all lines in file)
-Edit ,|wc -c            (count num characters in file)
-Edit 0 < date           (insert date at start of file)
-Edit -/{/,+/}/          (select contents of current { ... } block, including the enclosing braces)
-Edit s/"([ˆ"]*)"/‘‘1’’/ (replace straight-quoted "word" with open-close quoted ‘‘word’’)
-Edit x/ˆ/ .,/0d         (remove C comments from selection)
-Edit ,x/^PREFIX/ .,/$/ s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT to each line that starts with PREFIX)
-Edit ,x/REGIONREGEXP/ s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT to each region matching REGIONREGEXP)
-Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT across the entirety of buffers matching BUFREGEXP,
-                        e.g. Edit X/.*/ ,s/xx/yy/g changes all xx occurrences to yy in all buffers)
-
----
-
-## Text manipulation
-
-- Commands require custom scripts in ~/.acme/bin
-
-|c+ [COMMENTCHAR]       (comment selection, COMMENTCHAR is # if not specified)
-|c- [COMMENTCHAR]       (uncomment selection, COMMENTCHAR is # if not specified)
-|i+ [INDENTSTRING]      (indent selection, INDENTSTRING is a single tab char if not specified)
-|i- [INDENTSTRING]      (unindent selection, INDENTSTRING is a single tab char if not specified)
-|w+ [WIDTH]             (wrap selection, WIDTH is 70 if not specified)
-|w-                     (unwrap selection / join lines)
-|upper                  (uppercase selection)
-|lower                  (lowercase selection)
-|surround [BRACKETCHAR] (surround selection, BRACKETCHAR is left paren if not specified)
-Edit ,|dtw              (delete trailing whitespace, i.e. spaces and tabs)
-
----
-
-## Search and navigation
-
-- Commands starting with : are run with Button3 (right-click, plumb)
-  instead of the regular Button2 (middle-click, execute)
-- When right-clicking on symbols that don't match a plumbing rule,
-  a forward search is done in that buffer using that symbol
-- rg+ requires custom script in ~/.acme/bin
-
-:+/REGEXP               (REGEXP search forward, right-click to run, + optional)
+:N                      (Select line N of window, N is a number >=1
+                         or $ for the last line)
+:M,N                    (Select lines M to N in window, omit M to
+                         start from the first line and omit N to end
+                         at the last line)
+:+/REGEXP               (REGEXP search forward, right-click to run,
+                         + is optional)
 :-/REGEXP               (REGEXP search backward, right-click to run)
-rg+ REGEXP              (find lines in current dirtree files matching REGEXP using ripgrep)
-rg --files|rg REGEXP    (find files with filename matching REGEXP using ripgrep)
-
-:1                      (Select first line of buffer)
-:$                      (Select last line of buffer)
-:,                      (Select all lines in buffer)
-:1,8                    (Select lines 1--8 in buffer)
-
-FILENAME:+/REGEXP       (find next occurrence of REGEXP in FILENAME)
+FILENAME:/REGEXP        (find next occurrence of REGEXP in FILENAME,
+                         also useful as bookmarks)
 FILENAME:/REGEXP1/,/REGEXP2/
-                        (select region in FILENAME that begins at next REGEXP1
-                        and ends after the following REGEXP2)
+                        (select region in FILENAME that begins at next
+                         REGEXP1 and ends after the following REGEXP2)
 
----
+rg+ REGEXP              (find lines in current dirtree files matching
+                         REGEXP using ripgrep)
+rg --files|rg REGEXP    (find files with filename matching REGEXP
+                         using ripgrep)
 
-## Unicode
+Edit =                  (current line number)
+Edit ,d                 (clear window contents)
+Edit -/{/,+/}/          (select contents of current { ... } block,
+                         including the enclosing braces)
+Edit s/"([ˆ"]*)"/“\1”/  (replace the next straight double-quoted
+                         "word" with the corresponding left-right
+                         double-quoted “word”)
+Edit .+#0/OLD/c/NEW/
+.
+                        (replace next occurrence of OLD with NEW; note
+                         that *both* lines should be selected and run,
+                         as this is two Sam commands run in sequence)
+Edit .+#0/REGEXP/s/REGEXP/REPLACEMENT/
+.
+                        (same as above but using REGEXP REPLACEMENT)
+Edit ,x/^PREFIX/ .,/$/ s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT to each line that
+                         starts with PREFIX)
+Edit ,x/REGIONREGEXP/ s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT to each region
+                         matching REGIONREGEXP)
+Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
+                        (apply REGEXP REPLACEMENT across the entirety
+                         of windows whose name match BUFREGEXP, e.g.
+                         Edit X/.*/ ,s/xx/yy/g
+                         changes xx to yy in all buffers)
 
-- Requires the uni tool be installed on the system
-  https://github.com/arp242/uni
-- The easiest way to enter unicode characters is to search by
-  description, and copy-paste the desired character
+Edit ,>9 wc -r          (count num characters or runes in window)
+Edit ,|sort -r          (reverse sort all lines in window)
+Edit 0<date             (insert date at start of window)
+Edit x/ˆ/ .,/0d         (remove C comments from selection)
+Edit ,|dtw              (delete trailing whitespace like spaces/tabs)
+Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
+                        (add line numbers, change 4 to another number
+                         N to set starting column of original text to
+                         N+1; execute Undo to remove the line numbers)
+
+|c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
+|c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')
+|i+ [INDENTSTR]         (indent text, default INDENTSTR is '\t')
+|i- [INDENTSTR]         (unindent text, default INDENTSTR is '\t')
+|w+ [WIDTH]             (wrap text, default WIDTH is 70)
+|w-                     (unwrap text / join lines)
+|upper                  (uppercase text)
+|lower                  (lowercase text)
+|surround [BRACKETCHAR] (surround text, default BRACKETCHAR is '(')
 
 >uni i `{cat}           (identify chars in a string)
-uni s DESCRIPTION       (search for unicode chars matching DESCRIPTION)
-uni p CODEPOINT         (print unicode char(s) at CODEPOINT, which can be a code like U+2042 , a
-                         range like 2042..2044 , a category like Po or a block like 'box drawing')
+uni s DESCRIPTION       (look up unicode chars matching DESCRIPTION)
+uni p CODEPOINT         (print unicode char(s) at CODEPOINT, which can
+                         be a code like U+2042 , a range like
+                         2042..2044 , a category like Po or a block
+                         like 'box drawing')
 uni e DESCRIPTION       (print emoji matching DESCRIPTION)
+
+---
+
+## Other
+
+- Watch command requires Go 9fans.net/go/acme/Watch be installed
+
+Watch [-r] COMMAND [ARG1] ...
+                         (watch current dir and run COMMAND with args
+                          when files are written, add -r for recursive
+                          watch covering all subdirectories)
 
 ---
 
 ## Slideshow
 
-- Slideshows are directories with a index file ./index and multiple text files
-  whose filenames without leading directories appear in the index file
-- There should be no empty lines in the index file and the order of the
-  filenames indicate the order of the slides
+- Slideshows are directories with a index file ./index and multiple
+  text files whose filenames without leading directories appear in
+  the index file
+- There should be no empty lines in the index file and the order of
+  the filenames indicate the order of the slides
 - Commands require custom scripts in ~/.acme/bin
 
-Slide                   (start or restart slideshow in current directory)
+Slide                   (start or restart slideshow in current dir)
 Slide+                  (next slide)
 Slide-                  (previous slide)
 
@@ -112,16 +131,16 @@ Slide-                  (previous slide)
 
 ## Git
 
-git commit -am 'COMMIT MESSAGE'
-                        (commit with the given COMMIT MESSAGE)
+git status              (current repository status)
+git diff                (show uncommitted file changes)
+git commit -am 'TEXT'   (commit with the given commit message TEXT)
 git push -u origin      (push current local branch to origin)
 git fetch               (fetch changes)
 git merge origin/master (merge changes from origin/master branch)
-git pull                (same as 'git fetch' followed by 'git merge FETCH_HEAD')
-git rebase -i HEAD~3    (rebase interactively starting from 3 commits ago)
+git pull                (like 'git fetch' then 'git merge FETCH_HEAD')
+git rebase -i HEAD~3    (rebase interactively from 3 commits ago)
 git checkout BRANCH     (switch to BRANCH)
-git checkout -b NEWBRANCH
-                        (create a new branch called NEWBRANCH and switch to it)
+git checkout -b BRANCH  (create new BRANCH and switch to it)
 
 ---
 
@@ -131,8 +150,9 @@ git checkout -b NEWBRANCH
 - Use the -v command-line option for verbose output
 - https://pkg.go.dev/github.com/fhs/acme-lsp/cmd/L
 
-L comp [-e]             (completion candidates, add -e to automatically apply if only one)
-L def [-p]              (find definition and plumb, add -p to print only)
+L comp [-e]             (completion candidates, -e autocompletes if
+                         there is only one candidate)
+L def [-p]              (find definition and plumb, -p prints only)
 L fmt                   (format buffer and organize imports)
 L hov                   (show hover info for symbol at cursor)
 L impls                 (list implementation locations)
@@ -140,10 +160,10 @@ L refs                  (list references to symbol at cursor)
 L rn NEWNAME            (rename symbol at cursor to NEWNAME)
 L sig                   (show signature for function at cursor)
 L syms                  (list symbols in the current file)
-L type                  (find symbol type and plumb, add -p to print only)
+L type                  (find symbol type and plumb, -p prints only)
 L ws                    (list current workspace dirs)
-L ws+ [DIR1] ...        (add workspace dirs, use current if none specified)
-L ws- [DIR1] ...        (remove workspace dirs, use current if none specified)
+L ws+ [DIR1] ...        (add workspace dirs, default is `{pwd})
+L ws- [DIR1] ...        (remove workspace dirs, default is `{pwd})
 L -showconfig           (show config values)
 
 ---
@@ -154,28 +174,22 @@ L -showconfig           (show config values)
 
 Edit ,|runfc black      (format file using black)
 condaenv=ENVNAME condarun pylint --output=parseable $%
-                        (lint file using pylint in conda environment ENVNAME)
+                        (lint file using pylint in conda env ENVNAME)
 condaenv=ENVNAME condarun python3 -m pdb $%
-                        (run current file in conda env ENVNAME under control of the pdb debugger)
+                        (run current file in conda env ENVNAME under
+                         control of the pdb debugger)
 
 ---
 
 ## Markdown
 
-- Compilation commands require pandoc (for PDF output, also requires a LaTeX distribution like TeXLive)
-- Linting commands require markdownlint-cli installed via NVM in a POSIX-compatible shell like Bash
+- Compilation commands require pandoc (for PDF output, also requires a
+  LaTeX distribution like TeXLive)
+- Linting commands require markdownlint-cli installed via NVM in a
+  POSIX-compatible shell like Bash
 
 pandoc -o /tmp/markdown-preview.html $% && { xdg-open /tmp/markdown-preview.html || open /tmp/markdown-preview.html }
-                         (compile current markdown file to html and preview it in reader, Linux or macOS)
+                         (compile current markdown file to html and
+                          preview it in reader, Linux or macOS)
 bash -c '. $home/.nvm/nvm.sh && markdownlint '^$%^' && echo "No warnings or errors"'
                          (lint current markdown file)
-
----
-
-## Other
-
-- Watch commands require the Go 9fans.net/go/acme/Watch package be installed
-
-Watch [-r] COMMAND [ARG1] ...
-                         (watch current dir and run COMMAND with args when
-                          files are written, add -r for recursive watch)
