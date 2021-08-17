@@ -1,0 +1,29 @@
+#!/usr/bin/env rc
+
+# Search for last command matching given argument, if one is given
+# The number of commands shown is determined by $hnumresults which
+# if undefined defaults to 10
+# Adapted from https://9p.io/sources/contrib/rsc/scripts/%22
+
+rfork en
+
+PROMPT='[^ 	]*%[ 	]+'
+
+fn cmds {
+	9 echo -n 0 | 9p write acme/$winid/addr &&
+		9p read acme/$winid/body | 9 grep '^'$PROMPT'[^"]' | 9 sed 's/^/	/'
+}
+
+if(~ $#hnumresults 0) hnumresults=10
+
+switch($#*) {
+case 0
+	cmds | tail -$hnumresults
+case *
+	cmds | 9 grep '^	'$PROMPT^'.*'^$"* | {9 echo; 9 cat} |
+		9 pr -t -n | 9 sort -nr | 9 sort -u +1 | 9 sort -n |
+		9 sed 's/^ *[0-9]+	//' | 9 grep . | tail -$hnumresults
+}
+
+# the silly {echo; cat} gets around pr printing "empty file" when
+# presented with no input.
