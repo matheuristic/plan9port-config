@@ -4,6 +4,11 @@
 # directory, whether the window is dirty, and the name of the window.
 # Inspired by: https://github.com/mpl/lw
 
+# Note that in Acme a similar result can be achieved using the
+#    Edit X
+# Sam command which lists the windows and their dirty status, but not
+# window IDs and if the window corresponds to a directory or file.
+
 rfork en
 
 if (9p ls acme >[2]/dev/null >[1=2]) {
