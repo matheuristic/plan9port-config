@@ -389,6 +389,13 @@ For more information on Acme mounting and macOS, see the following
   fn aproj { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump }
   ```
 
+- Window management can get chaotic when there are many open. Listing
+  and finding windows can be done with the `Edit X` Sam command or
+  `$HOME/.acme/bin/lw` (or the [original](https://github.com/mpl/lw)
+  upon which it is based) and plumbing with Button3 (right-click).
+  Managing windows can be done by executing `Sort` to sort the windows
+  in a column by their tags.
+
 ## Sam
 
 Plan 9 also comes with another editor [Sam](http://sam.cat-v.org/)
