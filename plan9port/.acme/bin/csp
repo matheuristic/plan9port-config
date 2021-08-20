@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+# Wrapper for cspell spellchecker tool
+
+# Ensure NVM is loaded
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+	. "$NVM_DIR/nvm.sh"
+else
+	echo 'NVM not installed'
+	exit 1
+fi	
+
+# Run cspell if installed
+if ! command -v cspell >/dev/null 2>&1; then
+	echo 'cspell not installed'
+	exit 1
+else
+	cspell "$@"
+fi
