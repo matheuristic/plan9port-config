@@ -8,7 +8,7 @@ if (! enchant -h >[2]/dev/null >[1=2]) {
 }
 
 if (test $#* -eq 0 || test $#* -gt 1) {
-	echo exactly one file must be specified
+	echo usage: $0 FILENAME
 	exit 1
 }
 
