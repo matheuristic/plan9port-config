@@ -1,0 +1,15 @@
+#!/usr/bin/env rc
+
+# Spellchecks argument file using the enchant command-line tool
+
+if (! enchant -h >[2]/dev/null >[1=2]) {
+	echo enchant not installed
+	exit 1
+}
+
+if (test $#* -eq 0 || test $#* -gt 1) {
+	echo exactly one file must be specified
+	exit 1
+}
+
+enchant -L -l $1 |  awk '{print "'^$1^'" ":" $0}'
