@@ -1,15 +1,15 @@
 #!/usr/bin/env rc
 
-# Spellchecks argument file using the enchant command-line tool
+# Wraps enchant command-line tool for spellchecking
 
 if (! enchant -h >[2]/dev/null >[1=2]) {
 	echo enchant not installed
 	exit 1
 }
 
-if (test $#* -eq 0 || test $#* -gt 1) {
-	echo usage: $0 FILENAME
+if (test $#* -eq 0) {
+	echo 'usage: see enchant(1) manpage'
 	exit 1
 }
 
-enchant -L -l $1 |  9 awk '{print "'^$1^'" ":" $0}'
+enchant -L -l $* |  9 awk '{print "'^$1^'" ":" $0}'
