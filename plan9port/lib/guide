@@ -95,6 +95,8 @@ Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
                          line numbers; changing 4 in %4s to another
                          number N will set the starting column of the
                          original text to N+2 instead)
+Edit ,>nl|fzf -f QUERY  (fuzzy find in window on QUERY with line nums
+                         using fzf)
 
 |c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
 |c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')

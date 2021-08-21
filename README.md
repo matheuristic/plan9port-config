@@ -271,9 +271,11 @@ there are a number of helper scripts available at `~/.acme/bin`:
   }
   ```
 
-  The [TOML](https://toml.io/)-based config file for acme-lsp is at
+  Config params can be saved in a [TOML](https://toml.io/) file
   `$HOME/Library/Application Support/acme-lsp/config.toml` for macOS
   or `$HOME/.local/bin/acme-lsp/config.toml` for Unix or Linux.
+
+  An alternative is [acre](https://github.com/mjibson/acre).
 
 - [adir](https://github.com/lewis-weinberger/adir):
   Tree-style file explorer for Acme. Assuming `$PLAN9` and `mk` are
@@ -286,7 +288,8 @@ there are a number of helper scripts available at `~/.acme/bin`:
   ```
 
   No need to specify `BIN=$home/.acme/bin` if installing to `$PLAN9/bin`.
-  Alternatives are
+
+  Alternatives include
   [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree)
   and [xplor](https://git.sr.ht/~mkhl/xplor).
 
