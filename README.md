@@ -259,6 +259,22 @@ there are a number of helper scripts available at `~/.acme/bin`:
   GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
+  Create helper scripts in `$HOME/.acme/bin/` by running in `rc`:
+
+  ```shell
+  for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
+      > $home/.acme/bin/L^$cmd {
+          echo '#!/usr/bin/env rc'
+          echo exec L $cmd '$*'
+      }
+      chmod +x L^$cmd
+  }
+  ```
+
+  The [TOML](https://toml.io/)-based config file for acme-lsp is at
+  `$HOME/Library/Application Support/acme-lsp/config.toml` for macOS
+  or `$HOME/.local/bin/acme-lsp/config.toml` for Unix or Linux.
+
 - [adir](https://github.com/lewis-weinberger/adir):
   Tree-style file explorer for Acme. Assuming `$PLAN9` and `mk` are
   on the system path, install adir with:

@@ -163,6 +163,16 @@ git checkout -b BRANCH  (create new BRANCH and switch to it)
 - Use the -v command-line option for verbose output
 - https://pkg.go.dev/github.com/fhs/acme-lsp/cmd/L
 
+win acme-lsp            (start acme-lsp with config file at location
+                         per 'acme-lsp -showconfig' which is
+                         ~/.config/acme-lsp/config.toml for Unix or
+                         ~/Library/Application\ Support/acme-lsp/config.toml
+                         for macOS)
+win acme-lsp -server '(\.py)$:jedi-language-server' -v
+                        (start acme-lsp with verbose output, using the
+                         specified filename-to-language-server-command
+                         mapping, overriding the config file params)
+
 L comp [-e]             (completion candidates, -e autocompletes if
                          there is only one candidate)
 L def [-p]              (find definition and plumb, -p prints only)
