@@ -431,7 +431,7 @@ not exist, then the default plumbing rules are loaded from
 below, and it defines a plumbing rule for navigating to file locations
 in Python errors and also loads the default rules.
 
-```
+```text
 # to update: cat $HOME/lib/plumbing | 9p write plumb/rules
 
 editor = acme
@@ -522,7 +522,7 @@ Acme also supports specification of the main and alternate font when
 running its binary from the command line via the `-f` (main font) and
 `-F` (alternate font) flags, illustrated in an earlier section.
 
-**Notes**:
+Fonts can also be specified in ways that extend the standard behavior:
 
 - If the specified font has format `SCALE*FONT` where `SCALE` is some
   integer, `FONT` is used scaled by pixel repetition. This can be
@@ -542,10 +542,10 @@ running its binary from the command line via the `-f` (main font) and
   acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
   ```
 
-- On slower machines, using vector fonts can be slow when rendering
-  many unicode characters outside the basic plane on screen. As a
-  workaround, see the `fontscripts` folder for scripts that leverage
-  `fontsrv` to convert vector fonts to Plan 9 subf format.
+On slower machines, using vector fonts can be slow when rendering many
+unicode characters outside the basic plane on screen. As a workaround,
+see the `fontscripts` folder for scripts that leverage `fontsrv` to
+convert vector fonts to Plan 9 subf format.
 
 ## Keyboard bindings
 
