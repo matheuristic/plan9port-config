@@ -198,11 +198,26 @@ there are a number of helper scripts available at `~/.acme/bin`:
 - `condarun`: `condaenv=envname condarun cmd arg1 ...` executes `cmd`
   with the given args in the `envname` Conda environment (default
   environment is the one active when Acme was launched, else `base`).
+- `csp`: Wrapper for running
+  [cspell](https://github.com/streetsidesoftware/cspell)
+  installed using [npm](https://www.npmjs.com/) managed by
+  [NVM](https://github.com/nvm-sh/nvm).
+- `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
+  `COLUMNNUMBER` in each line of STDIN or text piped to the command.
 - `dtw`: Delete trailing whitespace (spaces/tabs).
+- `esp`: Wrapper for [Enchant](https://github.com/AbiWord/enchant)
+  except it only supports use with files and not STDIN or piped text.
+- `h`: `hcount=N h STRING` shows the last `N` commands in a win window
+  that contain `STRING`. If `hcount=N` is omitted then the last 10
+  matching commands are shown. If `STRING` is omitted, then the most
+  recent commands are show (i.e., match all commands).
 - `i+`: Indent. Specify an argument to change the
   indent string from the default Tab character.
 - `i-`: Unindent. An arg may be specified as in `i+`.
 - `lower`: Lowercase text selection.
+- `lw`: List Acme windows (including window ID, whether the window
+  is a directory window, and if the window is dirty). A fancier
+  version of running the `Edit X` Sam command.
 - `rg+`: Wrapper for running
   [ripgrep](https://github.com/BurntSushi/ripgrep) with output that
   can be plumbed.
