@@ -1,5 +1,31 @@
 # ~/lib/guide - master guide file with examples
 
+## Quick tags
+
+### General
+
+|c+ |c- |w+ |w- |s2t |t2s |upper |lower (Edit ,|dtw) (Edit X)
+(:+/REGEXP/) (rg+ 'REGEXP' $%) (Edit s/REGEXP/REPLACE/g)
+win (uni s QUERY) (Edit ,|grep -n '.*')
+
+### Python
+
+|is+ |is- (Edit ,|runfc black)
+condaenv=ENVNAME Watch condarun pylint --output=parseable $%
+condaenv=ENVNAME condarun python3 -m pdb $%
+
+### Markdown (macOS)
+
+pandoc -o /tmp/tmp.html $% && open /tmp/markdown-preview.html
+zsh -c '. $home/.nvm/nvm.sh && Watch markdownlint '^$%
+
+### Markdown (Unix)
+
+pandoc -o /tmp/tmp.html $% && xdg-open /tmp/markdown-preview.html
+bash -c '. $home/.nvm/nvm.sh && Watch markdownlint '^$%
+
+---
+
 ## Notes
 
 - *Nomenclature*:
@@ -56,9 +82,9 @@ Edit =                  (current line number)
 Edit ,d                 (clear window contents)
 Edit -/{/,+/}/          (select contents of current { ... } block,
                          including the enclosing braces)
-Edit s/"([ˆ"]*)"/“\1”/  (replace the next straight double-quoted
-                         "word" with the corresponding left-right
-                         double-quoted “word”)
+Edit s/"([ˆ"]*)"/“\1”/g (replace each straight double-quoted "word"
+                         in selection with the corresponding
+                         left-right double-quoted “word”)
 Edit .+#0/OLD/c/NEW/
 .
                         (replace next occurrence of OLD with NEW; note

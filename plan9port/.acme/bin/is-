@@ -1,0 +1,7 @@
+#!/usr/bin/env rc
+
+# Decrease indent of STDIN or piped text by $tabstop spaces
+
+indent=''
+for(_ in `{seq $tabstop}) indent=$indent^' '
+9 sed 's/^'^$indent^'(.*)/\1/'
