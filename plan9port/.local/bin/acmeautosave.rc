@@ -39,7 +39,7 @@ while() {
 	# Check if Acme is running
 	if (9p ls acme >[2]/dev/null >[1=2]) {
 		# Loop over Acme buffer windows (these have number window ids)
-		for(wid in `{9p ls acme | 9 grep -e [0-9]+}) {
+		for(wid in `{9p read acme/index | 9 awk '{print $1}'}) {
 			# Window tag name, i.e. the file path, which comes before ' Del Snarf'
 			# Assume that filenames don't contain newline characters
 			ifs='
