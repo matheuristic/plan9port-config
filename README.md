@@ -204,7 +204,7 @@ there are a number of helper scripts available at `~/.acme/bin`:
   [NVM](https://github.com/nvm-sh/nvm).
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
-- `d`: Diff the current window against the saved version.
+- `d`: Diff the current window against the current file on disk.
 - `dtw`: Delete trailing whitespace (spaces/tabs).
 - `esp`: Wrapper for [Enchant](https://github.com/AbiWord/enchant)
   except it only supports use with files and not STDIN or piped text.

@@ -1,17 +1,33 @@
 #!/usr/bin/env rc
 
-# Diff current Acme window text against saved version
+# Diff current Acme window text against saved version, replacing tabs
+# with »~~...~ strings that are $tabstop-long
 # Requires GNU diff
 
+if ((test $#winid -eq 0) || (test $#tabstop -eq 0)) {
+	echo 'Not in an Acme window'
+	exit 1
+}
+
+# on macOS, MacPorts and Homebrew coreutils (or gnudiff) packages
+# symlink each GNU tool 'xyz' to 'gxyz'
 diffcmd=diff
 if (gdiff --version >[2]/dev/null >[1=2]) {
 	diffcmd=gdiff
+}
+
+tabchars='»'
+numtrail=`{echo $tabstop-1 | hoc}
+if (test $numtrail -gt 0) {
+	for (_ in `{seq $numtrail}) {
+		tabchars=$tabchars^'~'
+	}
 }
 
 echo "--------"
 
 9p read acme/$winid/body | \
 	$diffcmd --unchanged-line-format='' --old-line-format=$%^':%dn:-%L' --new-line-format=$%^':%dn:+%L' $samfile -- - | \
-	9 sed -e 's/	/»~~~/g'
+	9 sed -e 's/	/'^$tabchars^'/g'
 
 echo "--------"
