@@ -1,0 +1,36 @@
+diff --git src/cmd/fontsrv/mac.c src/cmd/fontsrv/mac.c
+index c5a2e0f1..4b194d9e 100644
+--- src/cmd/fontsrv/mac.c
++++ src/cmd/fontsrv/mac.c
+@@ -17,14 +17,6 @@
+ 
+ extern void CGFontGetGlyphsForUnichars(CGFontRef, const UniChar[], const CGGlyph[], size_t);
+ 
+-// In these fonts, it's too hard to distinguish U+2018 and U+2019,
+-// so don't map the ASCII quotes there.
+-// See https://github.com/9fans/plan9port/issues/86
+-static char *skipquotemap[] = {
+-	"Courier",
+-	"Osaka",
+-};
+-
+ int
+ mapUnicode(char *name, int i)
+ {
+@@ -32,16 +24,6 @@ mapUnicode(char *name, int i)
+ 
+ 	if(0xd800 <= i && i < 0xe000) // surrogate pairs, will crash OS X libraries!
+ 		return 0xfffd;
+-	for(j=0; j<nelem(skipquotemap); j++) {
+-		if(strstr(name, skipquotemap[j]))
+-			return i;
+-	}
+-	switch(i) {
+-	case '\'':
+-		return 0x2019;
+-	case '`':
+-		return 0x2018;
+-	}
+ 	return i;
+ }
+ 

@@ -18,6 +18,15 @@ The shell commands here are for a POSIX-compatible shell or similar
 
 ## Installing plan9port and configuring it
 
+### Code patches
+
+There are some patches in the `patches` subdirectory.
+Apply desired patches to the source code prior to compilation.
+See the `README.md` file in the subdirectory for instructions.
+
+- `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
+  `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
+
 ### Compiling plan9port
 
 The following instructions are for a system-level install at
@@ -35,7 +44,8 @@ sudo ./INSTALL
 ```
 
 Local install (for the current user, creating a new git branch is for
-easier updating):
+easier updating, and code patches should be applied after the
+`git checkout` step):
 
 ```shell
 mkdir -p $HOME/packages
