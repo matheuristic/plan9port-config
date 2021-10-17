@@ -84,6 +84,8 @@ stow -t $HOME --no-folding plan9port
 
 This will create the symlinks:
 
+- `~/lib/guide`: Master guide file.
+- `~/lib/plumbing`: Plumbing file for controlling the behavior of `plumber`.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
   when the plan9port binaries directory is not added to the search
   path by default.
@@ -186,7 +188,7 @@ practice to keep a guide file open in a smaller side column window so
 commands that commonly used can be accessed readily.
 
 If `stow` was used to symlink the base configuration files, a master
-guide file will be available at `~/.acme/guide` containing a wide
+guide file will be available at `~/lib/guide` containing a wide
 array of commands and examples.
 
 ### Helper scripts

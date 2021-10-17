@@ -21,7 +21,6 @@ Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
 
 ### J
 
-* Shell
 win ijconsole
 
 * Watch
@@ -29,19 +28,17 @@ zsh -c 'ijconsole -js "require ''debug/lint''" "echo lint '''^$%^'''" "exit ''''
 
 ### Python
 
-* Edit
-,|runfc black
-
-* Shell
 condaenv=ENVNAME win condarun python3
 condaenv=ENVNAME condarun python3 -m pdb FILENAME.py
+
+* Edit
+,|runfc black
 
 * Watch
 condaenv=ENVNAME condarun pylint --output-format=parseable $%
 
 ### Markdown
 
-* Shell
 pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
 pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
 
@@ -249,7 +246,7 @@ L -showconfig           (show config values)
 - runfc and condarun are custom scripts in ~/.acme/bin
 
 Edit ,|runfc black      (format file using black)
-condaenv=ENVNAME condarun pylint --output=parseable $%
+condaenv=ENVNAME condarun pylint --output-format=parseable $%
                         (lint file using pylint in conda env ENVNAME)
 condaenv=ENVNAME condarun python3 -m pdb $%
                         (run current file in conda env ENVNAME under
