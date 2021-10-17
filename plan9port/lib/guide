@@ -14,45 +14,39 @@ Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
 
 ### General
 
-* Incremental search and replace (run with Edit)
+* Edit
+,|dtw
 .+#0/OLD/c/NEW/
 .
 
-* Delete trailing whitespaces (run with Edit)
-,|dtw
-
 ### J
 
-* REPL
+* Shell
 win ijconsole
 
-* Linting (run with Watch, can be slow as it runs the file fully)
+* Watch
 zsh -c 'ijconsole -js "require ''debug/lint''" "echo lint '''^$%^'''" "exit ''''"'
 
 ### Python
 
-* REPL (replace ENVNAME with desired Conda environment name)
-condaenv=ENVNAME win condarun python3
-
-* Format file (run with Edit)
+* Edit
 ,|runfc black
 
-* Linting (run with Watch)
-condaenv=ENVNAME condarun pylint --output-format=parseable $%
-
-* Debugging (replace FILENAME.py)
+* Shell
+condaenv=ENVNAME win condarun python3
 condaenv=ENVNAME condarun python3 -m pdb FILENAME.py
+
+* Watch
+condaenv=ENVNAME condarun pylint --output-format=parseable $%
 
 ### Markdown
 
-* Linting (run with Watch)
-zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
-
-* Render to HTML (replace FILENAME.md)
+* Shell
 pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
-
-* Render to PDF (replace FILENAME.md)
 pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
+
+* Watch
+zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
 
 ---
 
