@@ -380,6 +380,15 @@ For more information on Acme mounting and macOS, see the following
   (Load /path/to/project.dump)
   ```
 
+- A separate window can be useful for writing and maintaining a
+  history of commands. A handy use of this separate window is to write
+  commands to be run with Edit, and execute them by highlighting the
+  commands followed by a 2-1 chord on Edit in a target window's tag
+  (note that Edit is not added to window tags by default). For
+  example, write `,|s/abc/xyz/g` in a side window, highlight it and
+  use a 2-1 chord on Edit in the target window's tag in order to
+  replace all instances of `abc` with `xyz`.
+
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
   workspace dumps. The `sample-a.sh` sample launcher has comments
@@ -407,9 +416,10 @@ For more information on Acme mounting and macOS, see the following
 - For each project to create a project-specific guide file and copy
   into it a subset of the more useful commands for the project from
   the master guide file along with adding other project-specific
-  commands (like compile or testing scripts). Have the guide file open
-  in an Acme window for running specific project commands or for
-  copying useful commands to add to a buffer window's tag.
+  commands (like compile or testing scripts). Have the guide file open in
+  an Acme window for running specific project commands or for copying
+  useful commands to add to a buffer window's tag.
+
 - Create project-specific dump files so it is easy to save and load
   work sessions. The corresponding `Dump` and `Load` commands (with
   the appropriate dump file path) can be added to that project's guide
@@ -418,8 +428,10 @@ For more information on Acme mounting and macOS, see the following
   `~/.acme/dump/` that consolidates dump files across projects. When
   working with Git-controlled projects, the latter is better as it
   avoids polluting the Git repository with machine-local data.
+
 - To evaluate selections in REPLs running in win windows, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
+
 - Alternative command-line launchers for Acme (e.g. ones that use
   specific fonts or loads a given dump file) can be created as
   aliases, e.g. for Bash

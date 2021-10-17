@@ -1,0 +1,10 @@
+# local or temporary Emacs or Vim files
+*~
+\#*\#
+*.swp
+*.swo
+.projectile
+.dir-locals.el
+
+# local Acme guide file
+/guide

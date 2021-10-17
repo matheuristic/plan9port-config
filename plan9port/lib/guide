@@ -4,25 +4,55 @@
 
 ### General
 
-|c+ |c- |w+ |w- |s2t |t2s |upper |lower (Edit ,|dtw) (Edit X)
-(:+/REGEXP/) (rg+ 'REGEXP' $%) (Edit s/REGEXP/REPLACE/g)
-win (uni s QUERY) (Edit ,|grep -n '.*')
+Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
 
 ### Python
 
-|is+ |is- (Edit ,|runfc black)
-condaenv=ENVNAME Watch condarun pylint --output=parseable $%
-condaenv=ENVNAME condarun python3 -m pdb $%
+|is+ |is-
 
-### Markdown (macOS)
+## Quick guides
 
-pandoc -o /tmp/tmp.html $% && open /tmp/markdown-preview.html
-zsh -c '. $home/.nvm/nvm.sh && Watch markdownlint '^$%
+### General
 
-### Markdown (Unix)
+* Incremental search and replace (run with Edit)
+.+#0/OLD/c/NEW/
+.
 
-pandoc -o /tmp/tmp.html $% && xdg-open /tmp/markdown-preview.html
-bash -c '. $home/.nvm/nvm.sh && Watch markdownlint '^$%
+* Delete trailing whitespaces (run with Edit)
+,|dtw
+
+### J
+
+* REPL
+win ijconsole
+
+* Linting (run with Watch, can be slow as it runs the file fully)
+zsh -c 'ijconsole -js "require ''debug/lint''" "echo lint '''^$%^'''" "exit ''''"'
+
+### Python
+
+* REPL (replace ENVNAME with desired Conda environment name)
+condaenv=ENVNAME win condarun python3
+
+* Format file (run with Edit)
+,|runfc black
+
+* Linting (run with Watch)
+condaenv=ENVNAME condarun pylint --output-format=parseable $%
+
+* Debugging (replace FILENAME.py)
+condaenv=ENVNAME condarun python3 -m pdb FILENAME.py
+
+### Markdown
+
+* Linting (run with Watch)
+zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
+
+* Render to HTML (replace FILENAME.md)
+pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
+
+* Render to PDF (replace FILENAME.md)
+pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
 
 ---
 
@@ -43,6 +73,9 @@ bash -c '. $home/.nvm/nvm.sh && Watch markdownlint '^$%
 - Wrap the commands in parentheses to make them selectable by
   double-clicking just to the right of the left parenthesis, e.g.
   (Edit =)
+- For commands that take arguments, like Edit, it can be more
+  efficient to write the argument in a separate window, select it and
+  use a 2-1 mouse chord on Edit in the target window tag
 
 ---
 
@@ -121,8 +154,6 @@ Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
                          line numbers; changing 4 in %4s to another
                          number N will set the starting column of the
                          original text to N+2 instead)
-Edit ,>nl|fzf -f QUERY  (fuzzy find in window on QUERY with line nums
-                         using fzf)
 
 |c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
 |c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')
