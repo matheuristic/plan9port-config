@@ -601,6 +601,8 @@ it provides a few keyboard bindings applicable to most GUI programs.
 - `Ctrl-h`: Delete previous character
 - `Ctrl-w`: Delete previous word
 - `Ctrl-u`: Delete backwards to start of line
+- `Ctrl-f`: Complete filename or pop up options in a `+Error` window
+  (and warp the pointer to that window if it is newly created)
 
 ## macOS
 

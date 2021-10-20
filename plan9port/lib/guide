@@ -15,7 +15,9 @@ Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
 ### General
 
 * Edit
+=
 ,|dtw
+s/REGEXP/REPLACE/g
 .+#0/OLD/c/NEW/
 .
 
