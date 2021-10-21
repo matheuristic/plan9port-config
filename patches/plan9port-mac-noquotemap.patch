@@ -1,7 +1,7 @@
-diff --git src/cmd/fontsrv/mac.c src/cmd/fontsrv/mac.c
+diff --git a/src/cmd/fontsrv/mac.c b/src/cmd/fontsrv/mac.c
 index c5a2e0f1..4b194d9e 100644
---- src/cmd/fontsrv/mac.c
-+++ src/cmd/fontsrv/mac.c
+--- a/src/cmd/fontsrv/mac.c
++++ b/src/cmd/fontsrv/mac.c
 @@ -17,14 +17,6 @@
  
  extern void CGFontGetGlyphsForUnichars(CGFontRef, const UniChar[], const CGGlyph[], size_t);

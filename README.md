@@ -6,7 +6,7 @@
 ## About
 
 This repository contains a configuration for Plan 9 from User Space,
-which is a port of several [Plan 9](https://p9f.org/) tools to *nix
+which is a port of several [Plan 9](https://p9f.org/) tools to Unix
 systems.
 
 Most of this configuration will be built around
@@ -26,6 +26,9 @@ See the `README.md` file in the subdirectory for instructions.
 
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
   `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
+- `plan9port-x11-shiftpressbutton1.patch`: `Shift` sends Button1
+  while a mouse button is depressed on X11 systems. This allows
+  for 2-1 chords on non-macOS laptops without an external mouse.
 
 ### Compiling plan9port
 
