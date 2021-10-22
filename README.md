@@ -264,6 +264,11 @@ there are a number of helper scripts available at `~/.acme/bin`:
 
 ### Optional tools
 
+- [Go](https://golang.org/):
+  Some tools below require Go to install or run.
+  Installable via a package manager (e.g. APT or Homebrew or
+  MacPorts), or download a binary release from the website.
+
 - [acme-lsp](https://github.com/fhs/acme-lsp):
   [Language Server
   Protocol](https://microsoft.github.io/language-server-protocol/)

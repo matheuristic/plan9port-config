@@ -1,4 +1,4 @@
-# to update: cat $HOME/lib/plumbing | 9p write plumb/rules
+# to update: cat $home/lib/plumbing | 9p write plumb/rules
 
 editor = acme
 
@@ -10,6 +10,11 @@ data set $file
 attr add addr=$2
 plumb to edit
 plumb client $editor
+
+# git commits
+type is text
+data matches 'commit ([a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]+)'
+plumb start rc -c 'cd '''$wdir'''; git show '''$1''' | 9p write acme/cons'
 
 # include basic plumbing rules
 include basic
