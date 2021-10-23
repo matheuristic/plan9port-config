@@ -10,6 +10,10 @@ Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
 
 |is+ |is-
 
+### acme-lsp
+
+L
+
 ## Quick guides
 
 ### General
@@ -46,6 +50,11 @@ pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf 
 
 * Watch
 zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
+
+### acme-lsp
+
+acme-lsp
+comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-
 
 ---
 

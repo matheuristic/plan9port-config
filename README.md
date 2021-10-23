@@ -381,6 +381,29 @@ For more information on Acme mounting and macOS, see the following
 
 ### Usage tips
 
+- Middle-clicking (Button2) executes the region or word under the
+  point. Right-clicking (Button3) will plumb the region or word under
+  the point, or search (equivalent to Look) for the next occurrence if
+  not plumbable.
+
+- The window scrollbars are used in conjunction with the mouse for
+  moving the viewport across the buffer.
+
+  - Left-clicking (Button1) and right-clicking (Button3) on the
+    scrollbar moves the viewport up and down respectively where the
+    clicks near the top of scrollbar move the viewport less and clicks
+    near the bottom of the scrollbar move the viewport more.
+    Specifically, when Button1 or Button3 is clicked on the scrollbar
+    the number of lines the viewport is shifted is the number of lines
+    from the top of the viewport to the line next to where the
+    scrollbar was clicked. This has the effect that right-clicking the
+    scrollbar next to a line will move the viewport so that line is at
+    the top.
+
+  - Middle-clicks (Button2) on the scrollbar will move the viewport so
+    that the view indicator is at the position scrollbar was clicked,
+    which allows for directly jumping to a window position.
+
 - Wrap a command with parentheses to make it selectable by
   double-clicking (Button1 twice) just to the right of the left
   parenthesis. Useful for easy selection of commands containing
