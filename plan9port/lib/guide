@@ -16,6 +16,9 @@ L
 
 ## Quick guides
 
+Commands in blocks beginning with a "* COMMAND" line should be run
+with a 2-1 chord on COMMAND in a window tag.
+
 ### General
 
 * Edit
@@ -41,7 +44,7 @@ condaenv=ENVNAME condarun python3 -m pdb FILENAME.py
 ,|runfc black
 
 * Watch
-condaenv=ENVNAME condarun pylint --output-format=parseable $%
+condaenv=ENVNAME condarun pylint -f parseable $%
 
 ### Markdown
 
@@ -51,10 +54,25 @@ pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf 
 * Watch
 zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
 
+### Shell
+
+* Edit
+,|shfmt -ln posix -i 0
+
+* Watch
+shellcheck -a -f gcc $%
+
 ### acme-lsp
 
 acme-lsp
+
+* L
 comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-
+
+### DevSkim
+
+* Watch
+devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
 
 ---
 
@@ -78,6 +96,9 @@ comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-
 - For commands that take arguments, like Edit, it can be more
   efficient to write the argument in a separate window, select it and
   use a 2-1 mouse chord on Edit in the target window tag
+- Some commands like condarun, runfc, etc are custom scripts
+- Some programs like pandoc or markdownlint (Node.js markdownlint-cli)
+  are installed external of plan9port
 
 ---
 
@@ -249,31 +270,3 @@ L ws                    (list current workspace dirs)
 L ws+ [DIR1] ...        (add workspace dirs, default is `{pwd})
 L ws- [DIR1] ...        (remove workspace dirs, default is `{pwd})
 L -showconfig           (show config values)
-
----
-
-## Python
-
-- runfc and condarun are custom scripts in ~/.acme/bin
-
-Edit ,|runfc black      (format file using black)
-condaenv=ENVNAME condarun pylint --output-format=parseable $%
-                        (lint file using pylint in conda env ENVNAME)
-condaenv=ENVNAME condarun python3 -m pdb $%
-                        (run current file in conda env ENVNAME under
-                         control of the pdb debugger)
-
----
-
-## Markdown
-
-- Compilation commands require pandoc (for PDF output, also requires a
-  LaTeX distribution like TeXLive)
-- Linting commands require markdownlint-cli installed via NVM in a
-  POSIX-compatible shell like Bash
-
-pandoc -o /tmp/markdown-preview.html $% && { xdg-open /tmp/markdown-preview.html || open /tmp/markdown-preview.html }
-                         (compile current markdown file to html and
-                          preview it in reader, Linux or macOS)
-bash -c '. $home/.nvm/nvm.sh && markdownlint '^$%^' && echo "No warnings or errors"'
-                         (lint current markdown file)
