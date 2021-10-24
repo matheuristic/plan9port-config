@@ -4,7 +4,7 @@
 
 ### General
 
-Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower
+Edit Watch rg+ win |c+ |c- |w+ |w- |s2t |t2s |upper |lower :,
 
 ### Python
 
@@ -50,6 +50,9 @@ condaenv=ENVNAME condarun pylint -f parseable $%
 
 pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
 pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
+
+* Edit
+|mdformat --number --wrap 70 -
 
 * Watch
 zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%

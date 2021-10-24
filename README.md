@@ -10,8 +10,8 @@ which is a port of several [Plan 9](https://p9f.org/) tools to Unix
 systems.
 
 Most of this configuration will be built around
-[Acme](http://acme.cat-v.org/) and [Sam](http://sam.cat-v.org/),
-the two Plan 9 text editors.
+[Acme](http://acme.cat-v.org/) and [Sam](http://sam.cat-v.org/), the
+two Plan 9 text editors.
 
 The shell commands here are for a POSIX-compatible shell or similar
 (e.g. Bash or Zsh).
@@ -20,15 +20,15 @@ The shell commands here are for a POSIX-compatible shell or similar
 
 ### Code patches
 
-There are some patches in the `patches` subdirectory.
-Apply desired patches to the source code prior to compilation.
-See the `README.md` file in the subdirectory for instructions.
+There are some patches in the `patches` subdirectory. Apply desired
+patches to the source code prior to compilation. See the `README.md`
+file in the subdirectory for instructions.
 
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
   `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
-- `plan9port-x11-shiftpressbutton1.patch`: `Shift` sends Button1
-  while a mouse button is depressed on X11 systems. This allows
-  for 2-1 chords on non-macOS laptops without an external mouse.
+- `plan9port-x11-shiftpressbutton1.patch`: `Shift` sends Button1 while
+  a mouse button is depressed on X11 systems. This allows for 2-1
+  chords on non-macOS laptops without an external mouse.
 
 ### Compiling plan9port
 
@@ -88,14 +88,18 @@ stow -t $HOME --no-folding plan9port
 This will create the symlinks:
 
 - `~/lib/guide`: Master guide file.
-- `~/lib/plumbing`: Plumbing file for controlling the behavior of `plumber`.
+- `~/lib/plumbing`: Plumbing file for controlling the behavior of
+  `plumber`.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
   when the plan9port binaries directory is not added to the search
   path by default.
 - `~/.local/bin/acme.rc`: Launcher for Acme.
-- `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows in Acme.
-- `~/.local/bin/sample-a.sh`: Sample wrapper to run `acme.rc` via `rc.sh`.
-- `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via `rc.sh`.
+- `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows
+  in Acme.
+- `~/.local/bin/sample-a.sh`: Sample wrapper to run `acme.rc` via
+  `rc.sh`.
+- `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
+  `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
 Create directory used by the autosave script.
@@ -128,9 +132,9 @@ mouse (like laptops with touchpads).
 The default main font is `/lib/font/bit/lucsans/euro.8.font`
 (corresponding to the file `$PLAN9/font/lucsans/euro.8.font`) and the
 default alternate font is `/lib/font/bit/lucm/unicode.9.font`
-(corresponding to the file `$PLAN9/font/lucm/unicode.9.font`).
-Many users typically use a proportional-width main font and a
-fixed-width alternate font.
+(corresponding to the file `$PLAN9/font/lucm/unicode.9.font`). Many
+users typically use a proportional-width main font and a fixed-width
+alternate font.
 
 The following options can be specified when running the `acme` command
 to change the main or alternate fonts:
@@ -191,13 +195,13 @@ practice to keep a guide file open in a smaller side column window so
 commands that commonly used can be accessed readily.
 
 If `stow` was used to symlink the base configuration files, a master
-guide file will be available at `~/lib/guide` containing a wide
-array of commands and examples.
+guide file will be available at `~/lib/guide` containing a wide array
+of commands and examples.
 
 ### Helper scripts
 
-If `stow` was used to symlink the base configuration files,
-there are a number of helper scripts available at `~/.acme/bin`:
+If `stow` was used to symlink the base configuration files, there are
+a number of helper scripts available at `~/.acme/bin`:
 
 - `acmeed` ([source](https://moriendi.org/tools/acme/)): When used as
   a value for the `$EDITOR` environment variable, programs that
@@ -214,8 +218,8 @@ there are a number of helper scripts available at `~/.acme/bin`:
   with the given args in the `envname` Conda environment (default
   environment is the one active when Acme was launched, else `base`).
 - `csp`: Wrapper for running
-  [cspell](https://github.com/streetsidesoftware/cspell)
-  installed using [npm](https://www.npmjs.com/) managed by
+  [cspell](https://github.com/streetsidesoftware/cspell) installed
+  using [npm](https://www.npmjs.com/) managed by
   [NVM](https://github.com/nvm-sh/nvm).
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
@@ -227,13 +231,13 @@ there are a number of helper scripts available at `~/.acme/bin`:
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
   recent commands are show (i.e., match all commands).
-- `i+`: Indent. Specify an argument to change the
-  indent string from the default Tab character.
+- `i+`: Indent. Specify an argument to change the indent string from
+  the default Tab character.
 - `i-`: Unindent. An arg may be specified as in `i+`.
 - `lower`: Lowercase text selection.
-- `lw`: List Acme windows (including window ID, whether the window
-  is a directory window, and if the window is dirty). A fancier
-  version of running the `Edit X` Sam command.
+- `lw`: List Acme windows (including window ID, whether the window is
+  a directory window, and if the window is dirty). A fancier version
+  of running the `Edit X` Sam command.
 - `rg+`: Wrapper for running
   [ripgrep](https://github.com/BurntSushi/ripgrep) with output that
   can be plumbed.
@@ -255,8 +259,8 @@ there are a number of helper scripts available at `~/.acme/bin`:
   other than the default round parentheses `(` and `)`.
 - `t2s`: Replaces tabs with spaces. Specify an argument to change the
   number of spaces to a tab from the default of `$tabwidth`.
-- `uline`: Underline text selection. Specify an argument to change
-  the character for underlining from the default of '-'.
+- `uline`: Underline text selection. Specify an argument to change the
+  character for underlining from the default of '-'.
 - `upper`: Uppercase text selection.
 - `w+`: Wrap (format text so each line is under some width in chars),
   specify an arg for a width other than the default of `70`.
@@ -264,14 +268,12 @@ there are a number of helper scripts available at `~/.acme/bin`:
 
 ### Optional tools
 
-- [Go](https://golang.org/):
-  Some tools below require Go to install or run.
-  Installable via a package manager (e.g. APT or Homebrew or
+- [Go](https://golang.org/): Some tools below require Go to install or
+  run. Installable via a package manager (e.g. APT or Homebrew or
   MacPorts), or download a binary release from the website.
 
 - [acme-lsp](https://github.com/fhs/acme-lsp):
-  [Language Server
-  Protocol](https://microsoft.github.io/language-server-protocol/)
+  [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
   client. See its website for how to configure it and use it with LSP
   servers. Install acme-lsp with:
 
@@ -298,9 +300,9 @@ there are a number of helper scripts available at `~/.acme/bin`:
 
   An alternative is [acre](https://github.com/mjibson/acre).
 
-- [adir](https://github.com/lewis-weinberger/adir):
-  Tree-style file explorer for Acme. Assuming `$PLAN9` and `mk` are
-  on the system path, install adir with:
+- [adir](https://github.com/lewis-weinberger/adir): Tree-style file
+  explorer for Acme. Assuming `$PLAN9` and `mk` are on the system
+  path, install adir with:
 
   ```shell
   git clone https://github.com/lewis-weinberger/adir.git
@@ -308,17 +310,18 @@ there are a number of helper scripts available at `~/.acme/bin`:
   mk install BIN=$home/.acme/bin
   ```
 
-  No need to specify `BIN=$home/.acme/bin` if installing to `$PLAN9/bin`.
+  No need to specify `BIN=$home/.acme/bin` if installing to
+  `$PLAN9/bin`.
 
   Alternatives include
   [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree)
   and [xplor](https://git.sr.ht/~mkhl/xplor).
 
-- [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch):
-  Runs a given command each time any file in the current directory is
-  written and send the output to an Acme window whose name is the
-  current directory with a `/+watch` suffix. Executing `Del` in this
-  new window will close the window and end the Watch process. It also
+- [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
+  command each time any file in the current directory is written and
+  send the output to an Acme window whose name is the current
+  directory with a `/+watch` suffix. Executing `Del` in this new
+  window will close the window and end the Watch process. It also
   provides `Kill` and `Quit` commands that can be used with the
   command run by Watch (the command is echoed in the first line of the
   new window) to stop any Watch commands that stall. Watch is using
@@ -431,14 +434,14 @@ For more information on Acme mounting and macOS, see the following
 
   ```shell
   # ~/.acme/start - Acme start file
-  
+
   # Project workspaces
-  
+
   (Load /path/to/project1.dump)
   (Load /path/to/project2.dump)
-  
+
   # Bookmarks
-  
+
   /path/to/guide
   /path/to/folder1/
   /path/to/folder2/
@@ -449,9 +452,9 @@ For more information on Acme mounting and macOS, see the following
 - For each project to create a project-specific guide file and copy
   into it a subset of the more useful commands for the project from
   the master guide file along with adding other project-specific
-  commands (like compile or testing scripts). Have the guide file open in
-  an Acme window for running specific project commands or for copying
-  useful commands to add to a buffer window's tag.
+  commands (like compile or testing scripts). Have the guide file open
+  in an Acme window for running specific project commands or for
+  copying useful commands to add to a buffer window's tag.
 
 - Create project-specific dump files so it is easy to save and load
   work sessions. The corresponding `Dump` and `Load` commands (with
@@ -462,7 +465,7 @@ For more information on Acme mounting and macOS, see the following
   working with Git-controlled projects, the latter is better as it
   avoids polluting the Git repository with machine-local data.
 
-- To evaluate selections in REPLs running in win windows, Snarf
+- To evaluate selection in a REPL running in some win window, Snarf
   (1-2-3 chord) the selection, then execute Send in the REPL window.
 
 - Alternative command-line launchers for Acme (e.g. ones that use
@@ -641,9 +644,9 @@ Additional notes specific to macOS systems.
 
 ### macOS bindings
 
-When the touchpad is depressed, `Ctrl` acts as Button1, `Option`
-acts as Button2 and `Command` acts as Button3. Holding a modifier
-while depressing the touchpad does the same.
+When the touchpad is depressed, `Ctrl` acts as Button1, `Option` acts
+as Button2 and `Command` acts as Button3. Holding a modifier while
+depressing the touchpad does the same.
 
 - `Ctrl-Click`: Button1
 - `Option-Click`: Button2
@@ -675,7 +678,7 @@ On macOS, there are also additional keybindings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
    - **Script Path**: Path to some Acme launcher script (e.g.
-     `sample-a.sh` or a customized `a.sh` created from it),
+     `sample-a.sh` or a customized `a.sh` created from it), which
      needs to be a real file and not a symlink
    - **Interface**: None
    - **Checkbox Settings**:
@@ -718,7 +721,7 @@ Additional notes specific to Unix systems.
 When the touchpad is depressed, `Ctrl` acts as Button2, `Alt` acts as
 Button3 and `Command` acts as Button3. Holding a modifier while
 depressing the touchpad does the same. Note that 2-1 chords are not
-possible in *nix system without a mouse.
+possible in Unix system without a mouse.
 
 - `Ctrl-Click`: Button2
 - `Alt-Click`: Button3
@@ -739,8 +742,8 @@ To create a menu item for Acme, create a scaled down version of
 240x240), save it to `~/.local/share/icons/spaceglenda240.png` and
 create the [freedesktop.org](https://www.freedesktop.org/wiki/)
 desktop entry specification file at
-`~/.local/share/applications/acme.desktop` with the following
-contents (replace `USERNAME` as appropriate).
+`~/.local/share/applications/acme.desktop` with the following contents
+(replace `USERNAME` as appropriate).
 
 ```desktop
 [Desktop Entry]
