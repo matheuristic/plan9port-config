@@ -52,7 +52,7 @@ pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp
 pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
 
 * Edit
-|mdformat --number --wrap 70 -
+,|mdformat --number --wrap 70 -
 
 * Watch
 zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
