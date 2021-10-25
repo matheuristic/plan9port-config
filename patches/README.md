@@ -2,16 +2,18 @@
 
 ## Creating and using patches
 
-To create a patch:
+To create a patch from a Git repo diff (provide arguments to the
+`git diff` command as necessary):
 
 ```shell
-git diff > save.patch
+git diff > /path/to/save.patch
 ```
 
-To apply a patch:
+To apply a patch created using the above (the `-p1` option is to
+ignore the leading `a/` and `b/` prefixes created by `git diff`):
 
 ```shell
-patch -p1 < save.patch
+patch -p1 < /path/to/save.patch
 ```
 
 See this
@@ -36,7 +38,7 @@ This patch removes the default behavior of remapping characters
 To apply the patch, run from the repository root:
 
 ```shell
-patch -p1 < plan9port-x11-shiftpressbutton1.patch
+patch -p1 < /path/to/plan9port-x11-shiftpressbutton1.patch
 ```
 
 This patch makes it so `Shift` sends Button1 while the mouse button
