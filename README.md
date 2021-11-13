@@ -39,7 +39,7 @@ compile-time dependencies need to be installed.
 
 System install (for all users):
 
-```shell
+```sh
 cd /usr/local
 sudo git clone https://github.com/9fans/plan9port.git plan9
 cd plan9
@@ -50,7 +50,7 @@ Local install (for the current user, creating a new git branch is for
 easier updating, and code patches should be applied after the
 `git checkout` step):
 
-```shell
+```sh
 mkdir -p $HOME/packages
 cd $HOME/packages
 git clone https://github.com/9fans/plan9port.git
@@ -70,7 +70,7 @@ plan9port commands. In that case, `ls` runs the regular version of
 I.e., suppose `$HOME/.local/bin` exists and is on the shell search
 path, and plan9port is installed locally as above:
 
-```shell
+```sh
 cd $HOME/.local/bin
 ln -s $HOME/packages/plan9port/bin/9
 ```
@@ -81,7 +81,7 @@ Use GNU `stow` from the repository root directory to symbolically link
 the base configuration files and helper scripts to the corresponding
 user config locations.
 
-```shell
+```sh
 stow -t $HOME --no-folding plan9port
 ```
 
@@ -104,7 +104,7 @@ This will create the symlinks:
 
 Create directory used by the autosave script.
 
-```shell
+```sh
 mkdir -p $HOME/.acme/autosave
 ```
 
@@ -112,7 +112,7 @@ Copy `sample-a.sh` and `sample-sam.sh` to `~/.local/bin/a.sh` and
 `~/.local/bin/sam.sh` and modify them to create customized launchers
 for Acme and Sam.
 
-```shell
+```sh
 cp plan9port/.local/bin/sample-a.sh $HOME/.local/bin/a.sh
 cp plan9port/.local/bin/sample.sam.sh $HOME/.local/bin/sam.sh
 ```
@@ -144,7 +144,7 @@ to change the main or alternate fonts:
 
 Example of running Acme with different fonts:
 
-```shell
+```sh
 acme -f /lib/font/bit/pelm/unicode.13.font -F /mnt/font/GoMono/18a/font
 ```
 
@@ -167,7 +167,7 @@ path defaults to `~/acme.dump`.
 Acme can be launched with the `-l /path/to/dump/file` option to load a
 specific session dump file on startup. Example:
 
-```shell
+```sh
 acme -l /path/to/project/acme.dump
 ```
 
@@ -277,14 +277,14 @@ a number of helper scripts available at `~/.acme/bin`:
   client. See its website for how to configure it and use it with LSP
   servers. Install acme-lsp with:
 
-  ```shell
+  ```sh
   GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/acme-lsp@latest
   GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
   Create helper scripts in `$HOME/.acme/bin/` by running in `rc`:
 
-  ```shell
+  ```sh
   for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
       > $home/.acme/bin/L^$cmd {
           echo '#!/usr/bin/env rc'
@@ -296,7 +296,55 @@ a number of helper scripts available at `~/.acme/bin`:
 
   Config params can be saved in a [TOML](https://toml.io/) file
   `$HOME/Library/Application Support/acme-lsp/config.toml` for macOS
-  or `$HOME/.local/bin/acme-lsp/config.toml` for Unix or Linux.
+  or `$HOME/.config/acme-lsp/config.toml` for Unix or Linux.
+  Example:
+
+  ```toml
+  # ~/.config/acme-lsp/config.toml - acme-lsp config
+  
+  [Servers]
+  
+  	[Servers.elixir-ls]
+  	Command = ["/path/to/elixir-ls/language_server.sh"]
+  	StderrFile = ""
+  	LogFile = ""
+  
+  	[Servers.jedi-language-server]
+  	Command = ["jedi-language-server"]
+  	StderrFile = ""
+  	LogFile = ""
+  
+  	[Servers.gopls]
+  	Command = ["gopls", "serve", "-rpc.trace"]
+  	StderrFile = "gopls.stderr.log"
+  	LogFile = "gopls.log"
+  		# These settings gets passed to gopls
+  		[Servers.gopls.Options]
+  		hoverKind = "FullDocumentation"
+  
+  [[FilenameHandlers]]
+  Pattern = "\\.exs?$"
+  ServerKey = "elixir-ls"
+  
+  [[FilenameHandlers]]
+  Pattern = "\\.py$"
+  ServerKey = "jedi-language-server"
+  
+  [[FilenameHandlers]]
+  Pattern = "[/\\\\]go\\.mod$"
+  LanguageID = "go.mod"
+  ServerKey = "gopls"
+
+  [[FilenameHandlers]]
+  Pattern = "[/\\\\]go\\.sum$"
+  LanguageID = "go.sum"
+  ServerKey = "gopls"
+  
+  [[FilenameHandlers]]
+  Pattern = "\\.go$"
+  LanguageID = "go"
+  ServerKey = "gopls"
+  ```
 
   An alternative is [acre](https://github.com/mjibson/acre).
 
@@ -304,7 +352,7 @@ a number of helper scripts available at `~/.acme/bin`:
   explorer for Acme. Assuming `$PLAN9` and `mk` are on the system
   path, install adir with:
 
-  ```shell
+  ```sh
   git clone https://github.com/lewis-weinberger/adir.git
   cd adir
   mk install BIN=$home/.acme/bin
@@ -328,7 +376,7 @@ a number of helper scripts available at `~/.acme/bin`:
   for automatically linting or running tests when files are written.
   Install Watch with:
 
-  ```shell
+  ```sh
   GO111MODULE=on go get 9fans.net/go/acme/Watch@latest
   ```
 
@@ -346,7 +394,7 @@ Acme) when using that shell updates the tag line with the new
 directory. This is `$HOME/.bashrc` for Bash or `$HOME/.zshrc` for Zsh.
 Can be adapted for shells that are not POSIX-compatible like `fish`.
 
-```shell
+```sh
 # Update Acme window tag line with dir in which it's running
 if [ "$winid" ]; then
     _acme_cd () {
@@ -363,7 +411,7 @@ itself at a given mountpoint. This allows other programs that don't
 have or don't allow direct shell access (i.e. cannot call `9p`) to
 interact with Acme. Example:
 
-```shell
+```sh
 acme -m /path/to/mtpt
 ```
 
@@ -375,7 +423,7 @@ filesystem has to be mounted outside of `/User` with `MNT_DONTBROWSE`
 set on it. Mounting Acme at a directory in `/tmp` satisfies this, so
 mounting Acme on macOS should be done with this in mind. For example:
 
-```shell
+```sh
 acme -m /tmp/acme
 ```
 
@@ -412,7 +460,7 @@ For more information on Acme mounting and macOS, see the following
   parenthesis. Useful for easy selection of commands containing
   spaces. For example:
 
-  ```shell
+  ```sh
   (Load /path/to/project.dump)
   ```
 
@@ -432,7 +480,7 @@ For more information on Acme mounting and macOS, see the following
   when no extra options are provided. An example of a start/bookmarks
   file follows.
 
-  ```shell
+  ```sh
   # ~/.acme/start - Acme start file
 
   # Project workspaces
@@ -472,13 +520,13 @@ For more information on Acme mounting and macOS, see the following
   specific fonts or loads a given dump file) can be created as
   aliases, e.g. for Bash
 
-  ```shell
+  ```sh
   alias aproj='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
   ```
 
   or for rc
 
-  ```shell
+  ```sh
   fn aproj { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump }
   ```
 
@@ -533,7 +581,7 @@ See `9 man 7 plumb` for more information about plumbing rules.
 has to be started in a launch script or manually. The rc command below
 starts `plumber` if it is not running in the current namespace.
 
-```shell
+```sh
 9p stat plumb >[2]/dev/null >[1=2] || 9 plumber
 ```
 
@@ -543,7 +591,7 @@ Plumbing rules can be updated without restarting `plumber` via a Plan
 9 mount point (change `/path/to/plumbing` below as appropriate, e.g.
 `$home/lib/plumbing` to reload user-specific rules after an update).
 
-```shell
+```sh
 cat /path/to/plumbing | 9p write plumb/rules
 ```
 
@@ -580,7 +628,7 @@ the `$PLAN9/src/cmd/fontsrv` directory.
 When `fontsrv` is running, available host system fonts can by listing
 the `font` "directory" in the Plan 9 filesystem.
 
-```shell
+```sh
 fontsrv &
 9p ls font
 ```
@@ -607,7 +655,7 @@ Fonts can also be specified in ways that extend the standard behavior:
   helpful for high DPI Linux systems where fonts are not automatically
   scaled (unliked in macOS, where they are). Example:
 
-  ```shell
+  ```sh
   acme -f 2*/lib/font/bit/lucsans/unicode.8.font
   ```
 
@@ -616,7 +664,7 @@ Fonts can also be specified in ways that extend the standard behavior:
   useful in multi-screen environments where some screens are high DPI
   while other screens are low DPI. Example:
 
-  ```shell
+  ```sh
   acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
   ```
 
