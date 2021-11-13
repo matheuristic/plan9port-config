@@ -1,7 +1,9 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
-# Comment STDIN or piped text using argument as the leading comment string
-# (default comment string is '#')
-comment=$1
-if (~ $#comment 0) comment='#'
-9 sed 's/.*/'^$comment^' &/'
+# Comment STDIN or piped text using argument as the leading comment
+# string (default comment string is '#') with the comment strings
+# inserted at the column corresponding to the end of the shortest
+# leading indentation in the text
+
+COMMENTCHARS=${1:-"#"}
+awk 'BEGIN{n=0} {split($0,a,/[^ \t]/)} (NR==1||a[1]<shortest){shortest=a[1]} {lines[++n]=$0} END{for(i=1;i<=n;i++){sub(shortest, shortest "'"$COMMENTCHARS"'" " ", lines[i]); print lines[i]}}'

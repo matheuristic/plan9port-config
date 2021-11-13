@@ -1,7 +1,7 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
-# Uncomment STDIN or piped text using argument as the leading comment string
-# (default comment string is '#')
-commentchar=$1
-if (~ $#commentchar 0) commentchar='#'
-9 sed 's/^([	 ]*)'^$commentchar^' ?(.*)/\1\2/'
+# Uncomment STDIN or piped text using argument as the leading comment
+# string (default comment string is '#')
+
+COMMENTCHARS=${1:-"#"}
+awk '{split($0,a,/[^ \t]/)} {sub(a[1] "'"$COMMENTCHARS"'" " ?", a[1]); print}'

@@ -1,7 +1,7 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
 # Wrap STDIN or piped text to width given by argument (default is 70)
 # Uses par ( http://www.nicemice.net/par/ ) if installed, otherwise uses fmt
-width=$1
-if (~ $#width 0) width=70
-9 par 'w'^$width^'rq' >[2]/dev/null || 9 fmt -w $width
+
+WIDTH=${1:-70}
+par "w${WIDTH}rq" 2>/dev/null || fmt -w "${WIDTH}"

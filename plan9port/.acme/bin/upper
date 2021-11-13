@@ -1,5 +1,5 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
 # Covert STDIN or piped text to upper case
 
-9 tr a-z A-Z
+tr a-z A-Z
