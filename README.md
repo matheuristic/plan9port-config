@@ -806,3 +806,11 @@ Terminal=false
 Type=Application
 Version=1.0
 ```
+
+## Ports of Plan 9 tools to other languages
+
+- [Acme Go port](https://github.com/9fans/go/tree/main/cmd/acme)
+
+- [Edwood](https://github.com/rjkroege/edwood) (another Acme Go port)
+
+- [Sam Go port](https://github.com/9fans/go/tree/main/cmd/sam)
