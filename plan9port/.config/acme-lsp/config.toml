@@ -1,0 +1,48 @@
+# ~/.config/acme-lsp/config.toml - acme-lsp config
+
+# Note that a relative file paths use os.UserCacheDir(), so on Linux
+# "some.log" resolves to "$HOME/.cache/acme-lsp/some.log" and on macOS
+# "some.log" resolves to "$HOME/Library/Caches/acme-lsp/some.log"
+
+[Servers]
+
+	[Servers.elixir-ls]
+	Command = ["bash", "-c", "$HOME/.local/bin/elixir-ls.sh"]
+	StderrFile = ""
+	LogFile = ""
+
+	[Servers.jedi-language-server]
+	Command = ["bash", "-c", "$HOME/.local/bin/jedi-language-server.sh"]
+	StderrFile = ""
+	LogFile = ""
+
+	[Servers.gopls]
+	Command = ["gopls", "serve", "-rpc.trace"]
+	StderrFile = "gopls.stderr.log"
+	LogFile = "gopls.log"
+		# These settings get passed to gopls
+		[Servers.gopls.Options]
+		hoverKind = "FullDocumentation"
+
+[[FilenameHandlers]]
+Pattern = "\\.exs?$"
+ServerKey = "elixir-ls"
+
+[[FilenameHandlers]]
+Pattern = "\\.py$"
+ServerKey = "jedi-language-server"
+
+[[FilenameHandlers]]
+Pattern = "[/\\\\]go\\.mod$"
+LanguageID = "go.mod"
+ServerKey = "gopls"
+
+[[FilenameHandlers]]
+Pattern = "[/\\\\]go\\.sum$"
+LanguageID = "go.sum"
+ServerKey = "gopls"
+
+[[FilenameHandlers]]
+Pattern = "\\.go$"
+LanguageID = "go"
+ServerKey = "gopls"
