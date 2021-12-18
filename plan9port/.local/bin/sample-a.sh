@@ -38,6 +38,9 @@
 #    if [ "$1" = "-n" ]; then
 #        export NAMESPACE=/tmp/ns.$USER.${DISPLAY-:":0"}-$2
 #        mkdir -p "$NAMESPACE"
+#        # Uncomment below line if to maintain a cleaner /tmp/ directory
+#        # (the /tmp/ directory gets cleaned on reboots in any case)
+#        # trap 'rm -rf "$NAMESPACE"' EXIT
 #        shift; shift
 #    fi
 #    startparams="$@"
