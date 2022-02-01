@@ -1,4 +1,4 @@
-# ~/lib/guide - reference guide file, for template see guide-condensed
+# ~/lib/guide - reference guide file, also see guide-starter
 
 ## Quick tags
 
@@ -166,6 +166,7 @@ Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
                          changes xx to yy in all buffers)
 
 Edit X                  (list windows)
+Edit X/^'/w             (write all modified files)
 
 Edit ,>9 wc -r          (count num characters or runes in window)
 Edit ,|sort -r          (reverse sort all lines in window)

@@ -13,7 +13,7 @@ s/^    //g                    # 4-space unindent
 s/.*/(&)/g                    # wrap selection with parens
 .-/\(/,.+/\)/s:\((.*)\):\1:g  # splice parens containing selection
 ,>wc                          # line, word and char counts
-X/'/w                         # write all modified files
+X/^'/w                        # write all modified files
 X                             # list windows
 
 # Characters

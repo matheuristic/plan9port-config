@@ -88,7 +88,7 @@ stow -t $HOME --no-folding plan9port
 This will create the symlinks:
 
 - `~/lib/guide`: Reference guide file.
-- `~/lib/guide-condensed`: Basic guide file, use as a starter template
+- `~/lib/guide-starter`: Basic guide file, use as a starter template
   for project-specific guide files.
 - `~/lib/plumbing`: Plumbing file for controlling the behavior of
   `plumber`.
