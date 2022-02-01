@@ -1,0 +1,23 @@
+# Shell commands
+win                                       # new shell window
+rg+ 'text' | grep '^'^`{basename $%}^':'  # search for text in file
+
+# Edit commands
++/text/                       # search for text forwards
+$-/text/                      # search for text backwards from end
+,d                            # clear window, useful for +Error
+s/^./	&/g                   # tab indent
+s/^	//g                       # tab unindent
+s/^./    &/g                  # 4-space indent
+s/^    //g                    # 4-space unindent
+s/.*/(&)/g                    # wrap selection with parens
+.-/\(/,.+/\)/s:\((.*)\):\1:g  # splice parens containing selection
+,>wc                          # line, word and char counts
+X/'/w                         # write all modified files
+X                             # list windows
+
+# Characters
+αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
+–—‘’“”…«»•©®™†‡°·§¶№¡¿◊¢£€ÆŒæœ  # Typography
+±×÷√∑∏∫≠≈≤≥∂∆∞∩¬                # Math
+←→↑↓¹²³ⁿ                        # Other

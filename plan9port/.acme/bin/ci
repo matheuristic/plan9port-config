@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Convert STDIN or piped text to a regexp search term that is
+# case-insensitive, for example
+#   abc   -> [Aa][Bb][Cc]
+#   abc!% -> [Aa][Bb][Cc]!%
+
+awk '{n=length($0)}{for(i=1;i<=n;i++){c=substr($0,i,1);if(match(c,"[A-Za-z]")){printf("[" toupper(substr($0,i,1)) tolower(substr($0,i,1)) "]")}else{printf("%s",c)}}}{printf("\n")}'

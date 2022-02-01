@@ -87,7 +87,9 @@ stow -t $HOME --no-folding plan9port
 
 This will create the symlinks:
 
-- `~/lib/guide`: Master guide file.
+- `~/lib/guide`: Reference guide file.
+- `~/lib/guide-condensed`: Basic guide file, use as a starter template
+  for project-specific guide files.
 - `~/lib/plumbing`: Plumbing file for controlling the behavior of
   `plumber`.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
@@ -213,7 +215,8 @@ a number of helper scripts available at `~/.acme/bin`:
   executes `cmd` in it with the given args.
 - `c+`: Comment. Specify an argument to change the comment prefix from
   the default `#`.
-- `c-`: Uncomment, an arg may be specified as in `c+`.
+- `c-`: Uncomment. An argument may be specified as in `c+`.
+- `ci`: Convert an alphanumeric string to a case-insensitive regexp.
 - `condarun`: `condaenv=envname condarun cmd arg1 ...` executes `cmd`
   with the given args in the `envname` Conda environment (default
   environment is the one active when Acme was launched, else `base`).

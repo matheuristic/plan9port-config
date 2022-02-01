@@ -1,4 +1,4 @@
-# ~/lib/guide - master guide file with examples
+# ~/lib/guide - reference guide file, for template see guide-condensed
 
 ## Quick tags
 
@@ -182,6 +182,10 @@ Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
                          number N will set the starting column of the
                          original text to N+2 instead)
 
+Edit s/.*/(&)/g         (wrap selection with parens)
+Edit .-/\(/,.+/\)/s:\((.*)\):\1:g
+                        (splice parens containing selection)
+
 |c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
 |c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')
 |i+ [INDENTSTR]         (indent text, default INDENTSTR is '\t')
@@ -274,3 +278,26 @@ L ws                    (list current workspace dirs)
 L ws+ [DIR1] ...        (add workspace dirs, default is `{pwd})
 L ws- [DIR1] ...        (remove workspace dirs, default is `{pwd})
 L -showconfig           (show config values)
+
+---
+
+## Useful characters
+
+# Greek
+αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ
+
+# Typography
+–—‘’“”…«»•©®™†‡°·§¶№★
+¡¿※◊☞¢£€ÆŒæœ
+
+# Math
+±×÷√∑∏∫∮∴∵≠≈≉≤≥⊂⊃⊄⊅⊆⊇⊈⊉
+≔≕≜∷∹∀∂∃∄∅∆∇∈∉∝∞
+⋀⋁⋂⋃∧∨∩∪⊼⊽¬≃≁∥
+
+# Arrows
+←→↑↓⇐⇒⇑⇓⇔⇕⇍⇏⇎↤↦↥↧↺↻
+
+# Superscript/Subscript
+⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁱⁿ
+₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ
