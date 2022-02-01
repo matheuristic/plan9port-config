@@ -1,6 +1,6 @@
 # Shell commands
-win                                       # new shell window
-rg+ 'text' | grep '^'^`{basename $%}^':'  # search for text in file
+win                        # new shell window
+rg+ 'text' `{basename $%}  # search for text in saved version of file
 
 # Edit commands
 +/text/                       # search for text forwards
