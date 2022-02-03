@@ -285,7 +285,8 @@ L -showconfig           (show config values)
 ## Useful characters
 
 # Greek
-αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ
+αβγδεζηθικλμνξοπρστυϕχψω
+ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ
 
 # Typography
 –—‘’“”…«»•©®™†‡°·§¶№★
