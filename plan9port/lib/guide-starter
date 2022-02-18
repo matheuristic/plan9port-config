@@ -19,5 +19,6 @@ X                             # list windows
 # Characters
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
 –—‘’“”…«»•©®™†‡°·§¶№¡¿◊¢£€ÆŒæœ  # Typography
-±×÷√∑∏∫≠≈≤≥∂∆∞∩¬                # Math
+±×÷√∛∑∏∫≠≈≤≥∂∆∞∩¬               # Math
 ←→↑↓¹²³ⁿ                        # Other
+÷πℯ∈∉∋∌∘√∛∩∪≈≉≠≡≢≤≥⊆⊇⊈⊉⊊⊋⊻⊼⊽    # Julia math constants and operators
