@@ -200,6 +200,19 @@ If `stow` was used to symlink the base configuration files, a master
 guide file will be available at `~/lib/guide` containing a wide array
 of commands and examples.
 
+### Useful bundled commands
+
+plan9port comes with several useful commands for working with Acme
+(and Sam):
+
+- `B`: Opens file in a new window inside Acme (or Sam).
+- `E`: Opens file in a new window inside Acme (or Sam), returning
+  control to the calling process after editing is done. Useful for
+  using with `git` or other commands that opens an editor specified
+  by `$EDITOR` in a sub-process, e.g. `EDITOR=E git commit -a`.
+  See [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
+  for examples. Or use the `acmeed` script (see next section).
+
 ### Helper scripts
 
 If `stow` was used to symlink the base configuration files, there are
