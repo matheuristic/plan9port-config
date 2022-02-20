@@ -1,15 +1,10 @@
-# Shell commands
-win                        # new shell window
-rg+ 'text' `{basename $%}  # search for text in saved version of file
+# Tag commands
+Edit Font (Indent on) c- c+ i- i+ is- is+ rg+ <clip-paste.sh win
 
 # Edit commands
 +/text/                       # search for text forwards
 $-/text/                      # search for text backwards from end
 ,d                            # clear window, useful for +Error
-s/^./	&/g                   # tab indent
-s/^	//g                       # tab unindent
-s/^./    &/g                  # 4-space indent
-s/^    //g                    # 4-space unindent
 s/.*/(&)/g                    # wrap selection with parens
 .-/\(/,.+/\)/s:\((.*)\):\1:g  # splice parens containing selection
 ,>wc                          # line, word and char counts
@@ -20,5 +15,17 @@ X                             # list windows
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
 –—‘’“”…«»•©®™†‡°·§¶№¡¿◊¢£€ÆŒæœ  # Typography
 ±×÷√∛∑∏∫≠≈≤≥∂∆∞∩¬               # Math
-←→↑↓¹²³ⁿ                        # Other
+←→↑↓¹²³ⁱⁿₖₘₙ                    # Other
 ÷πℯ∈∉∋∌∘√∛∩∪≈≉≠≡≢≤≥⊆⊇⊈⊉⊊⊋⊻⊼⊽    # Julia math constants and operators
+
+# Git commands
+git log --oneline -10
+git status
+git diff
+git commit -a
+git push -u origin/HEAD
+git fetch
+git merge origin/HEAD
+git rebase -i HEAD~3          # NOTE: must always pick oldest commit
+git checkout BRANCH
+git checkout -b BRANCH

@@ -235,14 +235,16 @@ Slide-                  (previous slide)
 
 ## Git
 
+git log --oneline -10   (show last 10 commits, one line per commit)
 git status              (current repository status)
 git diff                (show uncommitted file changes)
 git commit -am 'TEXT'   (commit with the given commit message TEXT)
-git push -u origin      (push current local branch to origin)
+git push -u origin HEAD (push current local branch to origin branch)
 git fetch               (fetch changes)
-git merge origin/master (merge changes from origin/master branch)
+git merge origin/HEAD   (merge changes from origin branch)
 git pull                (like 'git fetch' then 'git merge FETCH_HEAD')
-git rebase -i HEAD~3    (rebase interactively from 3 commits ago)
+git rebase -i HEAD~3    (rebase interactively from 3 commits ago, note
+                         that the oldest commit must always be picked)
 git checkout BRANCH     (switch to BRANCH)
 git checkout -b BRANCH  (create new BRANCH and switch to it)
 
