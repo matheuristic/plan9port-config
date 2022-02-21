@@ -29,3 +29,6 @@ git merge origin/HEAD
 git rebase -i HEAD~3          # NOTE: must always pick oldest commit
 git checkout BRANCH
 git checkout -b BRANCH
+
+# Plumber rules
+cat $home/lib/plumbing | 9p write plumb/rules

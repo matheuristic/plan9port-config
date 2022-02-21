@@ -29,6 +29,10 @@ s/REGEXP/REPLACE/g
 .+#0/OLD/c/NEW/
 .
 
+### Plumber
+
+cat $home/lib/plumbing | 9p write plumb/rules
+
 ### J
 
 win ijconsole

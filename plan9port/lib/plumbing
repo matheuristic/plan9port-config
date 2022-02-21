@@ -4,7 +4,7 @@ editor = acme
 
 # ms office files (docx?, xlsx?, pptx?)
 data matches '([a-zA-Z¡-￿0-9_\-./][ a-zA-Z¡-￿0-9_\-./]*)\.([Dd][Oo][Cc][Xx]?|[Xx][Ll][Ss][Xx]?|[Pp][Pp][Tt][Xx]?)'
-arg isfile	$0
+arg isfile $0
 plumb to office
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
 
@@ -17,11 +17,57 @@ attr add addr=$2
 plumb to edit
 plumb client $editor
 
+# python enhancement proposal (PEP)
+type is text
+data matches 'PEP-?([0-9]+)'
+plumb start rc -c 'printf ''https://www.python.org/dev/peps/pep-%04d/'' '$1'/ | plumb -i'
+
+# request for comments (RFC)
+type is text
+data matches 'RFC[\-:]?([0-9]+)'
+plumb to web
+plumb start web https://www.rfc-editor.org/info/rfc$1
+
+# digital object identifer (DOI)
+type is text
+data matches '10.[0-9][0-9][0-9][0-9][0-9]?[0-9]?[0-9]?[0-9]?[0-9]?/[\-\._;\(\)/:a-zA-Z0-9]+'
+data set https://doi.org/$0
+plumb to web
+plumb start web $data
+
 # git commits, sourced from https://blog.silvela.org/post/2021-12-11-acme-tricks/
 type is text
 data matches '[0-9a-f]*[a-f][0-9a-f]*'
 data matches '([0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]+)'
 plumb start rc -c 'cd '$wdir'; cd `{git rev-parse --show-toplevel} && [ -d .git ] && git show '$1' | plumb -i -d edit -a ''action=showdata filename=+git/'$1''' '
+
+# market_identifier_code:ticker
+type is text
+data matches '(X[A-Z][A-Z][A-Z]):([0-9A-Z]+)'
+data set https://www.morningstar.com/stocks/$1/$2/quote
+plumb to web
+plumb start web $data
+
+# financial instrument global identifier (OpenFIGI)
+type is text
+data matches 'BBG[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9]'
+data set https://www.openfigi.com/id/$0
+plumb to web
+plumb start web $data
+
+# day YYYY-MM-DD or YYYYMMDD in Google Calendar
+type is text
+data matches '(20[0-9][0-9])[\-/]?(0[1-9]|1[0-2])[\-/]?(0[1-9]|[1-2][0-9]|3[01])
+data set https://calendar.google.com/calendar/u/0/r/day/$1/$2/$3
+plumb to web
+plumb start web $data
+
+# month YYYY-MM or YYYYMM in Google Calendar
+type is text
+data matches '(20[0-9][0-9])[\-/]?(0[1-9]|1[0-2])
+data set https://calendar.google.com/calendar/u/0/r/month/$1/$2/01
+plumb to web
+plumb start web $data
 
 # include basic plumbing rules
 include basic
