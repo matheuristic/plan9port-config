@@ -1,5 +1,5 @@
 # Tag commands
-Edit Font (Indent on) c- c+ i- i+ is- is+ rg+ <clip-paste.sh win
+Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s rg+
 
 # Edit commands
 +/text/                       # search for text forwards
