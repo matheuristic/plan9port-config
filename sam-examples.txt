@@ -1,0 +1,28 @@
+=                   # line number at point
+5,10                # select lines 5 to 10 inclusive
+,d                  # clear window contents
++/RE/               # search forwards for regexp RE
+$-/RE/              # search backwards from end for regexp RE
+-/^$/++,/^$/        # select current paragraph
+x/^/a/	/           # add tab of indent to selection
+x/^	/d              # remove a tab of indent from selection
+x v/^[ 	]+/d        # delete unindented lines in selection
+s/"([ˆ"]*)"/“\1”/g  # replace "..." with “...” in selection
+s/.*/(&)/g          # wrap selection with parens
+.-/\(/,.+/\)/s:\((.*)\):\1:g
+                    # splice parens containing selection
+-/OLD/ c/NEW/       # replace prev occurrence of OLD with NEW
+.+#0/RE1/s/RE2/
+.                   # replace next occurrence of regexp RE1 with RE2
+                    # starting from the top if nothing is selected;
+                    # select both lines to also move the viewport
+x/^RE1/ .,/$/ s/RE2/RE3/g
+                    # for each region matching regexp RE1, replace
+                    # regexp RE2 with replacement pattern RE3
+X/RE1/ ,s/RE2/RE3/g # for each buffer whose name matches regexp RE1
+                    # apply regexp (RE2) replacement (RE3) to buffer
+X                   # list windows
+X/^'/w              # write all modified files
+Y/^'/D              # close all clean (unmodified) files
+t "RE" $            # copy to end of file matching regexp RE
+w FILENAME          # write selection to FILENAME

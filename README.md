@@ -87,9 +87,7 @@ stow -t $HOME --no-folding plan9port
 
 This will create the symlinks:
 
-- `~/lib/guide`: Reference guide file.
-- `~/lib/guide-starter`: Basic guide file, use as a starter template
-  for project-specific guide files.
+- `~/lib/guide`: Basic guide file example.
 - `~/lib/plumbing`: Plumbing file for controlling the behavior of
   `plumber`.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
@@ -471,7 +469,7 @@ For more information on Acme mounting and macOS, see the following
     that the view indicator is at the position scrollbar was clicked,
     which allows for directly jumping to a window position.
 
-- Wrap a command with parentheses to make it selectable by
+- Wrap a command with parentheses or brackets to make it selectable by
   double-clicking (Button1 twice) just to the right of the left
   parenthesis. Useful for easy selection of commands containing
   spaces. For example:
@@ -823,6 +821,13 @@ Terminal=false
 Type=Application
 Version=1.0
 ```
+
+## Other files in this repository
+
+- `sam-examples.txt`: Examples of Sam commands, most of which can
+  also be used in Acme with the `Edit` command.
+
+- `unicode-chars.txt`: Useful Unicode characters.
 
 ## Ports of Plan 9 tools to other languages
 

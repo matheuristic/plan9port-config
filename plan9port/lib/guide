@@ -1,312 +1,58 @@
-# ~/lib/guide - reference guide file, also see guide-starter
+# Tag
+Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw rg+
 
-## Quick tags
+# Edit
+=                   # line number
++/text/             # search for text forwards
+$-/text/            # search for text backwards from end
+,d                  # clear whole buffer window, useful for +Error
+,>wc                # line, word and char counts for whole buffer
+X/^'/w              # write all modified files
+X                   # list windows
 
-### General
+# Characters
+αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
+–—‘’“”…«»•©®™†‡°·§¶№¡¿◊¢£€ÆŒæœ  # Typography
+±×÷√∛∑∏∫≠≈≤≥∂∆∇∞∩¬              # Math
+←→↑↓¹²³ⁱⁿₖₘₙ                    # Other
+÷πℯ∈∉∋∌∘√∛∩∪≈≉≠≡≢≤≥⊆⊇⊈⊉⊊⊋⊻⊼⊽    # Julia math constants and operators
 
-Edit Font ID Indent Tab Watch rg+ win
-|c+ |c- |w+ |w- |s2t |t2s |upper |lower :,
+# Git
+git log --oneline -10
+git status
+git diff
+git commit -a
+git push -u origin/HEAD
+git fetch
+git merge origin/HEAD
+git rebase -i HEAD~3          # NOTE: must always pick oldest commit
+git checkout BRANCH
+git checkout -b BRANCH
 
-### Python
+# Watch (requires 9fans.net/go/acme/Watch Go pkg)
+Watch [-r] COMMAND [ARG1] ...
 
-|is+ |is-
+# LSP (requires github.com/fhs/acme-lsp/cmd/{acme-lsp,L} Go pkgs)
+win acme-lsp
+Lcomp Ldef Lfmt Lhov Limpls Lrefs [Lrn SYM] Lsig Lsyns Ltype Lws+ Lws-
 
-### acme-lsp
-
-L
-
-## Quick guides
-
-Commands in blocks beginning with a "* COMMAND" line should be run
-with a 2-1 chord on COMMAND in a window tag.
-
-### General
-
-* Edit
-=
-,|dtw
-s/REGEXP/REPLACE/g
-.+#0/OLD/c/NEW/
-.
-
-### Plumber
-
-cat $home/lib/plumbing | 9p write plumb/rules
-
-### J
-
-win ijconsole
-
-* Watch
-zsh -c 'ijconsole -js "exit [ echo lint '''^$%^''' [ require ''debug/lint''"'
-
-### Python
-
-condaenv=ENVNAME win condarun python3
-condaenv=ENVNAME condarun python3 -m pdb FILENAME.py
-
-* Edit
-,|runfc black
-
-* Watch
-condaenv=ENVNAME condarun pylint -f parseable $%
-
-### Markdown
-
-pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
-pandoc --filter=pantable -o /tmp/tmp.pdf FILENAME.md && { xdg-open /tmp/tmp.pdf || open /tmp/tmp.pdf } &
-
-* Edit
-,|mdformat --number --wrap 70 -
-
-* Watch
-zsh -c '. $home/.nvm/nvm.sh && markdownlint '^$%
-
-### Shell
-
-* Edit
-,|shfmt -ln posix -i 0
-
-* Watch
-shellcheck -a -f gcc $%
-
-### acme-lsp
-
-acme-lsp
-
-* L
-comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-
-
-### DevSkim
-
-* Watch
+# DevSkim (https://github.com/microsoft/DevSkim)
 devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
 
----
+# ShellCheck (https://github.com/koalaman/shellcheck)
+shellcheck -a -f gcc $%
 
-## Notes
+# mdformat (https://github.com/executablebooks/mdformat)
+|mdformat --number --wrap 70 -
 
-- *Nomenclature*:
-  - BOLD are args that should be replaced with the appropriate string
-  - [SQUAREBRACKETED] args are optional
-  - ... indicate multiple args can be provided
-- Commands starting with : are run with Button3 (right-click, plumb)
-  instead of the regular Button2 (middle-click, execute)
-- When right-clicking on symbols that don't match a plumbing rule,
-  a forward search is done in that window using that symbol
-- Sam commands begin with Edit, e.g. Edit =
-  - See the Sam manpage for more info or Sam cheatsheet for idioms
-    https://9fans.github.io/plan9port/man/man1/sam.html
-    http://sam.cat-v.org/cheatsheet/
-- Wrap the commands in parentheses to make them selectable by
-  double-clicking just to the right of the left parenthesis, e.g.
-  (Edit =)
-- For commands that take arguments, like Edit, it can be more
-  efficient to write the argument in a separate window, select it and
-  use a 2-1 mouse chord on Edit in the target window tag
-- Some commands like condarun, runfc, etc are custom scripts
-- Some programs like pandoc or markdownlint (Node.js markdownlint-cli)
-  are installed external of plan9port
+# Pandoc (https://pandoc.org/)
+pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
 
----
+# Python Black (https://github.com/psf/black)
+|runfc black
 
-## Editing
+# Pylint (https://github.com/PyCQA/pylint)
+condaenv=ENVNAME condarun pylint -f parseable $%
 
-- Some commands below use scripts from ~/.acme/bin
-- rg (and the ~/.acme/bin/rg+) script require ripgrep be installed
-- fzf commands require the corresponding command be installed
-  - Binaries availabe at https://github.com/junegunn/fzf
-- uni commands require the corresponding command be installed
-  - Binaries available at https://github.com/arp242/uni
-
-:N                      (Select line N of window, N is a number >=1
-                         or $ for the last line)
-:M,N                    (Select lines M to N in window, omit M to
-                         start from the first line and omit N to end
-                         at the last line)
-:+/REGEXP               (REGEXP search forward, right-click to run,
-                         + is optional)
-:-/REGEXP               (REGEXP search backward, right-click to run)
-FILENAME:/REGEXP        (find next occurrence of REGEXP in FILENAME,
-                         also useful as bookmarks)
-FILENAME:/REGEXP1/,/REGEXP2/
-                        (select region in FILENAME that begins at next
-                         REGEXP1 and ends after the following REGEXP2)
-
-rg+ REGEXP              (find lines matching REGEXP in files within
-                         the current dirtree using ripgrep)
-rg --files --hidden|rg REGEXP
-                        (find files with filename matching REGEXP
-                         using ripgrep)
-9 du -a|9 awk '{print $2}'|fzf -f QUERY
-                        (find files in current dirtree whose names
-                         fuzzy match QUERY using fzf)
-
-Edit =                  (current line number)
-Edit ,d                 (clear window contents)
-Edit -/{/,+/}/          (select contents of current { ... } block,
-                         including the enclosing braces)
-Edit s/"([ˆ"]*)"/“\1”/g (replace each straight double-quoted "word"
-                         in selection with the corresponding
-                         left-right double-quoted “word”)
-Edit .+#0/OLD/c/NEW/
-.
-                        (replace next occurrence of OLD with NEW; note
-                         that *both* lines should be selected and run,
-                         as this is two Sam commands run in sequence)
-Edit .+#0/REGEXP/s/REGEXP/REPLACEMENT/
-.
-                        (same as above but using REGEXP REPLACEMENT)
-Edit ,x/^PREFIX/ .,/$/ s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT to each line that
-                         starts with PREFIX)
-Edit ,x/REGIONREGEXP/ s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT to each region
-                         matching REGIONREGEXP)
-Edit X/BUFREGEXP/ ,s/REGEXP/REPLACEMENT/g
-                        (apply REGEXP REPLACEMENT across the entirety
-                         of windows whose name match BUFREGEXP, e.g.
-                         Edit X/.*/ ,s/xx/yy/g
-                         changes xx to yy in all buffers)
-
-Edit X                  (list windows)
-Edit X/^'/w             (write all modified files)
-
-Edit ,>9 wc -r          (count num characters or runes in window)
-Edit ,|sort -r          (reverse sort all lines in window)
-Edit 0<date             (insert date at start of window)
-Edit x/ˆ/ .,/0d         (remove C comments from selection)
-Edit ,|dtw              (delete trailing whitespace like spaces/tabs)
-Edit ,|grep -n '.*'     (add line numbers, after which executing Undo
-                         will remove the added line numbers)
-Edit ,|awk '{print sprintf("%4s ", NR ":") $0}'
-                        (add line numbers with nicer formatting, where
-                         the original text starts at column 6, after
-                         which executing Undo will remove the added
-                         line numbers; changing 4 in %4s to another
-                         number N will set the starting column of the
-                         original text to N+2 instead)
-
-Edit s/.*/(&)/g         (wrap selection with parens)
-Edit .-/\(/,.+/\)/s:\((.*)\):\1:g
-                        (splice parens containing selection)
-
-|c+ [COMMENTCHAR]       (comment text, default COMMENTCHAR is '#')
-|c- [COMMENTCHAR]       (uncomment text, default COMMENTCHAR is '#')
-|i+ [INDENTSTR]         (indent text, default INDENTSTR is '\t')
-|i- [INDENTSTR]         (unindent text, default INDENTSTR is '\t')
-|w+ [WIDTH]             (wrap text, default WIDTH is 70)
-|w-                     (unwrap text / join lines)
-|upper                  (uppercase text)
-|lower                  (lowercase text)
-|surround [BRACKETCHAR] (surround text, default BRACKETCHAR is '(')
-
->uni i `{cat}           (identify chars in a string)
-uni s DESCRIPTION       (look up unicode chars matching DESCRIPTION)
-uni p CODEPOINT         (print unicode char(s) at CODEPOINT, which can
-                         be a code like U+2042 , a range like
-                         2042..2044 , a category like Po or a block
-                         like 'box drawing')
-uni e DESCRIPTION       (print emoji matching DESCRIPTION)
-
----
-
-## Automation
-
-- Watch command requires Go 9fans.net/go/acme/Watch be installed
-
-Watch [-r] COMMAND [ARG1] ...
-                         (watch current dir and run COMMAND with args
-                          when files are written, add -r for recursive
-                          watch covering all subdirectories)
-
----
-
-## Slideshow
-
-- Slideshows are directories with a index file ./index and multiple
-  text files whose filenames without leading directories appear in
-  the index file
-- There should be no empty lines in the index file and the order of
-  the filenames indicate the order of the slides
-- Commands require custom scripts in ~/.acme/bin
-
-Slide                   (start or restart slideshow in current dir)
-Slide+                  (next slide)
-Slide-                  (previous slide)
-
----
-
-## Git
-
-git log --oneline -10   (show last 10 commits, one line per commit)
-git status              (current repository status)
-git diff                (show uncommitted file changes)
-git commit -am 'TEXT'   (commit with the given commit message TEXT)
-git push -u origin HEAD (push current local branch to origin branch)
-git fetch               (fetch changes)
-git merge origin/HEAD   (merge changes from origin branch)
-git pull                (like 'git fetch' then 'git merge FETCH_HEAD')
-git rebase -i HEAD~3    (rebase interactively from 3 commits ago, note
-                         that the oldest commit must always be picked)
-git checkout BRANCH     (switch to BRANCH)
-git checkout -b BRANCH  (create new BRANCH and switch to it)
-
----
-
-## acme-lsp
-
-- Requires acme-lsp be installed and started
-- Use the -v command-line option for verbose output
-- https://pkg.go.dev/github.com/fhs/acme-lsp/cmd/L
-
-win acme-lsp            (start acme-lsp with config file at location
-                         per 'acme-lsp -showconfig' which is
-                         ~/.config/acme-lsp/config.toml for Unix or
-                         ~/Library/Application\ Support/acme-lsp/config.toml
-                         for macOS)
-win acme-lsp -server '(\.py)$:jedi-language-server' -v
-                        (start acme-lsp with verbose output, using the
-                         specified filename-to-language-server-command
-                         mapping, overriding the config file params)
-
-L comp [-e]             (completion candidates, -e autocompletes if
-                         there is only one candidate)
-L def [-p]              (find definition and plumb, -p prints only)
-L fmt                   (format buffer and organize imports)
-L hov                   (show hover info for symbol at cursor)
-L impls                 (list implementation locations)
-L refs                  (list references to symbol at cursor)
-L rn NEWNAME            (rename symbol at cursor to NEWNAME)
-L sig                   (show signature for function at cursor)
-L syms                  (list symbols in the current file)
-L type                  (find symbol type and plumb, -p prints only)
-L ws                    (list current workspace dirs)
-L ws+ [DIR1] ...        (add workspace dirs, default is `{pwd})
-L ws- [DIR1] ...        (remove workspace dirs, default is `{pwd})
-L -showconfig           (show config values)
-
----
-
-## Useful characters
-
-# Greek
-αβγδεζηθικλμνξοπρστυϕχψω
-ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ
-
-# Typography
-–—‘’“”…«»•©®™†‡°·§¶№★
-¡¿※◊☞¢£€ÆŒæœ
-
-# Math
-±×÷√∛∑∏∫∮∴∵≔≕≜∷∹
-≁≃≠≈≉≡≢≤≥⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋
-∀∂∃∄∅∆∇∈∉∝∞∥
-⋀⋁⋂⋃∧∨∩∪⊼⊽⊻¬
-
-# Arrows
-←→↑↓⇐⇒⇑⇓⇔⇕⇍⇏⇎↤↦↥↧↺↻
-
-# Superscript/Subscript
-⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁱⁿ
-₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ
+# Plumber rules
+cat $home/lib/plumbing | 9p write plumb/rules
