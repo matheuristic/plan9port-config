@@ -205,11 +205,11 @@ plan9port comes with several useful commands for working with Acme
 
 - `B`: Opens file in a new window inside Acme (or Sam).
 - `E`: Opens file in a new window inside Acme (or Sam), returning
-  control to the calling process after editing is done. Useful for
-  using with `git` or other commands that opens an editor specified
-  by `$EDITOR` in a sub-process, e.g. `EDITOR=E git commit -a`.
-  See [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
-  for examples. Or use the `acmeed` script (see next section).
+  control to the calling process after editing is done. Can be used
+  as `$EDITOR` so commands that use it to open an editor in a
+  sub-process do so using Acme, e.g. `EDITOR=E git commit -a`.
+  See [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/) for
+  examples. Or use the `acmeed` script (see next section).
 
 ### Helper scripts
 
@@ -285,6 +285,11 @@ a number of helper scripts available at `~/.acme/bin`:
 - [Go](https://golang.org/): Some tools below require Go to install or
   run. Installable via a package manager (e.g. APT or Homebrew or
   MacPorts), or download a binary release from the website.
+
+- [acmego](https://pkg.go.dev/9fans.net/go/acme/acmego):
+  When Go files are written, automatically makes adjustments in the
+  window body to the import block as needed using `goimports` but does
+  not write the file.
 
 - [acme-lsp](https://github.com/fhs/acme-lsp):
   [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
