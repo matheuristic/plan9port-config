@@ -1,11 +1,10 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
 # Add trailing comment to STDIN or piped text at column arg1 with
 # arg2 as comment prefix (default column is 30 and comment prefix
 # is '#')
-column=`{test $#1 -ne 0 && echo $1 || echo 30} # default of 30
-padding=`{9 echo $column - 2 | 9 hoc}
-if (test $padding -le 0) padding=0
-comment=$2
-if (~ $#comment 0) comment='#'
-9 awk '{printf "%-'^$padding^'s '^$comment^'\n", $0}'
+COMMENTCOLUMN=${1:-"30"}
+COMMENTPREFIX=${2:-"# "}
+PADDING=$(( ${COMMENTCOLUMN} - 2 ))
+if [ $PADDING -lt 0 ]; then PADDING=0; fi
+awk "{printf \"%-${PADDING}s ${COMMENTPREFIX}\n\", \$0}"
