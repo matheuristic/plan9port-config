@@ -297,8 +297,8 @@ a number of helper scripts available at `~/.acme/bin`:
   servers. Install acme-lsp with:
 
   ```sh
-  GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/acme-lsp@latest
-  GO111MODULE=on go get github.com/fhs/acme-lsp/cmd/L@latest
+  go install github.com/fhs/acme-lsp/cmd/acme-lsp@latest
+  go install github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
   Create helper scripts in `$HOME/.acme/bin/` by running in `rc`:
@@ -396,7 +396,7 @@ a number of helper scripts available at `~/.acme/bin`:
   Install Watch with:
 
   ```sh
-  GO111MODULE=on go get 9fans.net/go/acme/Watch@latest
+  go install 9fans.net/go/acme/Watch@latest
   ```
 
   To have Watch run a command when a file in the directory of an Acme

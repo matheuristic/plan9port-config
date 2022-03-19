@@ -43,13 +43,17 @@ devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
 shellcheck -a -f gcc $%
 
 # mdformat (https://github.com/executablebooks/mdformat)
-|mdformat --number --wrap 70 -
+Edit ,|mdformat --number --wrap 70 -
+
+# Go tools gofmt and goimports
+Edit ,|gofmt
+Edit ,|goimports
 
 # Pandoc (https://pandoc.org/)
 pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
 
 # Python Black (https://github.com/psf/black)
-|runfc black
+Edit ,|black -q -
 
 # Pylint (https://github.com/PyCQA/pylint)
 condaenv=ENVNAME condarun pylint -f parseable $%
