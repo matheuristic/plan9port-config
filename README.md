@@ -367,9 +367,19 @@ a number of helper scripts available at `~/.acme/bin`:
 
   An alternative is [acre](https://github.com/mjibson/acre).
 
-- [adir](https://github.com/lewis-weinberger/adir): Tree-style file
-  explorer for Acme. Assuming `$PLAN9` and `mk` are on the system
-  path, install adir with:
+- [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
+  Tree-style file explorer for Acme. Button2 on a directory in a
+  dirtree window will set that directory as the new tree root. Button3
+  on a directory will toggle listing of its contents, and on a file
+  will plumb it as usual. Install `dirtree` with:
+
+  ```sh
+  go install github.com/sminez/acme-corp/dirtree@latest
+  ```
+
+  Alternatives include [adir](https://github.com/lewis-weinberger/adir)
+  which can be installed, assuming `$PLAN9` and `mk` are on the system
+  path, with:
 
   ```sh
   git clone https://github.com/lewis-weinberger/adir.git
@@ -377,12 +387,11 @@ a number of helper scripts available at `~/.acme/bin`:
   mk install BIN=$home/.acme/bin
   ```
 
-  No need to specify `BIN=$home/.acme/bin` if installing to
-  `$PLAN9/bin`.
+  (No need to specify `BIN=$home/.acme/bin` if installing to
+  `$PLAN9/bin`.)
 
-  Alternatives include
-  [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree)
-  and [xplor](https://git.sr.ht/~mkhl/xplor).
+  Other alternatives include [xplor](https://git.sr.ht/~mkhl/xplor) or
+  its Go [port](https://github.com/mpl/xplor).
 
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
   command each time any file in the current directory is written and
