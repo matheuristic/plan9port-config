@@ -228,7 +228,7 @@ a number of helper scripts available at `~/.acme/bin`:
   the default `#`.
 - `c-`: Uncomment. An argument may be specified as in `c+`.
 - `ci`: Convert an alphanumeric string to a case-insensitive regexp.
-- `condarun`: `condaenv=envname condarun cmd arg1 ...` executes `cmd`
+- `condarun`: `condarun envname cmd arg1 ...` executes `cmd`
   with the given args in the `envname` Conda environment (default
   environment is the one active when Acme was launched, else `base`).
 - `csp`: Wrapper for running
@@ -320,19 +320,19 @@ a number of helper scripts available at `~/.acme/bin`:
 
   ```toml
   # ~/.config/acme-lsp/config.toml - acme-lsp config
-  
+
   [Servers]
-  
+
   	[Servers.elixir-ls]
   	Command = ["/path/to/elixir-ls/language_server.sh"]
   	StderrFile = ""
   	LogFile = ""
-  
+
   	[Servers.jedi-language-server]
   	Command = ["jedi-language-server"]
   	StderrFile = ""
   	LogFile = ""
-  
+
   	[Servers.gopls]
   	Command = ["gopls", "serve", "-rpc.trace"]
   	StderrFile = "gopls.stderr.log"
@@ -340,15 +340,15 @@ a number of helper scripts available at `~/.acme/bin`:
   		# These settings gets passed to gopls
   		[Servers.gopls.Options]
   		hoverKind = "FullDocumentation"
-  
+
   [[FilenameHandlers]]
   Pattern = "\\.exs?$"
   ServerKey = "elixir-ls"
-  
+
   [[FilenameHandlers]]
   Pattern = "\\.py$"
   ServerKey = "jedi-language-server"
-  
+
   [[FilenameHandlers]]
   Pattern = "[/\\\\]go\\.mod$"
   LanguageID = "go.mod"
@@ -358,7 +358,7 @@ a number of helper scripts available at `~/.acme/bin`:
   Pattern = "[/\\\\]go\\.sum$"
   LanguageID = "go.sum"
   ServerKey = "gopls"
-  
+
   [[FilenameHandlers]]
   Pattern = "\\.go$"
   LanguageID = "go"
@@ -555,6 +555,27 @@ For more information on Acme mounting and macOS, see the following
   upon which it is based) and plumbing with Button3 (right-click).
   Managing windows can be done by executing `Sort` to sort the windows
   in a column by their tags.
+
+- If using shells other than `rc` within Acme `win` windows, make sure
+  to handle dumb terminals (`TERM=dumb`) appropriately (e.g. don't use
+  any color escape codes). For instance, in Zsh the following can be
+  added to the `$HOME/.zshrc` file.
+
+  ```sh
+  # No fancy Zsh prompt when using dumb terminals
+  if [[ "$TERM" == "dumb" ]]; then
+    unsetopt zle
+    unsetopt prompt_cr
+    unsetopt prompt_subst
+    if whence -w precmd >/dev/null; then
+        unfunction precmd
+    fi
+    if whence -w preexec >/dev/null; then
+        unfunction preexec
+    fi
+    PS1='$ '
+  fi
+  ```
 
 ## Sam
 

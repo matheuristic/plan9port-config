@@ -56,7 +56,7 @@ pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp
 Edit ,|black -q -
 
 # Pylint (https://github.com/PyCQA/pylint)
-condaenv=ENVNAME condarun pylint -f parseable $%
+condarun ENVNAME pylint -f parseable $%
 
 # Plumber rules
 cat $home/lib/plumbing | 9p write plumb/rules
