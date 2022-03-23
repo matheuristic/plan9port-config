@@ -96,7 +96,7 @@ This will create the symlinks:
 - `~/.local/bin/acme.rc`: Launcher for Acme.
 - `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows
   in Acme.
-- `~/.local/bin/sample-a.sh`: Sample wrapper to run `acme.rc` via
+- `~/.local/bin/sample-acmeed.sh`: Sample wrapper to run `acme.rc` via
   `rc.sh`.
 - `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
   `rc.sh`.
@@ -108,17 +108,17 @@ Create directory used by the autosave script.
 mkdir -p $HOME/.acme/autosave
 ```
 
-Copy `sample-a.sh` and `sample-sam.sh` to `~/.local/bin/a.sh` and
-`~/.local/bin/sam.sh` and modify them to create customized launchers
-for Acme and Sam.
+Copy `sample-acmeed.sh` to `~/.local/bin/acmeed.sh` and
+`sample-sam.sh` to `~/.local/bin/sam.sh` and modify them to create
+customized launchers for Acme and Sam.
 
 ```sh
-cp plan9port/.local/bin/sample-a.sh $HOME/.local/bin/a.sh
+cp plan9port/.local/bin/sample-acmeed.sh $HOME/.local/bin/acmeed.sh
 cp plan9port/.local/bin/sample.sam.sh $HOME/.local/bin/sam.sh
 ```
 
-Edit `~/.local/bin/a.sh` and `~/.local/bin/sam.sh` to customize the
-launchers as desired.
+Edit `~/.local/bin/acmeed.sh` and `~/.local/bin/sam.sh` to customize
+the launchers as desired.
 
 ## Acme
 
@@ -503,7 +503,7 @@ For more information on Acme mounting and macOS, see the following
 
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
-  workspace dumps. The `sample-a.sh` sample launcher has comments
+  workspace dumps. The `sample-acmeed.sh` sample launcher has comments
   showing how a launcher can be set up to open this file on launch
   when no extra options are provided. An example of a start/bookmarks
   file follows.
@@ -776,8 +776,8 @@ On macOS, there are also additional keybindings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
    - **Script Path**: Path to some Acme launcher script (e.g.
-     `sample-a.sh` or a customized `a.sh` created from it), which
-     needs to be a real file and not a symlink
+     `sample-acmeed.sh` or a customized `acmeed.sh` created from it),
+     which needs to be a real file and not a symlink
    - **Interface**: None
    - **Checkbox Settings**:
      - `[ ]` Accept dropped items
@@ -833,7 +833,7 @@ possible in Unix system without a mouse.
 #### Acme freedesktop.org desktop entry specification
 
 Assume that `stow` was used above to symlink scripts and config files.
-Instructions here use the `~/.acme/bin/a.sh` launcher script.
+Instructions here use the `~/.acme/bin/acmeed.sh` launcher script.
 
 To create a menu item for Acme, create a scaled down version of
 `mac/spaceglenda.png` in the plan9port repository (at resolution
@@ -848,8 +848,8 @@ desktop entry specification file at
 Name=Acme
 Comment=A text editor that is the successor of sam
 GenericName=Text Editor
-Exec=/home/USERNAME/.local/bin/a.sh %f
-TryExec=/home/USERNAME/.local/bin/a.sh
+Exec=/home/USERNAME/.local/bin/acmeed.sh %f
+TryExec=/home/USERNAME/.local/bin/acmeed.sh
 Icon=/home/USERNAME/.local/share/icons/spaceglenda240.png
 Categories=Utility;Development;TextEditor;
 Terminal=false
