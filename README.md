@@ -393,6 +393,12 @@ a number of helper scripts available at `~/.acme/bin`:
   Other alternatives include [xplor](https://git.sr.ht/~mkhl/xplor) or
   its Go [port](https://github.com/mpl/xplor).
 
+- [Nyne](https://github.com/dnjp/nyne): Tools for Acme, including
+  `nynetab` which expands tabs and indents text (best used with a
+  hotkey daemon like [skhd](https://github.com/koekeishiya/skhd) or
+  [sxhkd](https://github.com/baskerville/sxhkd)), and `md` for
+  working with Markdown text and files.
+
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
   command each time any file in the current directory is written and
   send the output to an Acme window whose name is the current
@@ -871,3 +877,42 @@ Version=1.0
 - [Edwood](https://github.com/rjkroege/edwood) (another Acme Go port)
 
 - [Sam Go port](https://github.com/9fans/go/tree/main/cmd/sam)
+
+- [Yacco](https://github.com/aarzilli/yacco)
+
+## Other Plan 9-related tools
+
+- [ghfs](https://github.com/sirnewton01/ghfs): 9p Github file server.
+  To use it after installing, run ghfs, mount the filesystem with
+  `9 mount localhost:5640 /path/to/mountpoint` (replace port number
+  with set ghfs port, and modify the the mountpoint path as needed).
+
+- [muscle](https://github.com/nicolagi/muscle): 9p file server with
+  revision history and merge. Install with
+
+  ```sh
+  go install github.com/nicolagi/muscle/cmd/...
+  ```
+
+  Create an initial config using `muscle init` and customize.
+
+  After starting `musclefs` and `snapshotfs`, mount using something
+  akin to the following (replicated from the source repo), modifying
+  as needed (e.g. `youruser` or the paths).
+
+  ```sh
+  sudo mount 127.0.0.1 /mnt/muscle -t 9p -o 'trans=tcp,port=2323,dfltuid=1000,dfltgid=1000,uname=youruser'
+  sudo mount `{namespace}^/muscle /mnt/muscle -t 9p -o 'trans=unix,dfltuid=1000,dfltgid=1000,uname=youruser'
+  9pfuse 127.0.0.1:2323 /mnt/muscle
+  9pfuse `{namespace}^/muscle /mnt/muscle
+  ```
+
+  On Linux, an alternative to using `9pfuse` is
+  [v9fs](https://www.kernel.org/doc/html/latest/filesystems/9p.html)
+  which is built into the Linux kernel.
+
+  Similar to [Upspin](https://upspin.io/) but without the need to
+  maintain an always-connected running server.
+
+- [telegramfs](https://github.com/nicolagi/telegramfs): 9p Telegram
+  file server.
