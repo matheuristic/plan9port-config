@@ -888,7 +888,8 @@ Version=1.0
   with set ghfs port, and modify the the mountpoint path as needed).
 
 - [muscle](https://github.com/nicolagi/muscle): 9p file server with
-  revision history and merge. Install with
+  revision history and merge, with S3 as the write-once-read-many
+  (WORM) device. Install with:
 
   ```sh
   go install github.com/nicolagi/muscle/cmd/...
