@@ -592,6 +592,28 @@ For more information on Acme mounting and macOS, see the following
   fi
   ```
 
+- There is no shift-click semantics in Acme (click on a position A,
+  then shift-click on another position B to selection the region from
+  A to B). As a workaround:
+
+  1. Run `Edit =` at a file location to print the file's name and
+     cursor line number in a `+Errors` window. If desired, add a
+     forward search query `/REGEXP/` to the end. This sets the region
+     start location.
+
+  2. Click on a later position in the file.
+
+  3. In the `+Errors` window, append `,.` to the end of the file and
+     line location (plus forward search query, if applicable).
+
+  4. Button3 (right-click) on the resulting line in the `+Errors`
+     window to plumb it, which will select the file region specified.
+
+  The final line in the `+Errors` window to be plumbed will look
+  something like `/path/to/file:10,.` or `/path/to/file:10/text/,.`
+  (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.`
+  is the cursor location).
+
 ## Sam
 
 Plan 9 also comes with another editor [Sam](http://sam.cat-v.org/)

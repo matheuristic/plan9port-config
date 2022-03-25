@@ -3,6 +3,8 @@ Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw rg+
 
 # Edit
 =                   # line number
+.,3                 # select from cursor to end of line 3
+3,.                 # select from beginning of line 3 to the cursor
 +/text/             # search for text forwards
 $-/text/            # search for text backwards from end
 ,d                  # clear whole buffer window, useful for +Error
