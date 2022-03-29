@@ -774,7 +774,7 @@ compose key is `Alt`.
 - ``Alt-`-``_(char)_ for a character with grave accent,
   e.g. ``Alt-`-a`` for à
 - `Alt-^-`_(char)_ for a character with circumflex,
-  e.g. `Alt-^-`_char_ for â
+  e.g. `Alt-^-a` for â
 - `Alt-"-`_(char)_ for a character with umlaut,
   e.g. `Alt-"-a` for ä
 - `Alt-,-`_(char)_ for a character with cedilla,
