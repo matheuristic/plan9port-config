@@ -764,6 +764,41 @@ it provides a few keyboard bindings applicable to most GUI programs.
   (and warp the pointer to that window if it is newly created)
 - `ESC`: Selects text typed since last mouse action in Sam and Acme
 
+Runes can be entered using the compose key (`Alt` on PCs and `Option`
+on Macs) followed by a key sequence. This provides a way to type
+special characters on keyboards without those keys. Examples assuming
+compose key is `Alt`.
+
+- `Alt-'-`_(char)_ for a character with acute accent,
+  e.g. `Alt-'-a` for á
+- ``Alt-`-``_(char)_ for a character with grave accent,
+  e.g. ``Alt-`-a`` for à
+- `Alt-^-`_(char)_ for a character with circumflex,
+  e.g. `Alt-^-`_char_ for â
+- `Alt-"-`_(char)_ for a character with umlaut,
+  e.g. `Alt-"-a` for ä
+- `Alt-,-`_(char)_ for a character with cedilla,
+  e.g. `Alt-,-c` for ç
+- `Alt-*-`_(char)_ for Greek letters,
+  e.g. `Alt-*-a` for α
+- `Alt-`_(num)_`-`_(num)_ for fractions,
+  e.g. `Alt-1-2` for ½
+- `Alt-<-=` and `Alt->-=` for ≤ and ≥
+- `Alt-<--` and `Alt--->` for ← and →
+- `Alt-u-a` and `Alt-d-a` for ↑ and ↓
+- `Alt-X-`_(hex)_`-`_(hex)_`-`_(hex)_`-`_(hex)_ for a unicode
+  character with the given four hexadecimal digit code point, e.g.
+  `Alt-X-2-5-C-A` for the LOZENGE character ◊ (hex code point 25CA);
+  use `Alt-X-X-` for five hexadecimal digits and `Alt-X-X-X-` for six
+  hexadecimal digits
+
+See `lib/keyboard` in the plan9port source for key sequences, or the
+[KEYBOARD(7)](https://9fans.github.io/plan9port/man/man7/keyboard.html)
+man page (`man 7 keyboard`) for more info.
+
+Also, note that up and down in Plan 9 programs like Acme and Sam
+scroll the window viewport instead of moving the cursor.
+
 ## macOS
 
 Additional notes specific to macOS systems.
