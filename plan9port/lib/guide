@@ -22,8 +22,8 @@ X                   # list windows
 
 # Other ~/.acme/bin commands
 ci text             # gen case-insensitive regexp for non-regexp text
-csp '**/*.py'       # wrapper for `cspell` code spell-checker
-esp $%              # wrapper for `enchant` spell-checker
+csp '**/*.py'       # `cspell` code spell-check for Python files
+esp $%              # `enchant` spell-check on saved version of buffer
 
 # Git
 git log --oneline -10
