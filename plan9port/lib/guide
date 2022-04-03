@@ -1,5 +1,6 @@
 # Tag
-Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw rg+
+Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw d rg+
+|ct |lower |upper |surround |s2t |uline alink lw Slide Slide- Slide+
 
 # Edit
 =                   # line number
@@ -18,6 +19,11 @@ X                   # list windows
 ±×÷√∛∑∏∫≠≈≤≥∂∆∇∞∩¬              # Math
 ←→↑↓¹²³ⁱⁿₖₘₙ                    # Other
 ÷πℯ∈∉∋∌∘√∛∩∪≈≉≠≡≢≤≥⊆⊇⊈⊉⊊⊋⊻⊼⊽    # Julia math constants and operators
+
+# Other ~/.acme/bin commands
+ci text             # gen case-insensitive regexp for non-regexp text
+csp '**/*.py'       # wrapper for `cspell` code spell-checker
+esp $%              # wrapper for `enchant` spell-checker
 
 # Git
 git log --oneline -10
