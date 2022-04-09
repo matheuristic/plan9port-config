@@ -56,6 +56,7 @@ Edit ,|mdformat --number --wrap 70 -
 # Go tools gofmt and goimports
 Edit ,|gofmt
 Edit ,|goimports
+Edit ,|goreturns
 
 # Pandoc (https://pandoc.org/)
 pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
