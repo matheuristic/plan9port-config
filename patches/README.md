@@ -41,6 +41,6 @@ To apply the patch, run from the repository root:
 patch -p1 < /path/to/plan9port-x11-shiftpressbutton1.patch
 ```
 
-This patch makes it so `Shift` sends Button1 while the mouse button
-is depressed for X11 systems. This allows for a 2-1 chord via
+This patch makes it so `Shift` sends Button1 while the mouse button is
+depressed for X11 systems. This allows for a 2-1 chord via
 `Ctrl-Click` followed by pressing `Shift` on laptops.

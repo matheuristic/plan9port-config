@@ -205,10 +205,10 @@ plan9port comes with several useful commands for working with Acme
 
 - `B`: Opens file in a new window inside Acme (or Sam).
 - `E`: Opens file in a new window inside Acme (or Sam), returning
-  control to the calling process after editing is done. Can be used
-  as `$EDITOR` so commands that use it to open an editor in a
-  sub-process do so using Acme, e.g. `EDITOR=E git commit -a`.
-  See [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/) for
+  control to the calling process after editing is done. Can be used as
+  `$EDITOR` so commands that use it to open an editor in a sub-process
+  do so using Acme, e.g. `EDITOR=E git commit -a`. See
+  [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/) for
   examples. Or use the `acmeed` script (see next section).
 
 ### Helper scripts
@@ -228,9 +228,9 @@ a number of helper scripts available at `~/.acme/bin`:
   the default `#`.
 - `c-`: Uncomment. An argument may be specified as in `c+`.
 - `ci`: Convert an alphanumeric string to a case-insensitive regexp.
-- `condarun`: `condarun envname cmd arg1 ...` executes `cmd`
-  with the given args in the `envname` Conda environment (default
-  environment is the one active when Acme was launched, else `base`).
+- `condarun`: `condarun envname cmd arg1 ...` executes `cmd` with the
+  given args in the `envname` Conda environment (default environment
+  is the one active when Acme was launched, else `base`).
 - `csp`: Wrapper for running
   [cspell](https://github.com/streetsidesoftware/cspell) installed
   using [npm](https://www.npmjs.com/) managed by
@@ -286,10 +286,10 @@ a number of helper scripts available at `~/.acme/bin`:
   run. Installable via a package manager (e.g. APT or Homebrew or
   MacPorts), or download a binary release from the website.
 
-- [acmego](https://pkg.go.dev/9fans.net/go/acme/acmego):
-  When Go files are written, automatically makes adjustments in the
-  window body to the import block as needed using `goimports` but does
-  not write the file.
+- [acmego](https://pkg.go.dev/9fans.net/go/acme/acmego): When Go files
+  are written, automatically makes adjustments in the window body to
+  the import block as needed using `goimports` but does not write the
+  file.
 
 - [acme-lsp](https://github.com/fhs/acme-lsp):
   [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
@@ -315,8 +315,7 @@ a number of helper scripts available at `~/.acme/bin`:
 
   Config params can be saved in a [TOML](https://toml.io/) file
   `$HOME/Library/Application Support/acme-lsp/config.toml` for macOS
-  or `$HOME/.config/acme-lsp/config.toml` for Unix or Linux.
-  Example:
+  or `$HOME/.config/acme-lsp/config.toml` for Unix or Linux. Example:
 
   ```toml
   # ~/.config/acme-lsp/config.toml - acme-lsp config
@@ -377,9 +376,9 @@ a number of helper scripts available at `~/.acme/bin`:
   go install github.com/sminez/acme-corp/dirtree@latest
   ```
 
-  Alternatives include [adir](https://github.com/lewis-weinberger/adir)
-  which can be installed, assuming `$PLAN9` and `mk` are on the system
-  path, with:
+  Alternatives include
+  [adir](https://github.com/lewis-weinberger/adir) which can be
+  installed, assuming `$PLAN9` and `mk` are on the system path, with:
 
   ```sh
   git clone https://github.com/lewis-weinberger/adir.git
@@ -393,11 +392,17 @@ a number of helper scripts available at `~/.acme/bin`:
   Other alternatives include [xplor](https://git.sr.ht/~mkhl/xplor) or
   its Go [port](https://github.com/mpl/xplor).
 
+- [I](https://github.com/hherman1/I): Make CLI tools interactive in
+  Acme. Running `I <cli>` to execute the command in a new window,
+  where Button2 on window text will append the clicked text as a new
+  arg and rerun the command, Button2 on Back will remove the newest
+  arg and rerun, and Get will rerun the command as is.
+
 - [Nyne](https://github.com/dnjp/nyne): Tools for Acme, including
   `nynetab` which expands tabs and indents text (best used with a
   hotkey daemon like [skhd](https://github.com/koekeishiya/skhd) or
-  [sxhkd](https://github.com/baskerville/sxhkd)), and `md` for
-  working with Markdown text and files.
+  [sxhkd](https://github.com/baskerville/sxhkd)), and `md` for working
+  with Markdown text and files.
 
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
   command each time any file in the current directory is written and
@@ -601,18 +606,18 @@ For more information on Acme mounting and macOS, see the following
      forward search query `/REGEXP/` to the end. This sets the region
      start location.
 
-  2. Click on a later position in the file.
+  1. Click on a later position in the file.
 
-  3. In the `+Errors` window, append `,.` to the end of the file and
+  1. In the `+Errors` window, append `,.` to the end of the file and
      line location (plus forward search query, if applicable).
 
-  4. Button3 (right-click) on the resulting line in the `+Errors`
+  1. Button3 (right-click) on the resulting line in the `+Errors`
      window to plumb it, which will select the file region specified.
 
   The final line in the `+Errors` window to be plumbed will look
   something like `/path/to/file:10,.` or `/path/to/file:10/text/,.`
-  (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.`
-  is the cursor location).
+  (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.` is
+  the cursor location).
 
 ## Sam
 
@@ -769,20 +774,16 @@ on Macs) followed by a key sequence. This provides a way to type
 special characters on keyboards without those keys. Examples assuming
 compose key is `Alt`.
 
-- `Alt-'-`_(char)_ for a character with acute accent,
-  e.g. `Alt-'-a` for á
-- ``Alt-`-``_(char)_ for a character with grave accent,
-  e.g. ``Alt-`-a`` for à
-- `Alt-^-`_(char)_ for a character with circumflex,
-  e.g. `Alt-^-a` for â
-- `Alt-"-`_(char)_ for a character with umlaut,
-  e.g. `Alt-"-a` for ä
-- `Alt-,-`_(char)_ for a character with cedilla,
-  e.g. `Alt-,-c` for ç
-- `Alt-*-`_(char)_ for Greek letters,
-  e.g. `Alt-*-a` for α
-- `Alt-`_(num)_`-`_(num)_ for fractions,
-  e.g. `Alt-1-2` for ½
+- `Alt-'-`_(char)_ for a character with acute accent, e.g. `Alt-'-a`
+  for á
+- `` Alt-`- ``_(char)_ for a character with grave accent, e.g.
+  `` Alt-`-a `` for à
+- `Alt-^-`_(char)_ for a character with circumflex, e.g. `Alt-^-a` for
+  â
+- `Alt-"-`_(char)_ for a character with umlaut, e.g. `Alt-"-a` for ä
+- `Alt-,-`_(char)_ for a character with cedilla, e.g. `Alt-,-c` for ç
+- `Alt-*-`_(char)_ for Greek letters, e.g. `Alt-*-a` for α
+- `Alt-`_(num)_`-`_(num)_ for fractions, e.g. `Alt-1-2` for ½
 - `Alt-<-=` and `Alt->-=` for ≤ and ≥
 - `Alt-<--` and `Alt--->` for ← and →
 - `Alt-u-a` and `Alt-d-a` for ↑ and ↓
@@ -834,7 +835,7 @@ On macOS, there are also additional keybindings:
 
 1. Install [Platypus.app](https://github.com/sveinbjornt/Platypus) for
    creating macOS apps from command-line programs.
-2. Open Platypus.app and configure an app for launching Acme with the
+1. Open Platypus.app and configure an app for launching Acme with the
    following settings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
@@ -849,12 +850,12 @@ On macOS, there are also additional keybindings:
      - `[ ]` Remain running after execution
    - **Icon**: Set to the `spaceglenda.icns` file in the `$PLAN9/mac/`
      directory
-3. Click _Create App_ to bring up a save to file dialog, make sure
+1. Click _Create App_ to bring up a save to file dialog, make sure
    that "Create symlink to script and bundled files" is unchecked,
    select the destination folder, modify the application name as
    needed, and click _Create_ to create the application
-4. Move the generated application to the `/Applications` folder
-5. Drag the application from the `/Applications` folder to the dock to
+1. Move the generated application to the `/Applications` folder
+1. Drag the application from the `/Applications` folder to the dock to
    keep it in the dock (this is a launcher app, different from the
    launched app which is a `drawterm` app running Acme)
 
@@ -922,8 +923,8 @@ Version=1.0
 
 ## Other files in this repository
 
-- `sam-examples.txt`: Examples of Sam commands, most of which can
-  also be used in Acme with the `Edit` command.
+- `sam-examples.txt`: Examples of Sam commands, most of which can also
+  be used in Acme with the `Edit` command.
 
 - `unicode-chars.txt`: Useful Unicode characters.
 
