@@ -92,12 +92,14 @@ This will create the symlinks:
   `plumber`.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
   when the plan9port binaries directory is not added to the search
-  path by default.
+  path by default. Assumes the plan9port install directory is
+  `$HOME/packages/plan9port`, so copy this file and modify the
+  necessary paths if plan9port is installed elsewhere.
 - `~/.local/bin/acme.rc`: Launcher for Acme.
 - `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows
   in Acme.
-- `~/.local/bin/sample-acmeed.sh`: Sample wrapper to run `acme.rc` via
-  `rc.sh`.
+- `~/.local/bin/sample-startacme.sh`: Sample wrapper to run `acme.rc`
+  via `rc.sh`.
 - `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
   `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.

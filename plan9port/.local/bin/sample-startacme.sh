@@ -2,7 +2,7 @@
 
 # Sample wrapper file that launches Acme from environments without the Plan 9
 # from User Space (i.e., plan9port) bin directory in their search path. It is
-# recommended to copy this file to ~/.local/bin/acmeed.sh and customize it
+# recommended to copy this file to ~/.local/bin/startacme.sh and customize it
 # with the desired default settings.
 #
 # The following code illustrates how to modify this script so it launches into
