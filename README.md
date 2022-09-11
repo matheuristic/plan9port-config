@@ -429,21 +429,49 @@ a number of helper scripts available at `~/.acme/bin`:
 
 ### Using POSIX-compatible shells like Bash and Zsh with win
 
-Add the following snippet to the configuration of a POSIX-compatible
-shell so `cd`-ing into a new directory in `win` (for running shells in
-Acme) when using that shell updates the tag line with the new
-directory. This is `$HOME/.bashrc` for Bash or `$HOME/.zshrc` for Zsh.
-Can be adapted for shells that are not POSIX-compatible like `fish`.
+- Add the following snippet to the configuration of a POSIX-compatible
+  shell so `cd`-ing into a new directory in `win` (for running shells in
+  Acme) when using that shell updates the tag line with the new
+  directory. This is `$HOME/.bashrc` for Bash or `$HOME/.zshrc` for Zsh.
+  Can be adapted for shells that are not POSIX-compatible like `fish`.
 
-```sh
-# Update Acme window tag line with dir in which it's running
-if [ "$winid" ]; then
-    _acme_cd () {
-        \cd "$@" && awd
-    }
-    alias cd=_acme_cd
-fi
-```
+  ```sh
+  # Update Acme window tag line with dir in which it's running
+  if [ "$winid" ]; then
+      _acme_cd () {
+          builtin cd "$@" && awd
+      }
+      alias cd=_acme_cd
+  fi
+  ```
+
+- Additionally, for better integration with `win` windows make sure
+  to handle dumb terminals (`TERM=dumb`) appropriately (e.g. don't use
+  any color escape codes). For instance, in Zsh the following can be
+  added to the `$HOME/.zshrc` file.
+
+  ```sh
+  # No fancy Zsh prompt when using dumb terminals
+  if [[ "$TERM" == "dumb" ]]; then
+    unsetopt zle
+    unsetopt prompt_cr
+    unsetopt prompt_subst
+    if whence -w precmd >/dev/null; then
+        unfunction precmd
+    fi
+    if whence -w preexec >/dev/null; then
+        unfunction preexec
+    fi
+    PROMPT="%# "
+    RPROMPT=""
+  fi
+  ```
+
+- To have Acme `win` windows use a specific shell by default, start
+  Acme with the `SHELL` environment variable appropriately set. For
+  example, `visibleclicks=1 SHELL=zsh acme.rc` starts Acme using the
+  startup script in this repo with visible button clicks and Zsh as
+  the default shell.
 
 ### FUSE
 
@@ -577,27 +605,6 @@ For more information on Acme mounting and macOS, see the following
   upon which it is based) and plumbing with Button3 (right-click).
   Managing windows can be done by executing `Sort` to sort the windows
   in a column by their tags.
-
-- If using shells other than `rc` within Acme `win` windows, make sure
-  to handle dumb terminals (`TERM=dumb`) appropriately (e.g. don't use
-  any color escape codes). For instance, in Zsh the following can be
-  added to the `$HOME/.zshrc` file.
-
-  ```sh
-  # No fancy Zsh prompt when using dumb terminals
-  if [[ "$TERM" == "dumb" ]]; then
-    unsetopt zle
-    unsetopt prompt_cr
-    unsetopt prompt_subst
-    if whence -w precmd >/dev/null; then
-        unfunction precmd
-    fi
-    if whence -w preexec >/dev/null; then
-        unfunction preexec
-    fi
-    PS1='$ '
-  fi
-  ```
 
 - There is no shift-click semantics in Acme (click on a position A,
   then shift-click on another position B to selection the region from

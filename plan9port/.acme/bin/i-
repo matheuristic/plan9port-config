@@ -1,7 +1,6 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
 # Decrease indent of STDIN or piped text using argument as indentation
 # (default indentation is the tab character)
-indent=$1
-if (~ $#indent 0) indent='	'
-9 sed 's/^'^$indent^'(.*)/\1/'
+INDENT=${1:-"	"}
+sed "s/^${INDENT}\(.*\)/\1/"

@@ -24,10 +24,10 @@ if (test $numtrail -gt 0) {
 	}
 }
 
-echo "--------"
+echo '--------'
 
 9p read acme/$winid/body | \
 	$diffcmd --unchanged-line-format='' --old-line-format=$%^':%dn:-%L' --new-line-format=$%^':%dn:+%L' $samfile -- - | \
 	9 sed -e 's/	/'^$tabchars^'/g'
 
-echo "--------"
+echo '--------'
