@@ -406,6 +406,21 @@ a number of helper scripts available at `~/.acme/bin`:
   [sxhkd](https://github.com/baskerville/sxhkd)), and `md` for working
   with Markdown text and files.
 
+- [punt](https://github.com/sminez/acme-corp/tree/master/punt): Send
+  window contents to a external program from Acme (e.g., to make edits
+  in another editor or to view HTML in a browser) and sync changes
+  back to Acme window after external program is closed. Install with:
+
+  ```sh
+  go install github.com/sminez/acme-corp/punt@latest
+  ```
+
+  Usage example: `punt -e xterm nvim` or `punt -g emacsclient` from
+  the tag of the window to punt to the external program. The `-e`
+  option indicates the external program is to be run in the specified
+  terminal emulator, while the `-g` option indicates the external
+  program is a GUI one.
+
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
   command each time any file in the current directory is written and
   send the output to an Acme window whose name is the current
