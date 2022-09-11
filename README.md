@@ -307,11 +307,11 @@ a number of helper scripts available at `~/.acme/bin`:
 
   ```sh
   for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
-      > $home/.acme/bin/L^$cmd {
-          echo '#!/usr/bin/env rc'
-          echo exec L $cmd '$*'
-      }
-      chmod +x L^$cmd
+    > $home/.acme/bin/L^$cmd {
+      echo '#!/usr/bin/env rc'
+      echo exec L $cmd '$*'
+    }
+    chmod +x L^$cmd
   }
   ```
 
@@ -438,10 +438,10 @@ a number of helper scripts available at `~/.acme/bin`:
   ```sh
   # Update Acme window tag line with dir in which it's running
   if [ "$winid" ]; then
-      _acme_cd () {
-          builtin cd "$@" && awd
-      }
-      alias cd=_acme_cd
+    _acme_cd () {
+      builtin cd "$@" && awd
+    }
+    alias cd=_acme_cd
   fi
   ```
 
@@ -457,10 +457,10 @@ a number of helper scripts available at `~/.acme/bin`:
     unsetopt prompt_cr
     unsetopt prompt_subst
     if whence -w precmd >/dev/null; then
-        unfunction precmd
+      unfunction precmd
     fi
     if whence -w preexec >/dev/null; then
-        unfunction preexec
+      unfunction preexec
     fi
     PROMPT="%# "
     RPROMPT=""
@@ -529,7 +529,7 @@ For more information on Acme mounting and macOS, see the following
   parenthesis. Useful for easy selection of commands containing
   spaces. For example:
 
-  ```sh
+  ```text
   (Load /path/to/project.dump)
   ```
 
@@ -549,7 +549,7 @@ For more information on Acme mounting and macOS, see the following
   when no extra options are provided. An example of a start/bookmarks
   file follows.
 
-  ```sh
+  ```text
   # ~/.acme/start - Acme start file
 
   # Project workspaces
