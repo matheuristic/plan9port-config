@@ -95,13 +95,14 @@ This will create the symlinks:
   path by default. Assumes the plan9port install directory is
   `$HOME/packages/plan9port`, so copy this file and modify the
   necessary paths if plan9port is installed elsewhere.
-- `~/.local/bin/acme.rc`: Launcher for Acme.
+- `~/.local/bin/startacme.rc`: Launcher for Acme.
 - `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows
   in Acme.
-- `~/.local/bin/sample-startacme.sh`: Sample wrapper to run `acme.rc`
-  via `rc.sh`.
-- `~/.local/bin/sample-sam.sh`: Sample wrapper to run `sam` via
-  `rc.sh`.
+- `~/.local/bin/startsam.rc`: Launcher for Sam.
+- `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
+  `startacme.rc` via `rc.sh`.
+- `~/.local/bin/sample-startsam.sh`: Sample wrapper to run
+  `startsam.rc` via `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
 Create directory used by the autosave script.
@@ -178,8 +179,8 @@ acme -l /path/to/project/acme.dump
 If `stow` was used to symlink the base configuration files, a script
 to help with autosaving modified files that have yet to be written can
 be found at `~/.local/bin/acmeautosave.rc`. This script is
-automatically run by `~/.local/bin/acme.rc`, but only has effect if
-the `~/.acme/autosave` directory exists (which it will if the
+automatically run by `~/.local/bin/startacme.rc`, but only has effect
+if the `~/.acme/autosave` directory exists (which it will if the
 instructions above were followed).
 
 Autosaved modified files are saved to `~/.acme/autosave/%NAMESPACE%/`
@@ -484,9 +485,9 @@ a number of helper scripts available at `~/.acme/bin`:
 
 - To have Acme `win` windows use a specific shell by default, start
   Acme with the `SHELL` environment variable appropriately set. For
-  example, `visibleclicks=1 SHELL=zsh acme.rc` starts Acme using the
-  startup script in this repo with visible button clicks and Zsh as
-  the default shell.
+  example, `visibleclicks=1 SHELL=zsh startacme.rc` starts Acme using
+  the startup script in this repo with visible button clicks and Zsh
+  as the default shell.
 
 ### FUSE
 
@@ -605,13 +606,13 @@ For more information on Acme mounting and macOS, see the following
   aliases, e.g. for Bash
 
   ```sh
-  alias aproj='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
+  alias aproj='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
   ```
 
   or for rc
 
   ```sh
-  fn aproj { visibleclicks=1 $home/.local/bin/acme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump }
+  fn aproj { visibleclicks=1 $home/.local/bin/startacme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump }
   ```
 
 - Window management can get chaotic when there are many open. Listing

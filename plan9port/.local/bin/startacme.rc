@@ -1,6 +1,6 @@
 #!/usr/bin/env rc
 
-# ~/.local/bin/acme.rc - Launcher for plan9port Acme text editor
+# ~/.local/bin/startacme.rc - Launcher for plan9port Acme text editor
 #
 # To set fonts (run '9p ls font' to see available non-9p fonts), run acme with
 #   -f $font   : Set variable font ( default: $PLAN9/font/lucsans/euro.8.font )
@@ -34,7 +34,7 @@
 # $acmeautosaveinterval environment variables
 #
 # Example command using this launcher
-#   visibleclicks=1 SHELL=rc acme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
+#   visibleclicks=1 SHELL=rc startacme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
 #
 # Multiple instances of Acme can be run using different namespaces, e.g.
 #   #!/usr/bin/env rc
@@ -50,13 +50,13 @@
 # Example using this launcher
 #   #!/bin/sh
 #   # Usage: acme-launcher [-n N]
-#   # Launch acme via acme.rc and in a sub-namespace if the -n option is specified
+#   # Launch acme via startacme.rc and in a sub-namespace if the -n option is specified
 #   if [ "$1" = "-n" ]; then
 #     export NAMESPACE=/tmp/ns.$USER.$DISPLAY-$2
 #     mkdir -p "$NAMESPACE"
 #     shift; shift
 #   fi
-#   $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc "$@"
+#   $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc "$@"
 
 # Default width of a tab in 0 glyph width multiples
 if (~ $#tabstop 0) tabstop=4

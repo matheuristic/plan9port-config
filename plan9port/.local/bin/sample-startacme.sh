@@ -17,7 +17,7 @@
 #            echo "Start file does not exist, skipping load: $startfile" 1>&2
 #        fi
 #    fi
-#    $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc $startparams
+#    $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc $startparams
 #
 # The following code simplifies launching of multiple Acme instances,
 # enabling the script to take an optional '-n N' flag that launches
@@ -52,8 +52,8 @@
 #            echo "Start file does not exist, skipping load: $startfile" 1>&2
 #        fi
 #    fi
-#    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc \
+#    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc \
 #        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
 #        $startparams
 
-$HOME/.local/bin/rc.sh $HOME/.local/bin/acme.rc "$@"
+$HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc "$@"

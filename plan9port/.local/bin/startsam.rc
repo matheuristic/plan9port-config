@@ -1,6 +1,6 @@
 #!/usr/bin/env rc
 
-# ~/.local/bin/sam.rc - launcher for sam
+# ~/.local/bin/startsam.rc - launcher for sam
 #
 # To set font (run '9p ls font' to see available non-9p fonts) instead of using
 # the default, set the font variable
@@ -11,7 +11,7 @@
 # launchers fontsrv and plumber if they are not running
 #
 # Example command using this launcher
-#    font=/mnt/font/GoMono/16a/font sam.rc
+#    font=/mnt/font/GoMono/16a/font startsam.rc
 
 # Run only a single instance of plumber
 9p stat plumb >[2]/dev/null >[1=2] || 9 plumber
