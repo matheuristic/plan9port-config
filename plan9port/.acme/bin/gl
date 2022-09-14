@@ -1,0 +1,4 @@
+#!/bin/sh
+# show git-log for given or current file in new Acme window
+file=${1:-$samfile}
+git log --oneline -- "$file" | plumb -i -d edit -a "action=showdata filename=$file+Log"

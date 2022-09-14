@@ -26,6 +26,7 @@ csp '**/*.py'       # `cspell` code spell-check for Python files
 esp $%              # `enchant` spell-check on saved version of buffer
 
 # Git
+git grep -n 'some[Pp]attern'
 git log --oneline -10
 git status
 git diff
@@ -36,6 +37,8 @@ git merge origin/HEAD
 git rebase -i HEAD~3          # NOTE: must always pick oldest commit
 git checkout BRANCH
 git checkout -b BRANCH
+gl                            # git log for current file
+gb                            # git blame for current file
 
 # Watch (requires 9fans.net/go/acme/Watch Go pkg)
 Watch [-r] COMMAND [ARG1] ...

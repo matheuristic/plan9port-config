@@ -1,0 +1,4 @@
+#!/bin/sh
+# show git-blame for given or current file in new Acme window
+file=${1:-$samfile}
+git blame --date="short" "$file" | plumb -i -d edit -a "action=showdata filename=$file+Blame"
