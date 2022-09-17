@@ -52,7 +52,8 @@
 #            echo "Start file does not exist, skipping load: $startfile" 1>&2
 #        fi
 #    fi
-#    visibleclicks=1 SHELL=rc $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc \
+#    visibleclicks=1 SHELL=rc BROWSER=garcon-url-handler \
+#        $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc \
 #        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
 #        $startparams
 
