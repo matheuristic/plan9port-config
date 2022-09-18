@@ -38,9 +38,10 @@ git push -u origin/HEAD
 git fetch
 git merge origin/HEAD
 git mergetool
-git rebase -i HEAD~3          # NOTE: must always pick oldest commit
+git rebase -i HEAD~3     # NOTE: oldest commit must be set to "pick"
 git checkout BRANCH
 git checkout -b BRANCH
+git bisect         # start > bad > good COMMIT > (bad|good)* > reset
 
 # Watch (requires 9fans.net/go/acme/Watch Go pkg)
 Watch [-r] COMMAND [ARG1] ...
