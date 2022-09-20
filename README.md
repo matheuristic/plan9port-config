@@ -528,6 +528,8 @@ For more information on Acme mounting and macOS, see the following
 
   - Right-click on `:42` to jump to line 42.
 
+  - Right-click on `file:somefile` to open `somefile` in a browser.
+
 - The window scrollbars are used in conjunction with the mouse for
   moving the viewport across the buffer.
 
