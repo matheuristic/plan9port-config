@@ -1,7 +1,7 @@
 # Tag
 Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw d rg+
 |ct |lower |upper |surround |s2t |uline alink lw gl gb
-Slide Slide- Slide+
+Slide Slide- Slide+ :/[Ffoo] :-/[Ff]oo/ :42
 
 # Edit
 =                   # line number

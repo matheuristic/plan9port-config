@@ -522,6 +522,12 @@ For more information on Acme mounting and macOS, see the following
   the point, or search (equivalent to Look) for the next occurrence if
   not plumbable.
 
+  - Right-click on `:+/[Ff]oo/` to search forward for `foo` or `Foo`.
+
+  - Right-click on `:-/[Ff]oo/` to search backward for `foo` or `Foo`.
+
+  - Right-click on `:42` to jump to line 42.
+
 - The window scrollbars are used in conjunction with the mouse for
   moving the viewport across the buffer.
 
@@ -540,13 +546,13 @@ For more information on Acme mounting and macOS, see the following
     that the view indicator is at the position scrollbar was clicked,
     which allows for directly jumping to a window position.
 
-- Wrap a command with parentheses or brackets to make it selectable by
+- Wrap a command with brackets or parentheses to make it selectable by
   double-clicking (Button1 twice) just to the right of the left
   parenthesis. Useful for easy selection of commands containing
   spaces. For example:
 
   ```text
-  (Load /path/to/project.dump)
+  [Load /path/to/project.dump]
   ```
 
 - A separate window can be useful for writing and maintaining a
@@ -570,8 +576,8 @@ For more information on Acme mounting and macOS, see the following
 
   # Project workspaces
 
-  (Load /path/to/project1.dump)
-  (Load /path/to/project2.dump)
+  [Load /path/to/project1.dump]
+  [Load /path/to/project2.dump]
 
   # Bookmarks
 
@@ -793,6 +799,8 @@ it provides a few keyboard bindings applicable to most GUI programs.
 - `Ctrl-f`: Complete filename or pop up options in a `+Error` window
   (and warp the pointer to that window if it is newly created)
 - `ESC`: Selects text typed since last mouse action in Sam and Acme
+  if nothing is selected, or deletes selected text otherwise; quick
+  undoing of recent text input can be done with `ESC-ESC`
 
 Runes can be entered using the compose key (`Alt` on PCs and `Option`
 on Macs) followed by a key sequence. This provides a way to type
@@ -1000,3 +1008,11 @@ Version=1.0
 
 - [telegramfs](https://github.com/nicolagi/telegramfs): 9p Telegram
   file server.
+
+## Other useful links
+
+- [Acme Tricks](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
+
+- [Plan 9 Wiki Tip o' the day](https://9p.io/wiki/plan9/Tip_o'_the_day/index.html)
+
+- [Using the Plan 9 Plumber to Turn Acme into a Git GUI](https://alexkarle.com/blog/plan9-acme-git-gui.html)
