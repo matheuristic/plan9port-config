@@ -22,7 +22,7 @@ if (~ $#* 0) {
 	9 echo 'Example:'
 	9 echo '    F GoMono 22a'
 	9 echo ''
-	9 echo 'Run `9p font ls` to list available fonts'
+	9 echo 'Run `9p ls font` to list available fonts'
 	9 echo ''
 	9 echo 'Current font:' $curfont
 	exit
