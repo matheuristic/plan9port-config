@@ -1,0 +1,39 @@
+#!/usr/bin/env rc
+
+# Increment font size in current Acme window. Usage
+#     F+ [N]
+# where N is the number of points (defaults to 1 if unspecified)
+
+if (~ $#winid 0) {
+	9 echo must be run in acme
+	exit 1
+}
+
+if (test $#* -gt 1) {
+	9 echo 'F+ takes exactly zero or one argument'
+}
+
+curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+
+isvarfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+if (test $isvarfont -eq 0) {
+	9 echo Resizing not supported for bitmap font, currently $curfont
+	exit 1
+}
+
+curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
+cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
+antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
+cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicator
+delta=$1
+if (~ $#delta 0) delta=1
+
+if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'+'$delta | 9 hoc}
+if not {
+	9 echo Invalid point increment
+	exit 1
+}
+
+newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
+9 echo font $newfont | 9p write acme/$winid/ctl
+9 echo 'font:' $curfont '->' $newfont

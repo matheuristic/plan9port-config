@@ -1,0 +1,41 @@
+#!/usr/bin/env rc
+
+# Change font in current Acme window
+
+defaultfontsize=23a
+
+if (~ $#winid 0) {
+	9 echo must be run in acme
+	exit 1
+}
+
+curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+
+if (~ $#* 0) {
+	9 echo 'Change font in current Acme window. Usage:'
+	9 echo ''
+	9 echo '    F newfontname [newfontsize]'
+	9 echo ''
+	9 echo 'newfontsize should be suffixed with `a` to indicate antialiasing'
+	9 echo '(defaults to '''$defaultfontsize''')'
+	9 echo ''
+	9 echo 'Example:'
+	9 echo '    F GoMono 22a'
+	9 echo ''
+	9 echo 'Run `9p font ls` to list available fonts'
+	9 echo ''
+	9 echo 'Current font:' $curfont
+	exit
+}
+
+if (test $#* -gt 2) {
+	9 echo 'F takes exactly one or two arguments'
+}
+
+newfontname=$1
+newfontsize=$2
+if (~ $#newfontsize 0) newfontsize=$defaultfontsize
+
+newfont='/mnt/font/'$newfontname'/'$newfontsize'/font'
+9 echo font $newfont | 9p write acme/$winid/ctl
+9 echo 'font:' $curfont '->' $newfont

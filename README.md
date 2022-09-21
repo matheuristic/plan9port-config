@@ -1017,4 +1017,6 @@ Version=1.0
 
 - [Plan 9 Wiki Tip o' the day](https://9p.io/wiki/plan9/Tip_o'_the_day/index.html)
 
+- [plan9port linux environment](https://github.com/gdiazlo/p9penv)
+
 - [Using the Plan 9 Plumber to Turn Acme into a Git GUI](https://alexkarle.com/blog/plan9-acme-git-gui.html)
