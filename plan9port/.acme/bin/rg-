@@ -9,6 +9,8 @@ if [ "$winid" = "" ]; then
   exit 1
 fi
 
+RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
+
 9p read acme/$winid/body | \
   rg --no-heading --color=never --line-number "$@" | \
-  9 sed 's|^|'$samfile':|'
+  sed 's|^|'$RELATIVEPATH':|'
