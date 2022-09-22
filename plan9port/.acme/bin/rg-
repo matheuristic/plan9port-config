@@ -5,8 +5,8 @@
 # Note that for open modified files, the unsaved version is searched
 
 if [ "$winid" = "" ]; then
-  echo "Must be used from within Acme"
-  exit 1
+	echo "Must be used from within Acme"
+	exit 1
 fi
 
 if ! command -v rg >/dev/null 2>&1; then
