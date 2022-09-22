@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Run rg on all open Acme file window contents with plumbable output
+# Requires ripgrep be installed on the system
+# Note that for open modified files, the unsaved version is searched
+
+if [ "$winid" = "" ]; then
+  echo "Must be used from within Acme"
+  exit 1
+fi
+
+if ! command -v rg >/dev/null 2>&1; then
+	echo 'rg not installed'
+	exit 1
+fi
+
+if [ "$#" -eq 0 ]; then
+	echo 'Usage: rg-- [OPTIONS..] PATTERN'
+	echo 'See ripgrep help (`rg --help`) for available options'
+	exit 1
+fi
+
+# Iterate over windows, and run ripgrep on contents of file windows
+for wid in `9p read acme/index | 9 awk '{print $1}'`; do
+	wname=`9p read acme/$wid/tag | 9 sed 1q | 9 awk -F' Del Snarf' '{print $1}'`
+	if [ "$wname" != "" ]; then
+		bname=`9 basename "$wname" | 9 grep -v -e '^-' | 9 grep -v -e '\+Errors$'`
+		dirflag=`9p read acme/$wid/ctl | 9 awk '{print $4}'`
+		# only search if window is not a directory
+		if [ "$bname" != "" ] && [ "$dirflag" = "0" ]; then
+			9p read acme/$wid/body | \
+				rg --no-heading --color=never --line-number "$@" | \
+				9 sed 's|^|'$wname':|'
+		fi
+	fi
+done

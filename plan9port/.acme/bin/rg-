@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Run rg on current Acme window contents with plumbable output
-# Requires ripgrep be installed on the system
+# Requires ripgrep and realpath be installed on the system
 # Note that for open modified files, the unsaved version is searched
 
 if [ "$winid" = "" ]; then
