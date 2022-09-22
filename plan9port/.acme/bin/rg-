@@ -9,6 +9,22 @@ if [ "$winid" = "" ]; then
   exit 1
 fi
 
+if ! command -v rg >/dev/null 2>&1; then
+	echo 'rg not installed'
+	exit 1
+fi
+
+if ! command -v realpath /dev/null 2>&1; then
+	echo 'realpath not installed'
+	exit 1
+fi
+
+if [ "$#" -eq 0 ]; then
+	echo 'Usage: rg- [OPTIONS..] PATTERN'
+	echo 'See ripgrep help (`rg --help`) for available options'
+	exit 1
+fi
+
 RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
 
 9p read acme/$winid/body | \

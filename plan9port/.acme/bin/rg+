@@ -4,4 +4,15 @@
 # Requires ripgrep be installed on the system
 # Note that for open modified files, the saved version is searched
 
+if ! command -v rg >/dev/null 2>&1; then
+	echo 'rg not installed'
+	exit 1
+fi
+
+if [ "$#" -eq 0 ]; then
+	echo 'Usage: rg+ [OPTIONS..] PATTERN'
+	echo 'See ripgrep help (`rg --help`) for available options'
+	exit 1
+fi
+
 rg --no-heading --color=never -H -n "$@"

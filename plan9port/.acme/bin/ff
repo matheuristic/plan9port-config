@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Wrapper around ripgrep and fzf for finding files in Acme
+# TODO remove dependency on ripgrep, currently needed to list files as
+# fzf gives exit code 1 if we try to search files directly using it
+
+if ! command -v rg >/dev/null 2>&1; then
+	echo 'rg not installed'
+	exit 1
+fi
+
+if  ! command -v fzf >/dev/null 2>&1; then
+	echo 'fzf not installed'
+	exit 1
+fi
+
+if [ "$#" -ne 1 ]; then
+	echo "Usage: ff QUERY"
+	exit 1
+fi
+
+rg --files | fzf --color=bw --no-bold -f "$1"
