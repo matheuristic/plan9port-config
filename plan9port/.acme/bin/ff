@@ -19,4 +19,4 @@ if [ "$#" -ne 1 ]; then
 	exit 1
 fi
 
-rg --files | fzf --color=bw --no-bold -f "$1"
+rg --hidden -g '!.git/' --files | fzf --color=bw --no-bold -f "$1"

@@ -15,4 +15,4 @@ if [ "$#" -eq 0 ]; then
 	exit 1
 fi
 
-rg --no-heading --color=never -H -n "$@"
+rg --hidden -g '!.git/' --no-heading --color=never -H -n "$@"
