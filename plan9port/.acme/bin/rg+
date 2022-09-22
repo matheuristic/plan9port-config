@@ -2,5 +2,6 @@
 
 # Run rg with Acme right-click (button 3) parsable output format
 # Requires ripgrep be installed on the system
+# Note that for open modified files, the saved version is searched
 
 rg --no-heading --color=never -H -n "$@"

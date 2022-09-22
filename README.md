@@ -257,7 +257,13 @@ a number of helper scripts available at `~/.acme/bin`:
   of running the `Edit X` Sam command.
 - `rg+`: Wrapper for running
   [ripgrep](https://github.com/BurntSushi/ripgrep) with output that
-  can be plumbed.
+  can be plumbed. Note that for modified open files in Acme, the saved
+  version of the file is searched.
+- `rg-`: Wrapper for running
+  [ripgrep](https://github.com/BurntSushi/ripgrep) on the current Acme
+  window's contents with output that can be plumbed. Note that this
+  will search the unsaved modified contents if the window is dirty
+  (i.e., modifications made but not yet saved to file).
 - `runfc`: `>runfc cmd arg1 ...` will copy the text selection to a
   temporary file, run a command `cmd` that modifies the temporary file
   in-place (like Python's `black` formatter) and output the temporary
@@ -292,7 +298,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - [acmego](https://pkg.go.dev/9fans.net/go/acme/acmego): When Go files
   are written, automatically makes adjustments in the window body to
   the import block as needed using `goimports` but does not write the
-  file.
+  file. Also supports autoformatting Rust files using `rustfmt`. An
+  alternative that works on any Acme window using any given command is
+  [acme-autoformat](https://github.com/droyo/acme-autoformat).
 
 - [acme-lsp](https://github.com/fhs/acme-lsp):
   [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
@@ -1020,3 +1028,5 @@ Version=1.0
 - [plan9port linux environment](https://github.com/gdiazlo/p9penv)
 
 - [Using the Plan 9 Plumber to Turn Acme into a Git GUI](https://alexkarle.com/blog/plan9-acme-git-gui.html)
+
+- [When You Have Reached Acme](https://mkhl.codeberg.page/acme-setup/)

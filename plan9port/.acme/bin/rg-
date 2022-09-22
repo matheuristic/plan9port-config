@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Run rg on current Acme window contents with plumbable output
+# Requires ripgrep be installed on the system
+# Note that for open modified files, the unsaved version is searched
+
+if [ "$winid" = "" ]; then
+  echo "Must be used from within Acme"
+  exit 1
+fi
+
+9p read acme/$winid/body | \
+  rg --no-heading --color=never --line-number "$@" | \
+  9 sed 's|^|'$samfile':|'
