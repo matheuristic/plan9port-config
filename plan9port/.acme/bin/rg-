@@ -14,7 +14,7 @@ if ! command -v rg >/dev/null 2>&1; then
 	exit 1
 fi
 
-if ! command -v realpath /dev/null 2>&1; then
+if ! command -v realpath >/dev/null 2>&1; then
 	echo 'realpath not installed'
 	exit 1
 fi
