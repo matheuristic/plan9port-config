@@ -24,6 +24,9 @@ There are some patches in the `patches` subdirectory. Apply desired
 patches to the source code prior to compilation. See the `README.md`
 file in the subdirectory for instructions.
 
+- `plan9port-acme-soft-tabs.patch`: Adds soft tabs support to Acme
+  toggleable via a `Spaces [on|off|ON|OFF]` command and an `-i` CLI
+  option.
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
   `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
 - `plan9port-x11-shiftpressbutton1.patch`: `Shift` sends Button1 while

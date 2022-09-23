@@ -22,6 +22,28 @@ for more info.
 
 ## Patches
 
+### Add soft tabs to Acme editor
+
+To apply the patch, run from the repository root:
+
+```shell
+patch -p1 < /path/to/plan9port-acme-soft-tabs.patch
+```
+
+This patch adds a `Spaces` command, which can be used to toggle soft
+tabs (spacesindent mode). `Spaces on` and `Spaces off` turns
+spacesindent mode on and off for the current window. `Spaces ON` and
+`Spaces OFF` turns spacesindent mode on and off for existing and
+future windows.
+
+Additionally, this patch adds a command line option `-i` which causes
+each window to start in spacesindent mode (same as `Spaces ON`).
+
+Sourced with minor changes from [mkhl](https://github.com/mkhl)'s
+[acme/soft-tabs](https://github.com/mkhl/plan9port/tree/acme/soft-tabs)
+branch of [Plan 9 Port](https://github.com/9fans/plan9port)
+which ports spew's acme spaces indent mode from 9front.
+
 ### No remapping of backticks and single quotes on macOS systems
 
 To apply the patch, run from the repository root:
