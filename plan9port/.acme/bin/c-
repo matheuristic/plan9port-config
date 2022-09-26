@@ -4,4 +4,4 @@
 # string (default comment string is '#')
 
 COMMENTCHARS=${1:-"#"}
-awk '{split($0,a,/[^ \t]/)} {sub(a[1] "'"$COMMENTCHARS"'" " ?", a[1]); print}'
+9 awk '{split($0,a,/[^ \t]/)} {sub(a[1] "'"$COMMENTCHARS"'" " ?", a[1]); print}'
