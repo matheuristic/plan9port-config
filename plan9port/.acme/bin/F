@@ -12,11 +12,17 @@ if (~ $#winid 0) {
 curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
 
 if (~ $#* 0) {
+	9 echo $curfont
+	exit
+}
+
+if (~ $1 '-h') {
 	9 echo 'Change font in current Acme window. Usage:'
 	9 echo ''
 	9 echo '    F newfontname [newfontsize]'
 	9 echo ''
-	9 echo 'newfontsize should be suffixed with `a` to indicate antialiasing'
+	9 echo 'newfontname must be a `fontsrv` available font'
+	9 echo 'newfontsize can be suffixed with `a` to indicate antialiasing'
 	9 echo '(defaults to '''$defaultfontsize''')'
 	9 echo ''
 	9 echo 'Example:'
@@ -24,7 +30,7 @@ if (~ $#* 0) {
 	9 echo ''
 	9 echo 'Run `9p ls font` to list available fonts'
 	9 echo ''
-	9 echo 'Current font:' $curfont
+	9 echo 'Current font (dir or `fontsrv` path):' $curfont
 	exit
 }
 

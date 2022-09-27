@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Spellcheck current Acme buffer
+
+set -e
+
+# Support passing '-d dict' parameter to enchant
+
+if [ "$#" -gt 0 ] && ([ "$#" -ne 2 ] || [ "$1" != "-d" ]); then
+	PROGNAME=`basename $0`
+	echo "Usage: $PROGNAME [-d dict]"
+	echo ""
+	echo '    If -d is specified, dict must be an `enchant` dictionary'
+	exit 1
+fi
+
+ENCHANTPARAMS=""
+if [ "$1" = "-d" ]; then
+	if [ -z "$2" ]; then
+		echo "option -d specified but no dictionary provided"
+		exit 1
+	fi
+	ENCHANTPARAMS="$1 $2"
+fi
+
+if [ "$winid" = "" ]; then
+	echo "Must be used from within Acme"
+	exit 1
+fi
+
+if ! command -v enchant >/dev/null 2>&1; then
+	echo "enchant not installed"
+	exit 1
+fi
+
+if ! command -v realpath >/dev/null 2>&1; then
+	echo "realpath not installed"
+	exit 1
+fi
+
+RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
+
+{
+	set -e
+	IFS="
+	"
+	for l in `9p read acme/$winid/body | enchant $ENCHANTPARAMS -L -a`; do
+		if [ -n "`9 echo -n "$l" | 9 grep -e '^[&#]'`" ]; then
+			lword=`9 echo -n "$l" | 9 awk '{print $3}'`
+			lline=`9 echo -n "$l" | 9 awk '{print $2}'`
+			if [ -n "`9 echo -n "$l" | 9 grep -e '^&'`" ]; then  # starts with '&'
+				lindex=5
+			else                                                 # starts with '#'
+				lindex=4
+			fi
+			lcolumn=`9 echo -n "$l" | 9 awk '{print $'${lindex}'}' | 9 sed -e 's/^([0-9]+).*/\1/'`
+			lcolumnstart=`9 hoc -e "$lcolumn + 1"`
+			llength=`9 echo -n "$lword" | wc -c`
+			lcolumnend=`9 hoc -e "$lcolumnstart + $llength"`
+			lsuggest=`9 echo -n "$l" | 9 awk -F':' '{print ":" $2}'`
+			echo "${RELATIVEPATH}:${lline}:${lcolumnstart},${lline}:${lcolumnend}	$lword $lsuggest"
+		fi
+	done
+}

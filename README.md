@@ -245,8 +245,6 @@ a number of helper scripts available at `~/.acme/bin`:
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
 - `d`: Diff the current window against the current file on disk.
 - `dtw`: Delete trailing whitespace (spaces/tabs).
-- `esp`: Wrapper for [Enchant](https://github.com/AbiWord/enchant)
-  except it only supports use with files and not STDIN or piped text.
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
@@ -279,6 +277,8 @@ a number of helper scripts available at `~/.acme/bin`:
   selection with the result instead of outputting to the Error window.
 - `s2t`: Replaces spaces with tabs, specify an argument to change the
   number of spaces to a tab from the default of `$tabwidth`.
+- `sp`: Wrapper to run [Enchant](https://github.com/AbiWord/enchant)
+  spellchecker on the current Acme window with plumbable output.
 - `Slide`: Start slideshow for current directory, where the slides are
   text files and slide sequence is given by an `index` file containing
   filenames of the text files (with no leading directories) with one

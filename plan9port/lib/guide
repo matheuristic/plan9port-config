@@ -1,6 +1,6 @@
 # Tag
 Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw d rg+
-|ct |lower |upper |surround |s2t |uline alink lw gl gb
+|ct |lower |upper |surround |s2t |uline alink gl gb sp lw
 (F GoMono 22a) F- F+ Slide Slide- Slide+ :/[Ffoo] :-/[Ff]oo/ :42
 
 # Edit
@@ -25,7 +25,6 @@ X                   # list windows
 # Other ~/.acme/bin commands
 ci text             # gen case-insensitive regexp for non-regexp text
 csp '**/*.py'       # `cspell` code spell-check for Python files
-esp $%              # `enchant` spell-check on saved version of buffer
 
 # Git
 git grep -n 'some[Pp]attern'
