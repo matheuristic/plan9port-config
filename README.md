@@ -1031,6 +1031,8 @@ Version=1.0
 
 - [Acme Tricks](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
 
+- [On Some Tools for Plan9's Acme](https://tales.mbivert.com/on-some-tools-for-plan9-acme/)
+
 - [Plan 9 Wiki Tip o' the day](https://9p.io/wiki/plan9/Tip_o'_the_day/index.html)
 
 - [plan9port linux environment](https://github.com/gdiazlo/p9penv)

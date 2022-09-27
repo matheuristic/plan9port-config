@@ -50,7 +50,7 @@ while() {
 			if(test $#wname -ne 0) {
 				# Get filename, and filter if it matches a win window (starts with '-')
 				# or an error output window (ends with '+Errors')
-				bname=`{9 basename $wname | 9 grep -v -e '^-' | 9 grep -v -e '\+Errors$'}
+				bname=`{9 basename $wname | 9 grep -v -e '^-' | 9 grep -v -e '/\+[^/]*$'}
 				# Get flags for if window is a directory and if window is modified
 				isdir_ismod=`{9p read acme/$wid/ctl | 9 awk '{print $4$5}'}
 				# Backup window contents if not a win window,
