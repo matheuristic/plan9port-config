@@ -3,7 +3,7 @@ Edit Font (Indent on) <clip-paste.sh |c- |c+ |is- |is+ |t2s |dtw d rg+
 |ct |lower |upper |surround |s2t |uline alink gl gb sp lw
 (F GoMono 22a) F- F+ Slide Slide- Slide+ :/[Ffoo] :-/[Ff]oo/ :42
 
-# Edit
+# Edit commands
 =                   # line number
 .,3                 # select from cursor to end of line 3
 3,.                 # select from beginning of line 3 to the cursor

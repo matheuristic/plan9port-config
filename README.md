@@ -248,6 +248,8 @@ a number of helper scripts available at `~/.acme/bin`:
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
+- `gb`: Wrapper for `git blame` of file in current Acme window.
+- `gl`: Wrapper for `git log` of file in current Acme window.
 - `h`: `hcount=N h STRING` shows the last `N` commands in a win window
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
@@ -270,6 +272,7 @@ a number of helper scripts available at `~/.acme/bin`:
   (i.e., modifications made but not yet saved to file). Also requires
   [realpath](https://www.gnu.org/software/coreutils/manual/html_node/realpath-invocation.html)
   be installed (it is used to derive relative file paths).
+- `rg--`: Like `rg-` but for all Acme windows corresponding to files.
 - `runfc`: `>runfc cmd arg1 ...` will copy the text selection to a
   temporary file, run a command `cmd` that modifies the temporary file
   in-place (like Python's `black` formatter) and output the temporary
@@ -494,7 +497,8 @@ a number of helper scripts available at `~/.acme/bin`:
     if whence -w preexec >/dev/null; then
       unfunction preexec
     fi
-    PROMPT="%# "
+    # Set prompt so middle-clicking whole line reruns line's command
+    PROMPT=": %m; "
     RPROMPT=""
   fi
   ```
