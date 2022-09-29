@@ -70,13 +70,14 @@ PAGER=nobs
 # - $home/go/bin : Go compiled binaries
 # - /opt/local/bin
 # - /usr/local/bin
-for (d in /usr/local/bin \
-          /opt/local/bin \
-          $home/go/bin \
-          $home/.local/bin \
-          $home/.acme/bin \
-    ) {
-  if (test -d $d) PATH=$d:$PATH
+for (d in \
+	/usr/local/bin \
+	/opt/local/bin \
+	$home/go/bin \
+	$home/.local/bin \
+	$home/.acme/bin \
+) {
+	if (test -d $d) PATH=$d:$PATH
 }
 
 # Use Acme as the default editor through a helper script
@@ -88,7 +89,7 @@ fn cd { builtin cd $1 && awd $sysname }
 
 # Helper function for checking if a given program is running (or use pgrep)
 fn getprocs {
-  9 psu -a | 9 grep $1 | 9 grep -v grep
+	9 psu -a | 9 grep $1 | 9 grep -v grep
 }
 
 # Run only a single instance of plumber
@@ -100,11 +101,11 @@ fn getprocs {
 # Run only a single instance of acmeautosave.rc per namespace if it's installed
 # acmeautosave.rc does not take any arguments, so use the namespace as an arg
 # so as to disambiguate the namespace of each acmeautosave.rc process
-acmeautosavebin=$home/.local/bin/acmeautosave.rc
+acmeautosavebin=`{which acmeautosave.rc}
 if (test -x $acmeautosavebin) {
-  s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}} {
-    if (~ $#s 0) $acmeautosavebin `{namespace} &
-  }
+	s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}} {
+		if (~ $#s 0) $acmeautosavebin `{namespace} &
+	}
 }
 
 # Run Acme text editor with command line params

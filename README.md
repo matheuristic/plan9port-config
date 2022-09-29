@@ -93,14 +93,14 @@ This will create the symlinks:
 - `~/lib/guide`: Basic guide file example.
 - `~/lib/plumbing`: Plumbing file for controlling the behavior of
   `plumber`.
+- `~/.local/bin/acmeactivens.sh`: Outputs the namespaces
+  `/tmp/ns.$USER/*` for which there is a running instance of Acme.
 - `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
   when the plan9port binaries directory is not added to the search
   path by default. Assumes the plan9port install directory is
   `$HOME/packages/plan9port`, so copy this file and modify the
   necessary paths if plan9port is installed elsewhere.
 - `~/.local/bin/startacme.rc`: Launcher for Acme.
-- `~/.local/bin/acmeautosave.rc`: Autosave script for modified windows
-  in Acme.
 - `~/.local/bin/startsam.rc`: Launcher for Sam.
 - `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
   `startacme.rc` via `rc.sh`.
@@ -108,23 +108,23 @@ This will create the symlinks:
   `startsam.rc` via `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
-Create directory used by the autosave script.
+Create the autosave directory used by `~/.acme/bin/acmeautosave.rc`.
 
 ```sh
 mkdir -p $HOME/.acme/autosave
 ```
 
-Copy `sample-acmeed.sh` to `~/.local/bin/acmeed.sh` and
-`sample-sam.sh` to `~/.local/bin/sam.sh` and modify them to create
-customized launchers for Acme and Sam.
+Copy `sample-startacme.sh` to `~/.local/bin/startacme.sh` and
+`sample-startsam.sh` to `~/.local/bin/startsam.sh` and modify them to
+create customized launchers for Acme and Sam.
 
 ```sh
-cp plan9port/.local/bin/sample-acmeed.sh $HOME/.local/bin/acmeed.sh
-cp plan9port/.local/bin/sample.sam.sh $HOME/.local/bin/sam.sh
+cp plan9port/.local/bin/sample-startacme.sh $HOME/.local/bin/startacme.sh
+cp plan9port/.local/bin/sample.startsam.sh $HOME/.local/bin/startsam.sh
 ```
 
-Edit `~/.local/bin/acmeed.sh` and `~/.local/bin/sam.sh` to customize
-the launchers as desired.
+Edit `~/.local/bin/startacme.sh` and `~/.local/bin/startsam.sh` to
+customize the launchers as desired.
 
 ## Acme
 
@@ -181,7 +181,7 @@ acme -l /path/to/project/acme.dump
 
 If `stow` was used to symlink the base configuration files, a script
 to help with autosaving modified files that have yet to be written can
-be found at `~/.local/bin/acmeautosave.rc`. This script is
+be found at `~/.acme/bin/acmeautosave.rc`. This script is
 automatically run by `~/.local/bin/startacme.rc`, but only has effect
 if the `~/.acme/autosave` directory exists (which it will if the
 instructions above were followed).
@@ -222,11 +222,12 @@ plan9port comes with several useful commands for working with Acme
 If `stow` was used to symlink the base configuration files, there are
 a number of helper scripts available at `~/.acme/bin`:
 
+- `acmeautosave.rc`: See the __Autosaving__ section above.
 - `acmeed` ([source](https://moriendi.org/tools/acme/)): When used as
   a value for the `$EDITOR` environment variable, programs that
   utilize that environment variable will open a new window in Acme to
   edit files (run `Putdel` to confirm the write and delete the window,
-  or run `Del` to cancel the edit).
+  or run `Del` to cancel the edit). Alternative is the `E` command.
 - `alink` ([source](https://moriendi.org/tools/acme/)):
   `alink name cmd arg1 ...` creates a new window named `name` and
   executes `cmd` in it with the given args.
@@ -588,10 +589,10 @@ For more information on Acme mounting and macOS, see the following
 
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
-  workspace dumps. The `sample-acmeed.sh` sample launcher has comments
-  showing how a launcher can be set up to open this file on launch
-  when no extra options are provided. An example of a start/bookmarks
-  file follows.
+  workspace dumps. The `sample-startacme.sh` sample launcher has
+  comments showing how a launcher can be set up to open this file on
+  launch when no extra options are provided. An example of a
+  start/bookmarks file follows.
 
   ```text
   # ~/.acme/start - Acme start file
@@ -894,9 +895,9 @@ On macOS, there are also additional keybindings:
    following settings:
    - **App Name**: Acme
    - **Script Type**: Shell, `/bin/sh`
-   - **Script Path**: Path to some Acme launcher script (e.g.
-     `sample-acmeed.sh` or a customized `acmeed.sh` created from it),
-     which needs to be a real file and not a symlink
+   - **Script Path**: Path to some Acme launcher script (e.g. a
+     customized `startacme.sh` as described earlier), which needs to
+     be a real file and not a symlink
    - **Interface**: None
    - **Checkbox Settings**:
      - `[ ]` Accept dropped items
@@ -952,7 +953,7 @@ possible in Unix system without a mouse.
 #### Acme freedesktop.org desktop entry specification
 
 Assume that `stow` was used above to symlink scripts and config files.
-Instructions here use the `~/.acme/bin/acmeed.sh` launcher script.
+Instructions here use the `~/.acme/bin/startacme.sh` launcher script.
 
 To create a menu item for Acme, create a scaled down version of
 `mac/spaceglenda.png` in the plan9port repository (at resolution
@@ -967,8 +968,8 @@ desktop entry specification file at
 Name=Acme
 Comment=A text editor that is the successor of sam
 GenericName=Text Editor
-Exec=/home/USERNAME/.local/bin/acmeed.sh %f
-TryExec=/home/USERNAME/.local/bin/acmeed.sh
+Exec=/home/USERNAME/.local/bin/startacme.sh %f
+TryExec=/home/USERNAME/.local/bin/startacme.sh
 Icon=/home/USERNAME/.local/share/icons/spaceglenda240.png
 Categories=Utility;Development;TextEditor;
 Terminal=false
@@ -1032,6 +1033,8 @@ Version=1.0
   file server.
 
 ## Other useful links
+
+- [Acme plumbing rules for OCaml](https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467)
 
 - [Acme Tricks](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
 

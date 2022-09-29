@@ -4,8 +4,8 @@
 # Acme session
 
 for nsfull in /tmp/ns.$USER.*; do
-  nspart=`basename $nsfull`
-  if NAMESPACE=$nsfull 9 9p ls acme >/dev/null 2>&1; then
-    echo $NAMESPACE $nspart
-  fi
+	nspart=`basename $nsfull`
+	if NAMESPACE=$nsfull 9 9p ls acme >/dev/null 2>&1; then
+		echo $NAMESPACE $nspart
+	fi
 done
