@@ -249,6 +249,14 @@ a number of helper scripts available at `~/.acme/bin`:
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
+- `F`: Show font for current Acme window or set its font to an
+  available variable font in `fontsrv` (`9p ls font` to list fonts).
+- `F+`: Increment font size for the current Acme window by the given
+  number of points (defaults to 1 if called with no arg). Only works
+  if the current font is a variable font served by `fontsrv`.
+- `F-`: Decrement font size for the current Acme window by the given
+  number of points (defaults to 1 if called with no arg). Only works
+  if the current font is a variable font served by `fontsrv`.
 - `gb`: Wrapper for `git blame` of file in current Acme window.
 - `gl`: Wrapper for `git log` of file in current Acme window.
 - `h`: `hcount=N h STRING` shows the last `N` commands in a win window
