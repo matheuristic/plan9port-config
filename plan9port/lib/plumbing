@@ -47,11 +47,10 @@ data set https://doi.org/$0
 plumb to web
 plumb start web $data
 
-# git commits, sourced from https://blog.silvela.org/post/2021-12-11-acme-tricks/
+# git commits, sourced from https://alexkarle.com/blog/plan9-acme-git-gui.html
 type is text
-data matches '[0-9a-f]*[a-f][0-9a-f]*'
-data matches '([0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]+)'
-plumb start rc -c 'cd '$wdir'; cd `{git rev-parse --show-toplevel} && [ -d .git ] && git show '$1' | plumb -i -d edit -a ''action=showdata filename=+git/'$1''' '
+data matches '[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]+'
+plumb start rc -c 'git -C '$wdir' show '$0' >[2=1] | plumb -i -d edit -a ''action=showdata filename=/'$wdir'/'$0''''
 
 # market_identifier_code:ticker
 type is text
