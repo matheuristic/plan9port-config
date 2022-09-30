@@ -17,7 +17,7 @@ if (gdiff --version >[2]/dev/null >[1=2]) {
 }
 
 tabchars='»'
-numtrail=`{echo $tabstop-1 | hoc}
+numtrail=`{9 echo $tabstop-1 | 9 hoc}
 if (test $numtrail -gt 0) {
 	for (_ in `{seq $numtrail}) {
 		tabchars=$tabchars^'~'

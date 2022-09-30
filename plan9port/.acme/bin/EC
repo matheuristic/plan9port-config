@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Load indentation (tabs or spaces, and indent width) settings
+# for the current file from project's EditorConfig settings
+# Usage: Add EC to Acme window tag and middle-click (B2) on it
+
+if ! command -v editorconfig >/dev/null 2>&1; then
+	9 echo 'editorconfig not installed'
+	exit 1
+fi
+
+if [ "$1" = "-h" ]; then
+	9 echo 'Load EditorConfig indentation settings for current Acme file'
+	exit 0
+fi
+
+if [ -z "$winid" ]; then
+	9 echo 'Must be called from within Acme'
+	exit 1
+fi
+
+# Note: '\047' in the Awk script is "'", see the following for more info
+# https://stackoverflow.com/questions/9899001/how-to-escape-a-single-quote-inside-awk
+editorconfig $samfile | \
+	awk -F'=' '
+$1=="indent_style"{
+	cmd="acmeexec \047Spaces " (($2=="space") ? "on" : "off") "\047"
+	printf "%s => ", $0
+	system(cmd)
+	print cmd
+}
+$1=="tab_width"{
+	cmd="acmeexec \047Tab " $2 "\047"
+	printf "%s => ", $0
+	system(cmd)
+	print cmd
+}'

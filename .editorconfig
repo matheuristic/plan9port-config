@@ -1,0 +1,13 @@
+# This file is the top-most EditorConfig file
+root = true
+
+# All Files
+[*]
+charset = utf-8
+insert_final_newline = true
+
+# Markdown files
+[*.{md,mdx}]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = false
