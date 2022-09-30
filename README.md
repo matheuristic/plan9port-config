@@ -102,6 +102,9 @@ This will create the symlinks:
   necessary paths if plan9port is installed elsewhere.
 - `~/.local/bin/startacme.rc`: Launcher for Acme.
 - `~/.local/bin/startsam.rc`: Launcher for Sam.
+- `~/.local/bin/sample-pylsp`: Sample wrapper showing how to run
+  [Python LSP Server](https://github.com/python-lsp/python-lsp-server)
+  installed in a Conda environment. Of utility when using `acme-lsp`.
 - `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
   `startacme.rc` via `rc.sh`.
 - `~/.local/bin/sample-startsam.sh`: Sample wrapper to run
@@ -349,35 +352,45 @@ a number of helper scripts available at `~/.acme/bin`:
   or `$HOME/.config/acme-lsp/config.toml` for Unix or Linux. Example:
 
   ```toml
-  # ~/.config/acme-lsp/config.toml - acme-lsp config
-
+  # acme-lsp config
+  # ~/.config/acme-lsp/config.toml - Linux
+  # ~/Library/Preferences/Application\ Support/acme-lsp/config.toml - macOS
+  
+  # acme-lsp source repository: https://github.com/fhs/acme-lsp
+  
+  # Note that a relative file paths use os.UserCacheDir(), so on Linux
+  # "some.log" resolves to "$HOME/.cache/acme-lsp/some.log" and on macOS
+  # "some.log" resolves to "$HOME/Library/Caches/acme-lsp/some.log"
+  
+  # See https://godoc.org/github.com/fhs/acme-lsp/internal/lsp/acmelsp/config#File
+  # for more configuration options
+  
   [Servers]
 
-  	[Servers.elixir-ls]
-  	Command = ["/path/to/elixir-ls/language_server.sh"]
-  	StderrFile = ""
-  	LogFile = ""
-
-  	[Servers.jedi-language-server]
-  	Command = ["jedi-language-server"]
-  	StderrFile = ""
-  	LogFile = ""
+  	[Servers.pylsp]
+  	Command = ["bash", "-c", "$HOME/.local/bin/pylsp"]
+  	StderrFile = "pylsp.stderr.log"
+  	LogFile = "pylsp.log"
 
   	[Servers.gopls]
   	Command = ["gopls", "serve", "-rpc.trace"]
   	StderrFile = "gopls.stderr.log"
   	LogFile = "gopls.log"
-  		# These settings gets passed to gopls
+  		# These settings get passed to gopls
   		[Servers.gopls.Options]
   		hoverKind = "FullDocumentation"
 
-  [[FilenameHandlers]]
-  Pattern = "\\.exs?$"
-  ServerKey = "elixir-ls"
+  	[Servers.rust-analyzer]
+  	Command = ["rust-analyzer"]
+  	StderrFile = "rust-analyzer.stderr.log"
+  	Logfile = "rust-analyzer.log"
+  		# These settings get passed to rust-analyzer
+  		[Servers.rust-analyzer.Options]
+                  # "checkOnSave.enable" = false
 
   [[FilenameHandlers]]
   Pattern = "\\.py$"
-  ServerKey = "jedi-language-server"
+  ServerKey = "pylsp"
 
   [[FilenameHandlers]]
   Pattern = "[/\\\\]go\\.mod$"
@@ -393,6 +406,10 @@ a number of helper scripts available at `~/.acme/bin`:
   Pattern = "\\.go$"
   LanguageID = "go"
   ServerKey = "gopls"
+
+  [[FilenameHandlers]]
+  Pattern = "\\.rs$"
+  ServerKey = "rust-analyzer"
   ```
 
   An alternative is [acre](https://github.com/mjibson/acre).

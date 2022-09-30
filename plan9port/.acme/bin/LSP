@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Start acme-lsp with workspace set to git repo root or current dir
+
+# Check that acme-lsp is installed
+if ! command -v acme-lsp >/dev/null 2>&1; then
+	9 echo "acme-lsp not installed"
+	exit 1
+fi
+
+# Check that this is called from within Acme
+if [ -z "$winid" ]; then
+	9 echo 'Must be called from within Acme'
+	exit 1
+fi
+
+# If in a Git directory, use its root directory as the workspace
+WORKSPACE=`git rev-parse --show-toplevel 2>/dev/null`
+
+# Otherwise use the current directory
+if [ -z "$WORKSPACE" ]; then
+	WORKSPACE="$PWD"
+fi
+
+# Start acme-lsp
+acme-lsp -workspaces "$WORKSPACE" "$@"
