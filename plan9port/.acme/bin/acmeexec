@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Command to execute (Button3) some text in a specified Acme window
+# Command to execute (Button2) some text in a specified Acme window
 # Example (execute 'Get' in Acme window 8):
 #     acmeexec Get 8
 # Example (execute 'Indent on' in Acme window 9):

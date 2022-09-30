@@ -231,6 +231,8 @@ a number of helper scripts available at `~/.acme/bin`:
   utilize that environment variable will open a new window in Acme to
   edit files (run `Putdel` to confirm the write and delete the window,
   or run `Del` to cancel the edit). Alternative is the `E` command.
+- `acmeexec`: Execute (Button2) some text in specified Acme window
+  number (defaults to number of current Acme window).
 - `alink` ([source](https://moriendi.org/tools/acme/)):
   `alink name cmd arg1 ...` creates a new window named `name` and
   executes `cmd` in it with the given args.
@@ -249,6 +251,9 @@ a number of helper scripts available at `~/.acme/bin`:
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
 - `d`: Diff the current window against the current file on disk.
 - `dtw`: Delete trailing whitespace (spaces/tabs).
+- `EC`: Load [EditorConfig](https://editorconfig.org/) indentation
+  settings (spaces or tabs, and width of each indent level) for the
+  current Acme window based on filename.
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
