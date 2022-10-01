@@ -461,6 +461,8 @@ a number of helper scripts available at `~/.acme/bin`:
   plumb client issues -a -p $1/$2 $3
   ```
 
+  Install using `go install rsc.io/github/issue@latest`.
+
 - [I](https://github.com/hherman1/I): Make CLI tools interactive in
   Acme. Running `I <cli>` to execute the command in a new window,
   where Button2 on window text will append the clicked text as a new
@@ -1089,6 +1091,8 @@ Version=1.0
 - [Acme plumbing rules for OCaml](https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467)
 
 - [Acme Tricks](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
+
+- [Awesome Acme](https://github.com/mkmik/awesome-acme)
 
 - [On Some Tools for Plan9's Acme](https://tales.mbivert.com/on-some-tools-for-plan9-acme/)
 

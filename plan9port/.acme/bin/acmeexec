@@ -36,20 +36,19 @@ fi
 # (see https://github.com/9fans/plan9port/blob/master/src/cmd/acme/xfid.c#L809)
 9 echo -n "nomenu" | 9p write acme/$WID/ctl
 
-# Clear tag right of first '|'
-echo -n "cleartag" | 9p write acme/$WID/ctl
+# Text to execute will be appended to the tag, so find its start index
 STARTINDEX=`9p read acme/$WID/tag | 9 wc -c | 9 hoc`  # hoc to strip leading spaces
 
 # Append text to execute to tag
 echo -n "$CMD" | 9p write acme/$WID/tag
 CMDLENGTH=`9 echo -n "$CMD" | 9 wc -c`
 
-# Execute the added text
+# Find the end index of the added text and execute the text
 ENDINDEX=`9 echo "${STARTINDEX}+${CMDLENGTH}" | 9 hoc`
 EVENT="Mx$STARTINDEX $ENDINDEX"
 9 echo "$EVENT" | 9p write acme/$WID/event
 
-# Restore the original tag
+# Clear tag right of first '|' and restore to the original
 echo -n "cleartag" | 9p write acme/$WID/ctl
 echo -n "$TAGRIGHT" | 9p write acme/$WID/tag
 
