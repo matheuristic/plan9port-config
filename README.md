@@ -461,7 +461,10 @@ a number of helper scripts available at `~/.acme/bin`:
   plumb client issues -a -p $1/$2 $3
   ```
 
-  Install using `go install rsc.io/github/issue@latest`.
+  Install using `go install rsc.io/github/issue@latest`. This program
+  requires a Github personal access token be written to the file
+  `$HOME/.github-issue-token`, and the token needs to have the scope
+  `repo` for public repositories or `private_repo` for private ones.
 
 - [I](https://github.com/hherman1/I): Make CLI tools interactive in
   Acme. Running `I <cli>` to execute the command in a new window,
