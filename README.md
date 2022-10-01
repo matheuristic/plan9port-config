@@ -635,6 +635,22 @@ For more information on Acme mounting and macOS, see the following
   [Load /path/to/project.dump]
   ```
 
+- Mouse chording (pressing mouse buttons in a sequence without
+  releasing them) can be used to perform a number of actions.
+
+  - The 1-2 chord (press Button1 and hold, then press Button2)
+    executes Cut, i.e. remove selected text and overwrite the snarf
+    buffer with it.
+
+  - The 1-3 chord executes Paste, i.e. insert the contents of the
+    snarf buffer at the point or over selected text.
+
+  - The 2-1 chord will execute the current selected text using the
+    previously selected text as an appended argument.
+
+  - The 2-3 and 3-2 chords do not do anything, and can be used to get
+    out of an unintended button press.
+
 - A separate window can be useful for writing and maintaining a
   history of commands. A handy use of this separate window is to write
   commands to be run with Edit, and execute them by highlighting the
