@@ -1113,6 +1113,8 @@ Version=1.0
 
 - [Awesome Acme](https://github.com/mkmik/awesome-acme)
 
+- [Hints for writing Unix tools](https://monkey.org/~marius/unix-tools-hints.html)
+
 - [On Some Tools for Plan9's Acme](https://tales.mbivert.com/on-some-tools-for-plan9-acme/)
 
 - [Plan 9 Wiki Tip o' the day](https://9p.io/wiki/plan9/Tip_o'_the_day/index.html)
