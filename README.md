@@ -445,11 +445,33 @@ a number of helper scripts available at `~/.acme/bin`:
   Other alternatives include [xplor](https://git.sr.ht/~mkhl/xplor) or
   its Go [port](https://github.com/mpl/xplor).
 
+- [issue](https://pkg.go.dev/rsc.io/github/issue)
+  ([Github](https://github.com/rsc/github):
+  Acme client for reading and updating Github project tracker issues.
+  Note that the project repo defaults to `golang/go` so use the `-p`
+  CLI option to specify the appropriate project. In Acme, issues for
+  a given Github project can be searched by executing a command like
+  `issues -a -p <OWNER>/<REPOSITORY> <QUERY>`. Example plumbing rule:
+
+  ```text
+  # matches '<OWNER>/<REPOSITORY>/issues/<ISSUENUMBER>'
+  type is text
+  data matches '([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/issues/([0-9]+)'
+  plumb to githubissue
+  plumb client issues -a -p $1/$2 $3
+  ```
+
 - [I](https://github.com/hherman1/I): Make CLI tools interactive in
   Acme. Running `I <cli>` to execute the command in a new window,
   where Button2 on window text will append the clicked text as a new
   arg and rerun the command, Button2 on Back will remove the newest
   arg and rerun, and Get will rerun the command as is.
+
+- [Jira](https://pkg.go.dev/github.com/hdonnay/Jira)
+  ([Github](https://github.com/hdonnay/Jira)):
+  Acme client for reading and updating
+  [Jira](https://www.atlassian.com/software/jira) issues. See package
+  website or repository for how to set up appropriate plumbing rules.
 
 - [Nyne](https://github.com/dnjp/nyne): Tools for Acme, including
   `nynetab` which expands tabs and indents text (best used with a

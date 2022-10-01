@@ -52,17 +52,31 @@ type is text
 data matches '[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]+'
 plumb start rc -c 'git -C '$wdir' show '$0' >[2=1] | plumb -i -d edit -a ''action=showdata filename=/'$wdir'/'$0''''
 
-# market_identifier_code:ticker
-type is text
-data matches '(X[A-Z][A-Z][A-Z]):([0-9A-Z]+)'
-data set https://www.morningstar.com/stocks/$1/$2/quote
-plumb to web
-plumb start web $data
-
 # financial instrument global identifier (OpenFIGI)
 type is text
 data matches 'BBG[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9]'
 data set https://www.openfigi.com/id/$0
+plumb to web
+plumb start web $data
+
+# stock ticker
+type is text
+data matches 'ticker://([0-9A-Z.]+)'
+data set https://finance.yahoo.com/quote/$1/
+plumb to web
+plumb start web $data
+
+# morningstar.com search
+type is text
+data matches 'morningstar://([0-9A-Za-z\-.]+)'
+data set https://www.morningstar.com/search?query=$1
+plumb to web
+plumb start web $data
+
+# sec.gov/edgar entity search
+type is text
+data matches 'edgar://([0-9A-Za-z \-.]+)'
+data set https://www.sec.gov/edgar/search/#/entityName=$1
 plumb to web
 plumb start web $data
 

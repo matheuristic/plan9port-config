@@ -1,9 +1,26 @@
 #!/bin/sh
 
-# Increase indent of STDIN or piped text by argument (default $tabstop
-# or 4) spaces
+# Increase indent of STDIN or piped text by argument spaces
+# (default number of spaces is EditorConfig setting for the current
+# file if calling from Acme, or $tabstop, or 4)
 
-tabstop=${tabstop:-4}
-NUMSPACES=${1:-$tabstop}
+# If an argument is provided, use that as the number of spaces
+NUMSPACES=$1
+
+# Else, if in Acme, use the EditorConfig setting for file if available
+if [ -z "$NUMSPACES" ] && [ -n "$winid" ] && command -v editorconfig >/dev/null 2>&1; then
+	NUMSPACES=`editorconfig $samfile | grep tab_width | awk -F'=' '{print $2; exit}'`
+fi
+
+# Else, use the $tabstop value
+if [ -z "$NUMSPACES" ]; then
+	NUMSPACES=$tabstop
+fi
+
+# Else default to 4
+if [ -z "$NUMSPACES" ]; then
+	NUMSPACES=4
+fi
+
 INDENT=$(printf "%${NUMSPACES}s")
 sed "s/.*/${INDENT}&/"
