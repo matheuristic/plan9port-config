@@ -5,13 +5,15 @@
 # Note that for open modified files, the saved version is searched
 
 if ! command -v rg >/dev/null 2>&1; then
-	echo 'rg not installed'
+	echo 'rg not installed' 1>&2
 	exit 1
 fi
 
 if [ "$#" -eq 0 ]; then
-	echo 'Usage: rg+ [OPTIONS..] PATTERN'
-	echo 'See ripgrep help (`rg --help`) for available options'
+	cat << EOF >&2
+Usage: rg+ [OPTIONS..] PATTERN
+See ripgrep help (\`rg --help\`) for available options
+EOF
 	exit 1
 fi
 

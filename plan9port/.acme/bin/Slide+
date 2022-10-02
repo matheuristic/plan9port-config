@@ -10,7 +10,7 @@
 # Source: https://research.swtch.com/acme
 
 if(test ! -r index) {
-	9 echo no slide index
+	9 echo no slide index >[1=2]
 	exit 1
 }
 
@@ -19,15 +19,15 @@ current=`{9 basename $name}
 currentx=`{9 grep -n '^'$current'([ 	]|$)' index | 9 sed 's/:.*//'}
 
 if(~ $#currentx 0) {
-	9 echo not in slideshow
+	9 echo not in slideshow >[1=2]
 	exit 1
 }
 
 pagex=`{9 echo $currentx + 1 | 9 hoc}
 page=`{9 sed -n $pagex^p index | 9 awk '{print $1}'}
 if (~ $#page 0) {
-  9 echo at last page
-  exit 0
+	9 echo at last page >[1=2]
+	exit 0
 }
 
 Slide $page

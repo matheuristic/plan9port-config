@@ -5,18 +5,18 @@
 # Usage: Add EC to Acme window tag and middle-click (B2) on it
 
 if ! command -v editorconfig >/dev/null 2>&1; then
-	9 echo 'editorconfig not installed'
+	9 echo 'editorconfig not installed' 1>&2
+	exit 1
+fi
+
+if [ -z "$winid" ]; then
+	9 echo 'Must be called from within Acme' 1>&2
 	exit 1
 fi
 
 if [ "$1" = "-h" ]; then
 	9 echo 'Load EditorConfig indentation settings for current Acme file'
 	exit 0
-fi
-
-if [ -z "$winid" ]; then
-	9 echo 'Must be called from within Acme'
-	exit 1
 fi
 
 # Note: '\047' in the Awk script is "'", see the following for more info
@@ -34,4 +34,4 @@ $1=="tab_width"{
 	printf "%s => ", $0
 	system(cmd)
 	print cmd
-}'
+}' 1>&2

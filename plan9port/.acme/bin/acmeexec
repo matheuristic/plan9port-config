@@ -9,16 +9,18 @@
 #     acmeexec 'Font /mnt/font/GoRegular/22a/font'
 
 if [ -z "$winid" ]; then
-	echo "Must be run from within Acme"
+	echo "Must be run from within Acme" 1>&2
 	exit 1
 fi
 
 if [ "$#" -eq 0 ] || [ "$#" -gt 2 ]; then
 	PROGNAME=`basename $0`
-	echo "Usage: $PROGNAME COMMAND [WINID]"
-	echo ""
-	echo "    COMMAND is the text to execute in the Acme window (in quotes as needed)"
-	echo '    WINID is a Acme window id (default: `$winid` of current Acme window)'
+	cat << EOF >&2
+Usage: $PROGNAME COMMAND [WINID]
+
+    COMMAND is the text to execute in the Acme window (in quotes as needed)
+    WINID is a Acme window id (default: \$winid of current Acme window)
+EOF
 	exit 1
 fi
 
@@ -28,7 +30,7 @@ WID=${2:-$winid}
 # Store original tag right of first '|'
 TAGRIGHT=`9p read acme/$WID/tag | 9 awk -F'|' '{ st = index($0,"|");print substr($0,st+1)}'`
 if [ -z "$TAGRIGHT" ]; then
-	9 echo 'Error: Unable to parse tag (trying to orient on first "|")'
+	9 echo 'Error: Unable to parse tag (trying to orient on first "|")' 1>&2
 	exit 2
 fi
 

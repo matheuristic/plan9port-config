@@ -5,17 +5,17 @@
 # fzf gives exit code 1 if we try to search files directly using it
 
 if ! command -v rg >/dev/null 2>&1; then
-	echo 'rg not installed'
+	echo 'rg not installed' 1>&2
 	exit 1
 fi
 
 if  ! command -v fzf >/dev/null 2>&1; then
-	echo 'fzf not installed'
+	echo 'fzf not installed' 1>&2
 	exit 1
 fi
 
 if [ "$#" -ne 1 ]; then
-	echo "Usage: ff QUERY"
+	echo "Usage: `basename $0` QUERY" 1>&2
 	exit 1
 fi
 

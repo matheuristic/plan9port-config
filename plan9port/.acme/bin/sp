@@ -1,41 +1,41 @@
 #!/bin/sh
 
 # Spellcheck current Acme buffer
+# Supports passing '-d dict' parameter to enchant to use a specific dictionary
 
 set -e
 
-# Support passing '-d dict' parameter to enchant
+if ! command -v enchant >/dev/null 2>&1; then
+	9 echo "enchant not installed" 1>&2
+	exit 1
+fi
+
+if ! command -v realpath >/dev/null 2>&1; then
+	9 echo "realpath not installed" 1>&2
+	exit 1
+fi
+
+if [ "$winid" = "" ]; then
+	9 echo "must be used from within acme" 1>&2
+	exit 1
+fi
 
 if [ "$#" -gt 0 ] && ([ "$#" -ne 2 ] || [ "$1" != "-d" ]); then
-	PROGNAME=`basename $0`
-	echo "Usage: $PROGNAME [-d dict]"
-	echo ""
-	echo '    If -d is specified, dict must be an `enchant` dictionary'
+	9 cat << EOF >&2
+Usage: `basename $0` [-d dict]
+
+    If -d is specified, dict must be an \`enchant\` dictionary
+EOF
 	exit 1
 fi
 
 ENCHANTPARAMS=""
 if [ "$1" = "-d" ]; then
 	if [ -z "$2" ]; then
-		echo "option -d specified but no dictionary provided"
+		9 echo "option -d specified but no dictionary provided" 1>&2
 		exit 1
 	fi
 	ENCHANTPARAMS="$1 $2"
-fi
-
-if [ "$winid" = "" ]; then
-	echo "Must be used from within Acme"
-	exit 1
-fi
-
-if ! command -v enchant >/dev/null 2>&1; then
-	echo "enchant not installed"
-	exit 1
-fi
-
-if ! command -v realpath >/dev/null 2>&1; then
-	echo "realpath not installed"
-	exit 1
 fi
 
 RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
@@ -58,7 +58,7 @@ RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
 			llength=`9 echo -n "$lword" | wc -c`
 			lcolumnend=`9 hoc -e "$lcolumnstart + $llength"`
 			lsuggest=`9 echo -n "$l" | 9 awk -F':' '{print ":" $2}'`
-			echo "${RELATIVEPATH}:${lline}:${lcolumnstart},${lline}:${lcolumnend}	$lword $lsuggest"
+			9 echo "${RELATIVEPATH}:${lline}:${lcolumnstart},${lline}:${lcolumnend}	$lword $lsuggest"
 		fi
 	done
 }

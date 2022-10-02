@@ -23,11 +23,11 @@
 
 if(~ $#acmeautosavedir 0) acmeautosavedir=$home/.acme/autosave
 if(echo $acmeautosavedir | 9 grep ' ' >[2]/dev/null >[1=2]) {
-	echo Autosave directory must not contain a space: $acmeautosavedir
+	echo Autosave directory must not contain a space: $acmeautosavedir >[1=2]
 	exit 1
 }
 if(test ! -d $acmeautosavedir) {
-	echo Autosave directory does not exist: $acmeautosavedir
+	echo Autosave directory does not exist: $acmeautosavedir >[1=2]
 	exit 1
 }
 autosavedestdir=$acmeautosavedir/`{namespace | 9 sed -e 's|/|%|g'}

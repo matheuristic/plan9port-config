@@ -5,19 +5,20 @@
 # where N is the number of points (defaults to 1 if unspecified)
 
 if (~ $#winid 0) {
-	9 echo must be run in acme
+	9 echo must be run from within acme >[1=2]
 	exit 1
 }
 
 if (test $#* -gt 1) {
-	9 echo 'F+ takes exactly zero or one argument'
+	9 echo 'F+ takes exactly zero or one argument' >[1=2]
+	exit 1
 }
 
 curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
 
 isvarfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
 if (test $isvarfont -eq 0) {
-	9 echo Resizing not supported for bitmap font, currently $curfont
+	9 echo Resizing not supported for bitmap font, currently $curfont >[1=2]
 	exit 1
 }
 
@@ -30,15 +31,15 @@ if (~ $#delta 0) delta=1
 
 if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'-'$delta | 9 hoc}
 if not {
-	9 echo Invalid point increment
+	9 echo Invalid point increment >[1=2]
 	exit 1
 }
 
 if (test $newsize -lt 1) {
-	9 echo Cannot decrement font size to less than 1
+	9 echo Cannot decrement font size to less than 1 >[1=2]
 	exit 1
 }
 
 newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
 9 echo font $newfont | 9p write acme/$winid/ctl
-9 echo 'font:' $curfont '->' $newfont
+9 echo $newfont >[1=2]

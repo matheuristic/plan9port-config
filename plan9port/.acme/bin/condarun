@@ -5,7 +5,7 @@
 
 # Check that at least two arguments, environment and command, are provided
 if (test $#* -lt 2) {
-	echo Usage: $0 envname command arg1 arg2 ...
+	9 echo Usage: `{9 basename $0} envname command arg1 arg2 ... >[1=2]
 	exit 1
 }
 
@@ -15,11 +15,11 @@ if ((test $#condahome -eq 0) && (test -d $home/mambaforge)) condahome=$home/mamb
 if ((test $#condahome -eq 0) && (test -d $home/miniforge3)) condahome=$home/miniforge3
 if ((test $#condahome -eq 0) && (test -d $home/miniconda3)) condahome=$home/miniconda3
 if (~ $#condahome 0) {
-	echo 'condahome environment var not set and unable to autodetect' >[1=2]
+	9 echo 'condahome environment var not set and unable to autodetect' >[1=2]
 	exit 1
 }
 if (test ! -d $condahome) {
-	echo 'Expected conda install at '^$condahome^' but none found' >[1=2]
+	9 echo 'Expected conda install at '^$condahome^' but none found' >[1=2]
 	exit 1
 }
 
@@ -32,7 +32,7 @@ if (test $condaenv = 'base') condabin=$condahome/bin
 if not {
   condabin=$condahome/envs/$condaenv/bin
   if (test ! -d $condabin) {
-    echo 'Target environment '^$condaenv^' not found in Conda install at '^$condahome >[1=2]
+    9 echo 'Target environment '^$condaenv^' not found in Conda install at '^$condahome >[1=2]
     exit 1
   }
 }

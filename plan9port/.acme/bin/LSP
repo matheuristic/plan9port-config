@@ -4,13 +4,13 @@
 
 # Check that acme-lsp is installed
 if ! command -v acme-lsp >/dev/null 2>&1; then
-	9 echo "acme-lsp not installed"
+	9 echo "acme-lsp not installed" 1>&2
 	exit 1
 fi
 
 # Check that this is called from within Acme
 if [ -z "$winid" ]; then
-	9 echo 'Must be called from within Acme'
+	9 echo 'Must be called from within Acme' 1>&2
 	exit 1
 fi
 

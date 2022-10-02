@@ -2,46 +2,47 @@
 
 # Change font in current Acme window
 
-defaultfontsize=23a
+defaultfontsize=22a
 
 if (~ $#winid 0) {
-	9 echo must be run in acme
+	9 echo must be run from within acme >[1=2]
 	exit 1
 }
 
-curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-
-if (~ $#* 0) {
-	9 echo $curfont
-	exit
+if (test $#* -gt 2) {
+	9 echo 'F takes exactly one or two arguments' >[1=2]
+	exit 1
 }
 
 if (~ $1 '-h') {
-	9 echo 'Change font in current Acme window. Usage:'
-	9 echo ''
-	9 echo '    F newfontname [newfontsize]'
-	9 echo ''
-	9 echo 'newfontname must be a `fontsrv` available font'
-	9 echo 'newfontsize can be suffixed with `a` to indicate antialiasing'
-	9 echo '(defaults to '''$defaultfontsize''')'
-	9 echo ''
-	9 echo 'Example:'
-	9 echo '    F GoMono 22a'
-	9 echo ''
-	9 echo 'Run `9p ls font` to list available fonts'
-	9 echo ''
-	9 echo 'Current font (dir or `fontsrv` path):' $curfont
+	9 cat << EOF
 	exit
 }
+Change font in current Acme window. Usage:
 
-if (test $#* -gt 2) {
-	9 echo 'F takes exactly one or two arguments'
+    F [newfontname [newfontsize]]
+
+Sets window font to newfontname at newfontsize pt, if specified.
+Prints the window font path to stderr after, regardless of any change.
+
+newfontname must be a `fontsrv` available font
+newfontsize is size in points and can be suffixed with 'a' to use the
+font antialiased (defaults to '$defaultfontsize' if unspecified)
+
+Example:
+    F GoMono 23a
+
+Run `9p ls font` to list available fonts
+EOF
+
+# Set new font and size if changing font
+if (test $#* -gt 0) {
+	newfontname=$1
+	newfontsize=$2
+	if (~ $#newfontsize 0) newfontsize=$defaultfontsize
+	newfont='/mnt/font/'$newfontname'/'$newfontsize'/font'
+	9 echo font $newfont | 9p write acme/$winid/ctl
 }
 
-newfontname=$1
-newfontsize=$2
-if (~ $#newfontsize 0) newfontsize=$defaultfontsize
-
-newfont='/mnt/font/'$newfontname'/'$newfontsize'/font'
-9 echo font $newfont | 9p write acme/$winid/ctl
-9 echo 'font:' $curfont '->' $newfont
+# Print current font to stderr
+9p read acme/$winid/ctl | 9 awk '{print $7}' >[1=2]

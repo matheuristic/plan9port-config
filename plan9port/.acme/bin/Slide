@@ -30,7 +30,7 @@
 # Source: https://research.swtch.com/acme
 
 if (test ! -r index) {
-	9 echo no slide index
+	9 echo no slide index >[1=2]
 	exit 1
 }
 
@@ -41,7 +41,7 @@ if (~ $#name 0) {
 
 file=`{pwd}^/$name
 if(test ! -r $file) {
-	9 echo $file not found
+	9 echo $file not found >[1=2]
 	exit 1
 }
 

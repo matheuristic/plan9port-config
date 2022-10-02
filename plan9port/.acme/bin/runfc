@@ -5,11 +5,9 @@
 # Run STDIN or piped text through a command that modifies a file in-place and
 # print the result to STDOUT
 
-cmd=`{basename $0}
-
 # Check if a command is provided
 if (~ $#* 0) {
-	echo usage: $cmd command arg1 arg2 ...
+	echo usage: `{basename $0} command arg1 arg2 ... >[1=2]
 	exit 1
 }
 
