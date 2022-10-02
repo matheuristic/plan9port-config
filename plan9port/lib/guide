@@ -1,19 +1,21 @@
 # Tag
 Edit Font (Indent on) <cl-paste |c- |c+ |is- |is+ |t2s |dtw d rg+
-|ct |lower |upper |surround |s2t |uline alink gl gb sp lw
-[F GoRegular 22a] F- F+ Slide Slide- Slide+ :/[Ffoo] :-/[Ff]oo/ :42
+|ct |lower |upper |surround |s2t |uline alink gl gb sp lw :, :0 :$
+[F GoRegular 22a] F- F+ Slide Slide- Slide+ :/[Ffoo]/ :-/[Ff]oo/ :42
 
 # Edit commands
 =                   # line number
 .,3                 # select from cursor to end of line 3
-3,.                 # select from beginning of line 3 to the cursor
-+/text/             # search for text forwards
-$-/text/            # search for text backwards from end
+3,.                 # select from beginning of line 3 to cursor
++/text/             # search forward for text
+$-/text/            # search backward from end for text
 ,d                  # clear whole buffer window, useful for +Error
 ,>wc                # line, word and char counts for whole buffer
-X/^'/w              # write all modified files
-X                   # list windows
-, x v/^.*\.pdf\n/ d # select lines ending with .pdf (use with dirs)
+s/[Ff]rom/to/g      # regexp replace across selected text
+,s/[Ff]rom/to/g     # regexp replace across all text in current window
+X                   # list all windows
+X/^'/               # list all modified files
+X/^'/ w             # write all modified files
 
 # Characters
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
@@ -74,3 +76,14 @@ condarun ENVNAME pylint -f parseable $%
 
 # Plumber rules
 cat $home/lib/plumbing | 9p write plumb/rules
+
+# Advanced Edit commands
+# - Find occurrences of 'User' or 'user' in window, with context
+Edit , x g/[Uu]ser/ {
+	=
+	-1,+1p
+}
+# - Replace all occurrences of 'From' or 'from' to 'to' in all windows
+Edit X/^[^\+]./ {
+	, s/[Ffrom]/to/g
+}
