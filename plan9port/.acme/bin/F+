@@ -1,6 +1,7 @@
 #!/usr/bin/env rc
 
-# Increment font size in current Acme window. Usage
+# Increment font size in current Acme window, and print new font path.
+# Usage:
 #     F+ [N]
 # where N is the number of points (defaults to 1 if unspecified)
 
@@ -37,4 +38,4 @@ if not {
 
 newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
 9 echo font $newfont | 9p write acme/$winid/ctl
-9 echo $newfont >[1=2]
+9 echo $newfont

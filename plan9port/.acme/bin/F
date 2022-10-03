@@ -22,8 +22,9 @@ Change font in current Acme window. Usage:
 
     F [newfontname [newfontsize]]
 
-Sets window font to newfontname at newfontsize pt, if specified.
-Prints the window font path to stderr after, regardless of any change.
+Sets window font to newfontname at newfontsize pt, if specified, and
+prints the window font path to stdout after.
+Calling with no args will just print the full path of the current font.
 
 newfontname must be a `fontsrv` available font
 newfontsize is size in points and can be suffixed with 'a' to use the
@@ -45,4 +46,4 @@ if (test $#* -gt 0) {
 }
 
 # Print current font to stderr
-9p read acme/$winid/ctl | 9 awk '{print $7}' >[1=2]
+9p read acme/$winid/ctl | 9 awk '{print $7}'
