@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Rename current Acme window file
+
+set -e
+
+if [ -z "$winid" ]; then
+	echo "must be called from within acme" 1>&2
+	exit 1
+fi
+
+if [ "$#" -eq 0 ]; then
+	cat >&2 <<EOF
+Rename the current Acme window's file
+
+Usage: `basename $0` newfilename
+
+newfilename is the new file name
+EOF
+	exit 1
+fi
+
+if [ "$#" -gt 1 ]; then
+	echo "`basename $0` takes exactly one argument" 1>&2
+	exit 1
+fi
+
+ISDIRECTORY_ISMODIFIED=`9p read acme/$winid/ctl | awk '{print $4$5}'`
+if [ "$ISDIRECTORY_ISMODIFIED" != "00" ]; then
+	echo "can only rename unmodified files" 1>&2
+	exit 2
+fi
+
+TO=$1
+FROM=`9p read acme/$winid/tag | awk -F' Del Snarf' '{print $1; exit}'`
+
+# If target filepath is a relative one, construct path relative
+# to current working directory
+if ! echo $TO | grep -q '^/'; then
+	TO="$PWD/$TO"
+fi
+
+# If the window file exists (not always the case), then move it
+# to the new name only if does not clobber an existing file
+if [ -f "$FROM" ]; then
+	if [ -f "$TO" ]; then
+		echo "$TO already exists, delete it first" 1>&2
+		exit 2
+	fi
+	mv "$FROM" "$TO"
+fi
+
+# Update Acme window
+echo name "$TO" | 9p write acme/$winid/ctl
+echo clean | 9p write acme/$winid/ctl
+echo get | 9p write acme/$winid/ctl
