@@ -94,5 +94,18 @@ data set https://calendar.google.com/calendar/u/0/r/month/$1/$2/01
 plumb to web
 plumb start web $data
 
+# gemini using [lagrange](https://github.com/skyjake/lagrange)
+type is text
+data matches 'gemini://[^ ]+'
+plumb to gemini
+plumb start lagrange $0
+
+# view twitter through [nitter](https://github.com/zedeus/nitter)
+type is text
+data matches 'https?://twitter.com/(.*)'
+data set https://nitter.net/$1
+plumb to web
+plumb start web $data
+
 # include basic plumbing rules
 include basic
