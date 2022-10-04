@@ -47,7 +47,12 @@ if [ -f "$FROM" ]; then
 		echo "$TO already exists, delete it first" 1>&2
 		exit 2
 	fi
-	mv "$FROM" "$TO"
+	# Use `git mv` if file is under Git version control, else `mv`
+	if git ls-files --error-unmatch "$FROM" 1>/dev/null 2>&1; then
+		git mv "$FROM" "$TO"
+	else
+		mv "$FROM" "$TO"
+	fi
 fi
 
 # Update Acme window
