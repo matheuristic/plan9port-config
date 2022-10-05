@@ -764,8 +764,8 @@ For more information on Acme mounting and macOS, see the following
   - For direct helper programs, these would be `acme-lsp` (along with
     the relevant LSP servers), `Watch`, and any other programs desired
     (see the _Optional tools_ subsection above).
-  - Install the Lagrange Gemini browser to support plumbing Gemini
-    URLs in `gemini://...` form to a browser.
+  - Install [gcat](https://github.com/aaronjanse/gcat) to support
+    plumbing Gemini URLs `gemini://...` with output to `+Errors`.
 - Set up an Acme launcher app (macOS) or desktop entry (Linux) to make
   launching Acme easier.
 

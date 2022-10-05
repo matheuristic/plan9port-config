@@ -94,11 +94,11 @@ data set https://calendar.google.com/calendar/u/0/r/month/$1/$2/01
 plumb to web
 plumb start web $data
 
-# gemini using [lagrange](https://github.com/skyjake/lagrange)
+# gemini using [gcat](https://github.com/aaronjanse/gcat)
 type is text
 data matches 'gemini://[^ ]+'
 plumb to gemini
-plumb start lagrange $0
+plumb start rc -c 'gcat '$0' | 9 sed -e ''s;^=> ([^: 	]+[ 	]);=> '$0'/\1;g'' | 9p write acme/cons'
 
 # view twitter through [nitter](https://github.com/zedeus/nitter)
 type is text
