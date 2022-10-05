@@ -95,10 +95,15 @@ plumb to web
 plumb start web $data
 
 # gemini using [gcat](https://github.com/aaronjanse/gcat)
+# first sed expression is to handle same host relative links ('=> foo/')
+# second sed expression is to handle same host absolute links ('=> //bar')
+# third sed expression is to handle same host parent links ('=> ../')
+# fourth sed expression is to clean up messy relative links ('=> ./baz')
+# right-click :-/text\/gemini/ in Acme to search to start of plumbed page
 type is text
-data matches 'gemini://[^ ]+'
+data matches '(gemini://[^ |{};]*[^/])/?'
 plumb to gemini
-plumb start rc -c 'gcat '$0' | 9 sed -e ''s;^=> ([^: 	]+[ 	]);=> '$0'/\1;g'' | 9p write acme/cons'
+plumb start rc -c 'gcat '$1' | 9 sed -e ''s;^=> ([^: 	]+[ 	]);=> '$1'/\1;g'' -e ''s;^(=> gemini://[^/]+)([^ 	]*/)(/[^ 	]*);\1\3;g'' -e ''s;(^=> [^ 	]*)/[^/]+/../([^ 	]*);\1/\2;g'' -e ''s;(^=> [^ 	]*)/./([^ 	]*);\1/\2;g'' | 9p write acme/cons'
 
 # view twitter through [nitter](https://github.com/zedeus/nitter)
 type is text
