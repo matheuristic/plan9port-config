@@ -278,6 +278,8 @@ a number of helper scripts available at `~/.acme/bin`:
 - `lw`: List Acme windows (including window ID, whether the window is
   a directory window, and if the window is dirty). A fancier version
   of running the `Edit X` Sam command.
+- `mvto`: Rename current Acme window file, and updates the tag after.
+  Uses `git mv` if the file part of a Git repository, `mv` otherwise.
 - `rg+`: Wrapper for running
   [ripgrep](https://github.com/BurntSushi/ripgrep) with output that
   can be plumbed. Note that for modified open files in Acme, the saved
