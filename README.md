@@ -746,6 +746,62 @@ For more information on Acme mounting and macOS, see the following
   (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.` is
   the cursor location).
 
+### Typical workflow
+
+**Setup**:
+
+- Follow the setup as described above, applying the desired patches
+  prior to building.
+- Create `$HOME/.local/bin/startacme.sh` using the
+  `sample-startacme.sh` as a starting point.
+- Make sure all the necessary supporting programs () are installed.
+  - For the scripts in `$HOME/.acme/bin`, these would be GNU
+    coreutils, Conda, `fzf`, `git`, `ripgrep`, or `mamba`, `par` if
+    preferable to GNU coreutils' `fmt`, and `cspell` or `enchant` if
+    spell checking is needed.
+  - For direct helper programs, these would be `acme-lsp` (along with
+    the relevant LSP servers), `Watch`, and any other programs desired
+    (see the _Optional tools_ subsection above).
+  - Install the Lagrange Gemini browser to support plumbing Gemini
+    URLs in `gemini://...` form to a browser.
+- Set up an Acme launcher app (macOS) or desktop entry (Linux) to make
+  launching Acme easier.
+
+**Usage**:
+
+- Launch Acme
+- Load a dump file to restore a previous session
+- Execute `Indent on` in a window tag if appropriate
+- If editing code:
+  - Populate the window tag with useful commands, at least `Edit`,
+    `:0` and `:$`.
+  - If working on a Git version-controlled project, create a `guide`
+    file in the repository root as a space for putting useful commands
+    or as scratch. Add `/guide` to `.gitignore`.
+  - Useful `Edit` commands can be added to `guide`, and they can be
+    used using by 2-1 chording to `Edit` to a file window tag.
+  - Change the font by executing `Font` or `F <fontname> <fontsize>`
+    in the window tag.
+  - If there is an EditorConfig setting for the project, execute `EC`
+    in the window tag.
+  - Search code backwards and forwards by right-clicking
+    `:/[Ff]oo' and `:-/\[Bb\]ar\` in the window tag.
+  - Get all search results within a file by middle-clicking
+    `rg- '[Ff]oo'` which pops up the results in an error window.
+  - Get all search results across all files in the directory tree by
+    middle-clicking `rg+ '[Ff]oo'` which pops up the results in an
+    error window.
+  - To enable a write-compile-debug loop, middle-click `Watch` with
+    the appropriate arguments. Error locations can be plumbed to open
+    the appropriate code file and line.
+  - Middle-click `acme-lsp` to launch it for a window's project. It is
+    best to work on one project at a time when using `acme-lsp`.
+  - Git commands can be run from the `guide` file, or from the window
+    tag. Run `gl` or `gb` to see Git log or blame for the focused
+    window file.
+- When done with a session, `Dump` it to a file so it can be reloaded
+  and continued later.
+
 ## Sam
 
 Plan 9 also comes with another editor [Sam](http://sam.cat-v.org/)
