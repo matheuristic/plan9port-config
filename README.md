@@ -375,7 +375,7 @@ a number of helper scripts available at `~/.acme/bin`:
   [Servers]
 
   	[Servers.pylsp]
-  	Command = ["bash", "-c", "$HOME/.local/bin/pylsp"]
+  	Command = ["pylsp"]
   	StderrFile = "pylsp.stderr.log"
   	LogFile = "pylsp.log"
 
