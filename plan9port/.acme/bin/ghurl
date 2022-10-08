@@ -1,0 +1,91 @@
+#!/bin/sh
+
+# Hurl specified or current Acme window file to browser
+# Supported only for the following sites: Github, GitLab, Sourcehut
+# Assumes Git version >= 2.22 (for `git branch --show-current`)
+
+set -e
+
+# Usage
+if [ "$1" = "-h" ]; then
+	cat <<EOF
+Opens specified Git version-controlled file in given branch on the
+Git host in an external browser.
+
+Usage: $(basename $0) [-h] [-b branch] [file]
+
+-h shows usage
+-b branch opens the file in the given branch (default: current branch)
+file is the target file to open (default: current Acme window file)
+EOF
+	exit
+fi
+
+GITREPO=$(git rev-parse --show-toplevel)
+if [ -z "$GITREPO" ]; then
+	echo 'not in a git repo' 1>&2
+	exit 1
+fi
+
+# Get target branch
+if [ "$#" -gt 1 ]; then
+	if [ "$1" = "-b" ]; then
+		GITBRANCH=$2
+		shift; shift
+	fi
+fi
+GITBRANCH=${GITBRANCH:-$(git branch --show-current)}
+
+# Check args
+if [ "$#" -gt 1 ]; then
+	echo "too many args"
+	exit 1
+fi
+
+# Get file path of given file relative to repository root
+FILE=${1:-$samfile}
+if [ -n "$FILE" ]; then
+	FILE=$(readlink -f "$FILE")
+	FILE=${FILE##$GITREPO}
+	FILE=${FILE##/}
+fi
+
+# Get Git host URL for given file in target branch
+# Change ssh to https (works for most hosts), cleanup trailing '.git'
+GITURL=$(git remote get-url origin | 9 sed -e 's!^git@([^:]+):!https://\1/!' -e 's/\.git$//')
+# Extract out the URI scheme (in case the repo is on Gemini or non-https)
+URISCHEME=$(echo -n "$GITURL" | 9 awk -F'://' '{print $1; exit}')
+URIPATH=$(echo -n "$GITURL" | 9 sed -e 's;[0-9A-Za-z]+://;;')
+# Get Git host
+GITHOST=$(echo -n "$URIPATH" | 9 sed -e 's!/.*$!!')
+case "$GITHOST" in
+	github.com)
+		if [ -n "$FILE" ]; then
+			URIPATH="$URIPATH/blob/$GITBRANCH/$FILE"
+		else
+			URIPATH="$URIPATH/tree/$GITBRANCH"
+		fi
+		;;
+	gitlab.com)
+		if [ -n "$FILE" ]; then
+			URIPATH="$URIPATH/-/blob/$GITBRANCH/$FILE"
+		else
+			URIPATH="$URIPATH/-/tree/$GITBRANCH"
+		fi
+		;;
+	git.sr.ht)
+		if [ -n "$FILE" ]; then
+			URIPATH="$URIPATH/tree/$GITBRANCH/item/$FILE"
+		else
+			URIPATH="$URIPATH/tree/$GITBRANCH"
+		fi
+		;;
+	*)
+		echo "host git site $GITHOST not supported"
+		exit 2
+esac
+# URL encode spaces or special characters in the filename
+URIPATH=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$URIPATH")
+# Open external browser, try ChromeOS opener, then Linux, then macOS
+FULLURI="$URISCHEME://$URIPATH"
+garcon-url-handler "$FULLURI" || xdg-open "$FULLURI" || open "$FULLURI"
