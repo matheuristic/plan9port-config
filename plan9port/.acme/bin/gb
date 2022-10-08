@@ -2,4 +2,4 @@
 # show git-blame for given or current file in new Acme window
 if [ -z "$samfile" ]; then 9 echo 'Must be used from Acme or Sam' 1>&2; exit 1; fi
 file=${1:-$samfile}
-git blame --date="short" "$file" | plumb -i -d edit -a "action=showdata filename=$file+Blame"
+git blame --date="short" "$file" | 9 plumb -i -d edit -a "action=showdata filename=$(9 dirname $file)/+Blame-$(9 basename $file)"

@@ -236,6 +236,12 @@ a number of helper scripts available at `~/.acme/bin`:
 - `alink` ([source](https://moriendi.org/tools/acme/)):
   `alink name cmd arg1 ...` creates a new window named `name` and
   executes `cmd` in it with the given args.
+- `Blog`: Monitors the Acme log, and append the name of each file as
+  it is opened to `$HOME/.acme/recentf` or specified file. If using,
+  it is best to run at the start of each Acme session.
+- `Brecent`: Prints the most recently opened files logged to
+  `$HOME/.acme/recentf` by `Blog`, up to a specified number (defaults
+  to 20 if not specified), from least recent to most recent.
 - `c+`: Comment. Specify an argument to change the comment prefix from
   the default `#`.
 - `c-`: Uncomment. An argument may be specified as in `c+`.
@@ -267,6 +273,8 @@ a number of helper scripts available at `~/.acme/bin`:
   if the current font is a variable font served by `fontsrv`.
 - `gb`: Wrapper for `git blame` of file in current Acme window.
 - `gl`: Wrapper for `git log` of file in current Acme window.
+- `ghurl`: Hurl the specified or current Acme window file in current
+  or given branch to a web browser.
 - `h`: `hcount=N h STRING` shows the last `N` commands in a win window
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
@@ -773,8 +781,10 @@ For more information on Acme mounting and macOS, see the following
 
 - Launch Acme
 - Load a dump file to restore a previous session
-- Execute `Indent on` in a window tag if appropriate
+- Execute `Blog` to log opened files to `$HOME/.acme/recentf`
+- If needed, execute `Brecent` to list recently edited files
 - If editing code:
+  - Execute `Indent on` in a window tag if appropriate
   - Populate the window tag with useful commands, at least `Edit`,
     `:0` and `:$`.
   - If working on a Git version-controlled project, create a `guide`
