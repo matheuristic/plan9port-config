@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Show recently opened files, from least to most recent
+
+# Usage: Brecent [numfiles] [cachefile]
+#     numfiles is the number of file paths to show (default: 20)
+#     cachefile is the cache file path (default: ~/.acme/recentf)
+# The cache file should contain one file path per line, with the
+# oldest accessed file at the top and newest at the bottom.
+# Duplicates are ok (handled by the script).
+
+set -e
+
+NUMFILES=${1:-20}
+RECENTFILE=${2:-$HOME/.acme/recentf}
+
+if ! test -f "$RECENTFILE"; then
+	echo "cache file $RECENTFILE does not exist"
+	exit 1
+fi
+
+9 tail -r ~/.acme/recentf \
+	| 9 awk 'BEGIN{n=1} (n<='$NUMFILES' && !($0 in a)){a[$0];b[n]=$0;++n} END{for(i=n-1;i>0;--i) print b[i]}'

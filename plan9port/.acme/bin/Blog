@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Continually log Acme file opens to ~/.acme/recentf or specified file
+# Does not create the parent folder, so ensure it exists prior.
+
+# ~/.acme/recent will contain one line per file open, with the oldest
+# at the top and the newest at the bottom. Duplicates are not removed.
+
+# On POSIX systems, it is safe to have multiple instances of this
+# script (e.g., when running multiple instances of Acme across
+# different namespaces) appending ('>>') to the same file when
+# messages are sufficiently short. See following links for details:
+# https://unix.stackexchange.com/questions/346062/concurrent-writing-to-a-log-file-from-many-processes
+# https://www.notthewizard.com/2014/06/17/are-files-appends-really-atomic/
+
+# Usage: Blog [<path-to-cache-file>]
+
+set -e
+
+RECENTFILE=${1:-$HOME/.acme/recentf}
+RECENTFILEDIR=$(dirname "$RECENTFILE")
+
+if ! test -d "$RECENTFILEDIR"; then
+	echo "directory $RECENTFILEDIR does not exist"
+	exit 1
+fi
+
+# Note that plan9port grep does not buffer the output by default
+# when reading from stdin and specifying a -b flag will make it buffer
+# output instead (opposite of the behavior when reading from a file),
+# so plan9port grep is called without the -b flag here. See
+# https://github.com/9fans/plan9port/blob/master/src/cmd/grep/main.c#L88-L93
+9p read acme/log \
+	| 9 sed -l -e '/^[0-9]+ new [^	 ]/!d;s/^[0-9]+ new //' \
+	| 9 grep -v -e '(^|/)([-+][^/]*)$' \
+	>> "$RECENTFILE"
