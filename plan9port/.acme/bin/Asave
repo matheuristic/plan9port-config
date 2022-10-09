@@ -1,0 +1,122 @@
+#!/bin/sh
+
+# Saves modified (i.e. unsaved) files in the running Acme instance to
+# an autosave directory intermittently.
+
+# Each modified file's window content is backed up to a file whose
+# name is the modified file's path but with slashes replaced by
+# percent characters, in a subfolder of the autosave directory whose
+# name is the current namespace with slashes replaced by percent
+# characters and spaces replaced by plus characters. For example, a
+# dirty `/path/to/some file` is backed up as `%path%to%some+file`.
+
+# Assumes file names do not contain newline characters.
+
+# This script does not check if another instance is running, so check
+# (i.e. don't edit the same file in multiple Acme instances) before
+# running to avoid write conflicts.
+
+# Usage: Asave [-h] [-d autosavedir] [-i interval] [-l logfile]
+
+# Note: The "set -o pipefail" option was added to the POSIX shell
+# standard but is not available on all POSIX-compatible shells yet, so
+# comment out for now. See https://www.austingroupbugs.net/view.php?id=789
+# This is needed so errors in `9p read acme/index | 9 sed ... | 9 awk`
+# make the script exit, which would allow for more logical behavior of
+# this script exiting automatically when it is started outside of a
+# running Acme and that running Acme exits.
+
+set -e
+# set -o pipefail
+
+while [ "$#" -gt 0 ]; do
+	case $1 in
+		-h)
+			cat <<EOF
+Saves modified (i.e. unsaved) files in the running Acme instance to
+an autosave directory intermittently.
+
+Usage: $(basename "$0") [-h] [-d autosavedir] [-i interval] [-l logfile]
+
+    -h show usage notes and exit
+    -d autosave stores backup files in autosavedir (default: ~/.acme/autosave)
+    -i interval sets backup interval to every interval seconds (default: 30)
+    -l logfile logs script run details to logfile (default: <nothing>)
+EOF
+			exit
+			;;
+		-d)
+			if [ -n "$2" ]; then
+				AUTOSAVEDIR="$2"
+				shift; shift
+			else
+				echo "-d requires a non-empty option argument that is a directory path" 1>&2
+				exit 1
+			fi
+			;;
+		-i)
+			if [ -n "$2" ]; then
+				AUTOSAVEINT="$2"
+				shift; shift
+			else
+				echo "-i requires a non-empty option argument that is a number" 1>&2
+				exit 1
+			fi
+			;;
+		-l)
+			if [ -n "$2" ]; then
+				LOGFILE="$2"
+				shift; shift
+			else
+				echo "-l requires a non-empty option argument that is a file path" 1>&2
+				exit 1
+			fi
+			;;
+		*)
+			echo "Unknown option: $1"
+			exit 1
+	esac
+done
+
+AUTOSAVEDIR=${AUTOSAVEDIR:-$HOME/.acme/autosave}
+AUTOSAVEINT=${AUTOSAVEINT:-30}
+LOGFILE=${LOGFILE:-/dev/null}
+
+# Create autosave directory path if needed
+mkdir -p "$AUTOSAVEDIR"
+
+# Convert save interval to deciseconds
+AUTOSAVEINTDS=$(echo "$AUTOSAVEINT * 10" | 9 hoc)
+
+while true; do
+	# Loop over Acme file windows, which have numeric window ids
+	9p read acme/index | \
+		9 sed -e 's/ Del Snarf.*//' | \
+		9 awk '
+{
+	wid=$1;
+	isdir=$4;
+	ismodified=$5;
+	nameidx=match($0, "/.*$");
+	name=(nameidx > 0) ? substr($0, nameidx) : "";
+	if (! (isdir || match(name, "[+-][^/]*$"))) {
+		gsub(/\//, "%", name); # substitute slashes with "%"
+		gsub(/ /, "+", name); # substitute spaces with "+"
+		gsub(/	/, "=", name); # substitute tabs with "="
+		filepath=("'$AUTOSAVEDIR'/" name)
+		print ("windowid=" wid " ; isdir=" isdir " ; ismodified=" ismodified " ; name=" name " ; backupfilepath=" filepath)
+		if (ismodified) {
+			cmd=("9p read acme/" wid "/body > \"" filepath"\"")
+		}
+		else {
+			cmd=("rm -f \"" filepath "\"")
+		}
+		system(cmd)
+		print cmd
+	}
+}' 1>>"$LOGFILE" 2>&1
+	# Wait using 0.1 second sleeps to propagate SIGINT signals faster
+	for i in $(seq "$AUTOSAVEINTDS"); do
+		sleep 0.1
+	done
+done

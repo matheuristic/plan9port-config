@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Continually log Acme file opens to ~/.acme/recentf or specified file
-# Does not create the parent folder, so ensure it exists prior.
+# Continually log Acme file opens to ~/.acme/recentf or specified
+# file, creating the parent and ancestor directories if needed.
 
 # ~/.acme/recent will contain one line per file open, with the oldest
 # at the top and the newest at the bottom. Duplicates are not removed.
@@ -20,10 +20,8 @@ set -e
 RECENTFILE=${1:-$HOME/.acme/recentf}
 RECENTFILEDIR=$(dirname "$RECENTFILE")
 
-if ! test -d "$RECENTFILEDIR"; then
-	echo "directory $RECENTFILEDIR does not exist"
-	exit 1
-fi
+# Create parent directory of cache file if needed
+mkdir -p "$RECENTFILEDIR"
 
 # Note that plan9port grep does not buffer the output by default
 # when reading from stdin and specifying a -b flag will make it buffer

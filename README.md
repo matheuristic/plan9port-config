@@ -111,12 +111,6 @@ This will create the symlinks:
   `startsam.rc` via `rc.sh`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
-Create the autosave directory used by `~/.acme/bin/acmeautosave.rc`.
-
-```sh
-mkdir -p $HOME/.acme/autosave
-```
-
 Copy `sample-startacme.sh` to `~/.local/bin/startacme.sh` and
 `sample-startsam.sh` to `~/.local/bin/startsam.sh` and modify them to
 create customized launchers for Acme and Sam.
@@ -184,16 +178,13 @@ acme -l /path/to/project/acme.dump
 
 If `stow` was used to symlink the base configuration files, a script
 to help with autosaving modified files that have yet to be written can
-be found at `~/.acme/bin/acmeautosave.rc`. This script is
-automatically run by `~/.local/bin/startacme.rc`, but only has effect
-if the `~/.acme/autosave` directory exists (which it will if the
-instructions above were followed).
+be found at `~/.acme/bin/Asave`. This script is designed to be run
+from within Acme so that it will automatically exit when Acme exits.
 
-Autosaved modified files are saved to `~/.acme/autosave/%NAMESPACE%/`
-where `%NAMESPACE%` is the current namespace with slashes replaced by
-percents. For example, when Acme and the autosave script run in
-namespace `/tmp/ns.someuser.:0`, autosaves are written into the
-`~/.acme/autosave/%tmp%ns.someuser.:0/` directory.
+Autosaved modified files are stored in `~/.acme/autosave/` by default,
+with their filenames as the full path after replacing `/` with `%`,
+` ` (spaces) with `+`, and `	` (tabs) with `=`. Once a file is saved
+and therefore clean, its autosaved version will be autoremoved.
 
 ### Guide files
 
@@ -225,7 +216,6 @@ plan9port comes with several useful commands for working with Acme
 If `stow` was used to symlink the base configuration files, there are
 a number of helper scripts available at `~/.acme/bin`:
 
-- `acmeautosave.rc`: See the __Autosaving__ section above.
 - `acmeed` ([source](https://moriendi.org/tools/acme/)): When used as
   a value for the `$EDITOR` environment variable, programs that
   utilize that environment variable will open a new window in Acme to
@@ -236,6 +226,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - `alink` ([source](https://moriendi.org/tools/acme/)):
   `alink name cmd arg1 ...` creates a new window named `name` and
   executes `cmd` in it with the given args.
+- `Asave`: Saves modified (i.e. unsaved) files in the running Acme
+  instance to an autosave directory intermittently. See the subsection
+  _Autosaving_ above.
 - `Blog`: Monitors the Acme log, and append the name of each file as
   it is opened to `$HOME/.acme/recentf` or specified file. If using,
   it is best to run at the start of each Acme session.
@@ -782,6 +775,8 @@ For more information on Acme mounting and macOS, see the following
 - Launch Acme
 - Load a dump file to restore a previous session
 - Execute `Blog` to log opened files to `$HOME/.acme/recentf`
+- Execute `Asave` to autosave dirty (i.e., modified and unsaved) files
+  to `$HOME/.acme/autosave`
 - If needed, execute `Brecent` to list recently edited files
 - If editing code:
   - Execute `Indent on` in a window tag if appropriate

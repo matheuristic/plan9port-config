@@ -3,7 +3,7 @@ Edit Font :, :0 :$ :42,49 :/[Ff]oo/ :-/[Ff]oo/ :0+/foo/ :$-/foo/
 EC d gl gb lw sp <cl-paste |c- |c+ |i- |i+ |is- |is+ |s2t |t2s |ct
 |lower |upper |surround |uline (F GoRegular 22a) F- F+ (Indent on)
 (rg+ '[Ff]oo') (rg- '[Ff]oo') (rg-- '[Ff]oo') (alink wname ls -a)
-Slide Slide- Slide+
+Asave Blog Brecent Slide Slide- Slide+
 
 # Edit commands
 =                   # line number

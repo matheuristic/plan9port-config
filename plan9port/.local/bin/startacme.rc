@@ -98,15 +98,5 @@ fn getprocs {
 # Run only a single instance of fontsrv
 9p stat font >[2]/dev/null >[1=2] || fontsrv &
 
-# Run only a single instance of acmeautosave.rc per namespace if it's installed
-# acmeautosave.rc does not take any arguments, so use the namespace as an arg
-# so as to disambiguate the namespace of each acmeautosave.rc process
-acmeautosavebin=`{which acmeautosave.rc}
-if (test -x $acmeautosavebin) {
-	s=`{getprocs 'rc '^$acmeautosavebin^' '^`{namespace}} {
-		if (~ $#s 0) $acmeautosavebin `{namespace} &
-	}
-}
-
 # Run Acme text editor with command line params
 acme $*
