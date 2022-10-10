@@ -5,14 +5,14 @@
 To create a patch from a Git repo diff (provide arguments to the
 `git diff` command as necessary):
 
-```shell
+```sh
 git diff > /path/to/save.patch
 ```
 
 To apply a patch created using the above (the `-p1` option is to
 ignore the leading `a/` and `b/` prefixes created by `git diff`):
 
-```shell
+```sh
 patch -p1 < /path/to/save.patch
 ```
 
@@ -20,13 +20,20 @@ See this
 [link](https://stackoverflow.com/questions/4610744/can-i-get-a-patch-compatible-output-from-git-diff)
 for more info.
 
+For convenience, a shell script `apply-patches.sh` can be run
+to apply all patches in this directory:
+
+```sh
+./apply-patches.sh /path/to/plan9port/repository
+```
+
 ## Patches
 
 ### Add soft tabs to Acme editor
 
 To apply the patch, run from the repository root:
 
-```shell
+```sh
 patch -p1 < /path/to/plan9port-acme-soft-tabs.patch
 ```
 
@@ -48,18 +55,18 @@ which ports spew's acme spaces indent mode from 9front.
 
 To apply the patch, run from the repository root:
 
-```shell
+```sh
 patch -p1 < /path/to/plan9port-mac-noquotemap.patch
 ```
 
 This patch removes the default behavior of remapping characters
 `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
 
-### Press shift to send Button1 when mouse button is depressed
+### Press shift to send Button1 when mouse button is depressed on X11
 
 To apply the patch, run from the repository root:
 
-```shell
+```sh
 patch -p1 < /path/to/plan9port-x11-shiftpressbutton1.patch
 ```
 
