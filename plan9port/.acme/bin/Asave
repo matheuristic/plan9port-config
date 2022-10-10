@@ -99,7 +99,9 @@ while true; do
 	ismodified=$5;
 	nameidx=match($0, "/.*$");
 	name=(nameidx > 0) ? substr($0, nameidx) : $6;
-	if (! (isdir || match(name, "[+-][^/]*$"))) {
+	gsub(/^[ 	]*/, "", name); # trim leading whitespace
+	gsub(/[ 	]*$/, "", name); # trim trailing whitespace
+	if (! (isdir || (length(name) == 0) || match(name, /(^|\/)[+-][^\/]*$/) || match(name, /\.git\/COMMIT_EDITMSG$/))) {
 		gsub(/\//, "%", name); # substitute slashes with "%"
 		gsub(/ /, "+", name); # substitute spaces with "+"
 		gsub(/	/, "=", name); # substitute tabs with "="
