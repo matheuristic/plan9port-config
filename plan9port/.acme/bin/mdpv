@@ -2,7 +2,7 @@
 
 # mdpv (markdown preview)
 # Preview current Acme window's or a given Markdown file in a browser
-# Assumes -o option specifies output file for the converter
+# Assumes the Markdown-to-HTML converter writes its output to stdout
 
 set -e
 
@@ -25,8 +25,8 @@ Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
 mdfile is the path to a Markdown file
     (default: current window file if run from within Acme)
 
-Note that the specified converter command has to support an -o
-outputfile option for specifying the output HTML file.
+Note that the specified converter command is expected to output the
+resulting HTML code to stdout.
 
 Additionally, the temporary HTML file is not automatically cleaned up
 by this script.
@@ -122,8 +122,8 @@ if [ -z "$TMPFILE" ]; then
 	fi
 fi
 
-# Convert Markdown to HTML, assumes converter has an -o option that specifies output file
-$CONVERT -o "$TMPFILE" "$MDFILE"
+# Convert Markdown to HTML, assumes converter writes output to stdout
+$CONVERT "$MDFILE" >"$TMPFILE"
 
 # Open HTML file in browser
 $BROWSER "$TMPFILE"
