@@ -1,5 +1,5 @@
 #!/bin/sh
 # show git-log for given or current file in new Acme window
-if [ -z "$samfile" ]; then 9 echo 'Must be used from Acme or Sam' 1>&2; exit 1; fi
+if [ -z "$samfile" ]; then 9 echo 'Must be used from Acme' 1>&2; exit 1; fi
 file=${1:-$samfile}
 git log --oneline -- "$file" | 9 plumb -i -d edit -a "action=showdata filename=$(9 dirname $file)/+Log-$(9 basename $file)"

@@ -1,12 +1,13 @@
 # Tag
 Edit Font :, :0 :$ :42,49 :/[Ff]oo/ :-/[Ff]oo/ :0+/foo/ :$-/foo/
-EC d gl gb lw sp <cl-paste |c- |c+ |i- |i+ |is- |is+ |s2t |t2s |ct
-|lower |upper |surround |uline (F GoRegular 22a) F- F+ (Indent on)
-(rg+ '[Ff]oo') (rg- '[Ff]oo') (rg-- '[Ff]oo') (alink wname ls -a)
-Asave Blog Brecent Slide Slide- Slide+
+Asave Blog Brecent EC F F- F+ d gl gb lw mdpv sp <cl-paste
+|c- |c+ |ct |i- |i+ |is- |is+ |s2t |t2s |lower |upper |surround |uline
+(Indent on) (Space on) (Tab 8) (rg+ '[Ff]oo') (rg- 'bar') (rg-- 'baz')
+(alink wname ls -a) Slide Slide- Slide+
 
 # Edit commands
-=                   # line number
+=                   # file:linenumber
+=#                  # file:charaddr
 .,3                 # select from cursor to end of line 3
 3,.                 # select from beginning of line 3 to cursor
 ,d                  # clear whole window, useful for +Error

@@ -1,0 +1,129 @@
+#!/bin/sh
+
+# mdpv (markdown preview)
+# Preview current Acme window's or a given Markdown file in a browser
+# Assumes -o option specifies output file for the converter
+
+set -e
+
+# Process command line options and their arguments
+while [ "$#" -gt 0 ]; do
+	case $1 in
+		-h)
+			cat <<EOF
+Preview current Acme window's or a given Markdown file in a browser.
+
+Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
+
+-h shows usage and exits
+-c convertcmd sets the conversion command to convertcmd
+    (default: pandoc or kramdown or multimarkdown)
+-b browsecmd sets the browser launch command to browsecmd
+    (default: garcon-url-handler or xdg-open or open)
+-t tmpfile sets the temporary HTML file generated to tmpfile
+    (default: ~/Downloads/__tmp__.html for garcon-url-handler or /tmp/tmp.html otherwise)
+mdfile is the path to a Markdown file
+    (default: current window file if run from within Acme)
+
+Note that the specified converter command has to support an -o
+outputfile option for specifying the output HTML file.
+
+Additionally, the temporary HTML file is not automatically cleaned up
+by this script.
+EOF
+			exit
+			;;
+		-c)
+			if [ -n "$2" ]; then
+				CONVERT="$2"
+				shift; shift
+			else
+				echo "-c requires a non-empty option argument that is a command (with args if needed)" 1>&2
+				exit 1
+			fi
+			;;
+		-b)
+			if [ -n "$2" ]; then
+				BROWSE="$2"
+				shift; shift
+			else
+				echo "-b requires a non-empty option argument that is a command (with args if needed)" 1>&2
+				exit 1
+			fi
+			;;
+		-t)
+			if [ -n "$2" ]; then
+				TMPFILE="$2"
+				shift; shift
+			else
+				echo "-t requires a non-empty option argument that is a file path" 1>&2
+				exit 1
+			fi
+			;;
+		*)
+			break
+	esac
+done
+
+# Check that there are no extra arguments
+if [ "$#" -gt 1 ]; then
+	echo 'must specify exactly zero or one file' 1>&2
+	exit 1
+fi
+
+# Automatically set Markdown source file as needed (only when calling from Acme)
+if [ -z "$MDFILE" ]; then
+	if [ -z "$samfile" ]; then
+		echo 'no file specified and not running in Acme'
+		exit 1
+	else
+		MDFILE=$samfile
+	fi
+fi
+
+# Automatically set browser command if not specified
+if [ -z "$BROWSER" ]; then
+	# Try Crostini (ChromeOS) > Linux > macOS URL handlers
+	if command -v garcon-url-handler 1>/dev/null 2>&1; then
+		BROWSER=garcon-url-handler
+	elif command -v xdg-open 1>/dev/null 2>&1; then
+		BROWSER=xdg-open
+	elif command -v open 1>/dev/null 2>&1; then
+		BROWSER=open
+	else
+		echo 'BROWSER variable not set and no auto-detected URL handler installed'
+		exit 1
+	fi
+fi
+
+# Automatically set conversion command if not specified
+if [ -z "$CONVERT" ]; then
+	if command -v pandoc 1>/dev/null 2>&1; then
+		CONVERT="pandoc"
+	elif command -v kramdown 1>/dev/null 2>&1; then
+		CONVERT="kramdown"
+	elif command -v multimarkdown 1>/dev/null 2>&1; then
+		CONVERT="multimarkdown"
+	else
+		echo 'convert command not set using -c option and no auto-detected Markdown converter installed'
+		exit 1
+	fi
+fi
+
+# Automatically set temporary HTML file path if not specified
+if [ -z "$TMPFILE" ]; then
+	# If using garcon-url-handler, the host browser cannot access files
+	# outside the user directory tree, so work around by saving to the
+	# user's Downloads directory
+	if [ "$BROWSER" = "garcon-url-handler" ]; then
+		TMPFILE="$HOME/Downloads/__tmp__.html"
+	else
+		TMPFILE=/tmp/tmp.html
+	fi
+fi
+
+# Convert Markdown to HTML, assumes converter has an -o option that specifies output file
+$CONVERT -o "$TMPFILE" "$MDFILE"
+
+# Open HTML file in browser
+$BROWSER "$TMPFILE"

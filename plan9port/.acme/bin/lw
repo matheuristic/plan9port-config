@@ -1,4 +1,4 @@
-#!/usr/bin/env rc
+#!/bin/sh
 
 # List Acme windows, specifically each window's ID, whether it is a
 # directory, whether the window is dirty, and the name of the window.
@@ -9,21 +9,19 @@
 # Sam command which lists the windows and their dirty status, but not
 # window IDs and if the window corresponds to a directory or file.
 
-rfork en
+set -e
 
-if (9p ls acme >[2]/dev/null >[1=2]) {
-	9 awk 'BEGIN{print "winid", "isdir", "dirty", "name"}' OFS='	'
-	# Loop over Acme windows (these have number window ids)
-	for (wid in `{9p ls acme | 9 grep -e [0-9]+}) {
-		# Window tag name, i.e. the file path, which comes before ' Del Snarf'
-		# Assume that filenames don't contain newline characters
-		ifs='
-' {
-			wname=`{9p read acme/$wid/tag | 9 awk -F' Del Snarf' '{print $1; exit}'}
-		}
-		if (~ $#wname 0) wname=''
-		# Get flags for if window is a directory and if window is modified
-		9p read acme/$wid/ctl |
-			9 awk '{print sprintf("%5s","'^$wid^'"), sprintf("%5s",$4), sprintf("%5s",$5), "'^$wname^'"}' OFS='	'
-	}
+9p read acme/index | \
+	9 sed -e 's/ Del Snarf.*//' | \
+	9 awk '
+BEGIN {
+	print "winid", "isdir", "dirty", "name"
 }
+{
+	wid=$1;
+	isdir=$4;
+	ismodified=$5;
+	nameidx=match($0, "/.*$");
+	name=(nameidx > 0) ? substr($0, nameidx) : $6;
+	print sprintf("%5s", wid), sprintf("%5s", isdir), sprintf("%5s", ismodified), name
+}'

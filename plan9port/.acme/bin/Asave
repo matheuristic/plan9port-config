@@ -98,7 +98,7 @@ while true; do
 	isdir=$4;
 	ismodified=$5;
 	nameidx=match($0, "/.*$");
-	name=(nameidx > 0) ? substr($0, nameidx) : "";
+	name=(nameidx > 0) ? substr($0, nameidx) : $6;
 	if (! (isdir || match(name, "[+-][^/]*$"))) {
 		gsub(/\//, "%", name); # substitute slashes with "%"
 		gsub(/ /, "+", name); # substitute spaces with "+"
