@@ -630,14 +630,27 @@ For more information on Acme mounting and macOS, see the following
     that the view indicator is at the position scrollbar was clicked,
     which allows for directly jumping to a window position.
 
-- Wrap a command with brackets or parentheses to make it selectable by
-  double-clicking (Button1 twice) just to the right of the left
-  parenthesis. Useful for easy selection of commands containing
-  spaces. For example:
+- Double-clicking (Button1 twice) just to the right of a left brace
+  (`{`), bracket (`[`) or parenthesis (`(`), or just to the left of a
+  right brace (`}`), bracket (`]`) or parenthesis (`)`) will select
+  the text within paired braces, brackets or parentheses. This also
+  works for text between greater than (`>`) and smaller than (`<`)
+  chars. Example text:
 
   ```text
-  [Load /path/to/project.dump]
+  (some text between (parentheses))
+  [same thing within brackets
+    but also across lines]
+  <div>some <em>XML</em> or <em>HTML</em> text</div>
   ```
+
+  - Wrap a command with brackets or parentheses to make it selectable
+    by double-clicking as described above. Useful for easy selection
+    of commands containing spaces. For example:
+
+    ```text
+    (Load /path/to/project.dump)
+    ```
 
 - Mouse chording (pressing mouse buttons in a sequence without
   releasing them) can be used to perform a number of actions.
