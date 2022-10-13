@@ -42,6 +42,7 @@ hascmdp() {
 hascmdp curl  # need curl to make queries to the API
 hascmdp gawk  # need gawk for the gensub function
 hascmdp jq    # need jq for processing JSON
+hascmdp pandoc # need pandoc for converting HTML to plain text
 
 tophelper() {
 	if [ "$#" -lt 2 ]; then
