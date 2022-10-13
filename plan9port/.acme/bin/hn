@@ -46,13 +46,14 @@ hascmdp pandoc # need pandoc for converting HTML to plain text
 
 tophelper() {
 	if [ "$#" -lt 2 ]; then
-		echo 'requires a number argument and an api name as arguments' >&2
+		echo 'requires an api name, a start index (inclusive) and end index (exclusive) as arguments' >&2
 		exit 1
 	fi
-	NUMITEMS=$1
-	APINAME=$2
-	ITEMCOUNTER=1
-	for ITEMID in $(curl -s "$BASEURL/v0/$APINAME.json" | jq -c ".[0:$NUMITEMS]|.[]"); do
+	APINAME=$1
+	STARTINDEX=$2
+	ENDINDEX=$3
+	ITEMCOUNTER=$((STARTINDEX + 1))
+	for ITEMID in $(curl -s "$BASEURL/v0/$APINAME.json" | jq -c ".[$STARTINDEX:$ENDINDEX]|.[]"); do
 		URL="$BASEURL/v0/item/$ITEMID.json"
 		echo
 		curl -s "$URL" \
@@ -69,31 +70,35 @@ tophelper() {
 }
 
 news() {
-	NUMSTORIES=$1
+	START=$1
+	END=$2
 	echo "----------------"
-	echo "Top $NUMSTORIES stories from https://news.ycombinator.com"
-	tophelper $NUMSTORIES topstories
+	echo "Top stories ($((START + 1))--$END) from https://news.ycombinator.com"
+	tophelper topstories $START $END
 }
 
 ask() {
-	NUMASK=$1
+	START=$1
+	END=$2
 	echo "----------------"
-	echo "Top $NUMASK Ask HN postings from https://news.ycombinator.com/jobs"
-	tophelper $NUMASK askstories
+	echo "Top Ask HN postings ($((START + 1))--$END) from https://news.ycombinator.com/jobs"
+	tophelper askstories $START $END
 }
 
 show() {
-	NUMSHOW=$1
+	START=$1
+	END=$2
 	echo "----------------"
-	echo "Top $NUMSHOW Show HN postings from https://news.ycombinator.com/jobs"
-	tophelper $NUMSHOW showstories
+	echo "Top Show HN postings ($((START + 1))--$END) from https://news.ycombinator.com/jobs"
+	tophelper showstories $START $END
 }
 
-jobs() {
-	NUMJOBS=$1
+ycjobs() {
+	START=$1
+	END=$2
 	echo "----------------"
-	echo "Most recent $NUMJOBS YC startup job postings from https://news.ycombinator.com/jobs"
-	tophelper $NUMJOBS jobstories
+	echo "Most recent YC startup job postings ($((START + 1))--$END) from https://news.ycombinator.com/jobs"
+	tophelper jobstories 0 $NUMJOBS
 }
 
 deletedp() {
@@ -294,42 +299,40 @@ item() {
 }
 
 case $1 in
-	news)
-		news ${2:-10}
-		;;
-	ask)
-		ask ${2:-10}
-		;;
-	show)
-		show ${2:-10}
-		;;
-	jobs)
-		jobs ${2:-20}
+	news|ask|show|ycjobs)
+		# If no arg is provided to command, show 1st to 30th postings
+		# If one arg is provided to command, show 1st to arg-th postings
+		# If two args are provided to command, show 1st arg-th to 2nd arg-th postings
+		if [ "$#" -le 2 ]; then
+			$1 0 ${2:-30}
+		else
+			$1 $2 $3
+		fi
 		;;
 	story)
 		if [ -z "$2" ]; then
-			echo 'story action requires a story item id' >&2
+			echo 'story command requires a story item id' >&2
 			exit 1
 		fi
 		story $2
 		;;
 	comment)
 		if [ -z "$2" ] || [ -z "$3" ]; then
-			echo 'comment action requires a comment item id and an indent level' >&2
+			echo 'comment command requires a comment item id and an indent level' >&2
 			exit 1
 		fi
 		comment $2 $3
 		;;
 	user)
 		if [ -z "$2" ]; then
-			echo 'user action requires at least a username' >&2
+			echo 'user command requires at least a username' >&2
 			exit 1
 		fi
 		user $2 ${3:-20}
 		;;
 	item)
 		if [ -z "$2" ]; then
-			echo 'item action requires at least an item id' >&2
+			echo 'item command requires at least an item id' >&2
 			exit 1
 		fi
 		item $2
@@ -339,10 +342,10 @@ case $1 in
 		cat >&2 <<EOF
 Command-line HN client.
 
-Usage: $PROGNAME news [<number>, default 10]
-       $PROGNAME ask [<number>, default 10]
-       $PROGNAME show [<number>, default 10]
-       $PROGNAME jobs [<number>, default 20]
+Usage: $PROGNAME news [<endnumber> | <startnumber> <endnumber>]
+       $PROGNAME ask [<endnumber> | <startnumber> <endnumber>]
+       $PROGNAME show [<endnumber> | <startnumber> <endnumber>]
+       $PROGNAME ycjobs [<endnumber> | <startnumber> <endnumber>]
        $PROGNAME story <itemid>
        $PROGNAME comment <itemid> <indentlevel>
        $PROGNAME item <itemid>
