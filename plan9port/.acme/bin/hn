@@ -345,6 +345,7 @@ Usage: $PROGNAME news [<number>, default 10]
        $PROGNAME jobs [<number>, default 20]
        $PROGNAME story <itemid>
        $PROGNAME comment <itemid> <indentlevel>
+       $PROGNAME item <itemid>
 EOF
 		exit 1
 esac
