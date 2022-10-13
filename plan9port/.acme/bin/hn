@@ -1,0 +1,349 @@
+#!/bin/sh
+
+# Command-line HN (news.ycombinator.com) client
+
+# Plumbing rules for plan9port Acme:
+#
+# # open HN item using hn script
+# type is text
+# data matches 'https?://news.ycombinator.com/item\?id=([0-9]*)'
+# plumb to hn
+# plumb start rc -c 'hn item '$1' | 9p write acme/cons'
+#
+# # open HN user page using hn script
+# type is text
+# data matches 'https?://news.ycombinator.com/user\?id=([\-_0-9A-Za-z]*)'
+# plumb to hn
+# plumb start rc -c 'hn user '$1' | 9p write acme/cons'
+#
+# # open HN top stories, Ask HN, Show HN, or HN YC startup jobs using hn script
+# type is text
+# data matches 'https?://news.ycombinator.com/(news|ask|show|jobs)'
+# plumb to hn
+# plumb start rc -c 'hn '$1' | 9p write acme/cons'
+#
+# # open HN top stories using hn script
+# type is text
+# data matches 'https?://news.ycombinator.com/?'
+# plumb to hn
+# plumb start rc -c 'hn news | 9p write acme/cons'
+
+set -e
+
+BASEURL="https://hacker-news.firebaseio.com"
+
+hascmdp() {
+	if ! command -v "$1" >/dev/null 2>&1; then
+		echo "$1 needs to be installed"
+		exit 1
+	fi
+}
+
+hascmdp curl  # need curl to make queries to the API
+hascmdp gawk  # need gawk for the gensub function
+hascmdp jq    # need jq for processing JSON
+
+tophelper() {
+	if [ "$#" -lt 2 ]; then
+		echo 'requires a number argument and an api name as arguments' >&2
+		exit 1
+	fi
+	NUMITEMS=$1
+	APINAME=$2
+	ITEMCOUNTER=1
+	for ITEMID in $(curl -s "$BASEURL/v0/$APINAME.json" | jq -c ".[0:$NUMITEMS]|.[]"); do
+		URL="$BASEURL/v0/item/$ITEMID.json"
+		echo
+		curl -s "$URL" \
+			| jq -r '"'$ITEMCOUNTER'|||\(.title)|||\(.url)|||\(.score)|||\(.by)|||\(.time)|||\(.descendants)|||\(.id)"' \
+			| gawk -F'\\|\\|\\|' '
+				{
+					itemcounter=$1; title=$2; url=$3; score=$4; by=$5; time=$6; descendants=$7; id=$8;
+					printf "%d.	%s => %s\n", itemcounter, title, url;
+					print ("	" score "pts, by " by " at " strftime("%c",time) " | " descendants " comments: https://news.ycombinator.com/item?id=" id);
+					exit;
+				}'
+		ITEMCOUNTER=$((ITEMCOUNTER + 1))
+	done
+}
+
+news() {
+	NUMSTORIES=$1
+	echo "----------------"
+	echo "Top $NUMSTORIES stories from https://news.ycombinator.com"
+	tophelper $NUMSTORIES topstories
+}
+
+ask() {
+	NUMASK=$1
+	echo "----------------"
+	echo "Top $NUMASK Ask HN postings from https://news.ycombinator.com/jobs"
+	tophelper $NUMASK askstories
+}
+
+show() {
+	NUMSHOW=$1
+	echo "----------------"
+	echo "Top $NUMSHOW Show HN postings from https://news.ycombinator.com/jobs"
+	tophelper $NUMSHOW showstories
+}
+
+jobs() {
+	NUMJOBS=$1
+	echo "----------------"
+	echo "Most recent $NUMJOBS YC startup job postings from https://news.ycombinator.com/jobs"
+	tophelper $NUMJOBS jobstories
+}
+
+deletedp() {
+	if [ "$(echo $PAYLOAD | jq -r '.deleted')" = "true" ]; then
+		return 0
+	elif [ "$(echo $PAYLOAD | jq -r '.dead')" = "true" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+sanitize() {
+	PAYLOAD=$(echo "$1" | sed -e ':x;$!N;s/[	 ]*\n[	 ]*/ /g;tx') # get rid of newlines
+	echo "$PAYLOAD"
+}
+
+story() {
+	if [ -z "$1" ]; then
+		echo 'requires an item id as an argument'
+		exit 1
+	fi
+	ITEMID=$1
+	URL="$BASEURL/v0/item/$ITEMID.json"
+	echo "----------------"
+	echo "https://news.ycombinator.com/item?id=$ITEMID"
+	echo
+	PAYLOAD=$(curl -s "$URL")
+	PAYLOAD=$(sanitize "$PAYLOAD")
+	deletedp "$PAYLOAD" && {
+		echo "https://news.ycombinator.com/item?id=$ITEMID is a dead or deleted item"
+		return
+	}
+	echo $PAYLOAD \
+		| jq -r '"\(.title)|||\(.url)|||\(.score)|||\(.by)|||\(.time)|||\(.descendants)|||\(.id)|||\(.kids|@sh)"' \
+		| gawk -F'\\|\\|\\|' '
+			{
+				title=$1; url=$2; score=$3; by=$4; time=$5; descendants=$6; id=$7;
+				if ($8 != "null") { split($8, kids, " ") };
+				print (title " => " url);
+				print (score "pts, by " by " at " strftime("%c",time) " | " descendants " comments");
+				for (i=1; i<=length(kids); ++i) {
+					system("hn comment " kids[i] " 0");
+				}
+				exit;
+			}'
+}
+
+comment() {
+	if [ "$#" -ne 2 ]; then
+		echo 'requires an item id and an indent level as arguments'
+		exit 1
+	fi
+	ITEMID=$1
+	INDENTLEVEL=$2
+	URL="$BASEURL/v0/item/$ITEMID.json"
+	echo
+	PAYLOAD=$(curl -s "$URL")
+	PAYLOAD=$(sanitize "$PAYLOAD")
+	deletedp "$PAYLOAD" && {
+		for i in $(seq $INDENTLEVEL); do
+			echo -n "	"
+		done
+		echo "https://news.ycombinator.com/item?id=$ITEMID is a dead or deleted item"
+		return
+	}
+	echo $PAYLOAD \
+		| jq -r '"'''$INDENTLEVEL'|||\(.by)|||\(.id)|||\(.text | gsub("\n"; "\\n"))|||\(.time)|||\(.type)|||\(.parent)|||\(.kids|@sh)''"' \
+		| gawk -F'\\|\\|\\|' '
+			{
+				indentlevel=$1; by=$2; id=$3; text=$4; time=$5; type=$6; parent=$7;
+				if ($8 != "null") { split($8, kids, " ") };
+				# Create prefix string for each new line
+				prefix=""
+				for (i=1; i<=indentlevel; i++) { gsub(/^/, "	", prefix) }
+				# Print header
+				print prefix by " at " strftime("%c", time) " => https://news.ycombinator.com/item?id=" id
+				# Print HTML converted to plain text
+				text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
+				gsub(/<p>/, "</p><p>", text)
+				text = "<p>" text "</p>"
+				cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol=crlf"
+				while ((cmd | getline result) > 0) {
+					print prefix result
+				}
+				close(cmd)
+				for (i=1; i<=length(kids); i++) {
+					system("hn comment " kids[i] " " (indentlevel + 1));
+				}
+			}'
+}
+
+user() {
+	if [ "$#" -lt 2 ]; then
+		echo 'requires a username and number of recent activity items as arguments' >&2
+		exit 1
+	fi
+	USERNAME=$1
+	NUMITEMS=$2
+	URL="$BASEURL/v0/user/$USERNAME.json"
+	echo "----------------"
+	echo "https://news.ycombinator.com/user?id=$USERNAME"
+	echo
+	PAYLOAD=$(curl -s "$URL")
+	PAYLOAD=$(sanitize "$PAYLOAD")
+	echo "$PAYLOAD" \
+		| jq -r '"\(.created)|||\(.id)|||\(.karma)|||\(.about)"' \
+		| gawk -F'\\|\\|\\|' '
+			{
+				created=$1; id=$2; karma=$3; about=$4;
+				print  "user:    " id;
+				print  "created: " strftime("%c", created);
+				print  "karma:   " karma;
+				# Print HTML converted to plain text
+				about = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", about)
+				gsub(/<p>/, "</p><p>", about)
+				about = "<p>" about "</p>"
+				cmd = "echo \"" about "\" | pandoc --from=html --to=plain --eol=crlf"
+				aboutfirstline=1;
+				while ((cmd | getline result) > 0) {
+					if (aboutfirstline == 1) {
+						print "about:   " result
+						aboutfirstline=0
+					}
+					else {
+						print "         " result
+					}
+				}
+				close(cmd)
+			}'
+	echo
+	echo "Most recent $NUMITEMS activity items:"
+	ITEMCOUNTER=1
+	for ITEMID in $(echo $PAYLOAD | jq -c ".submitted[0:$NUMITEMS]|.[]"); do
+		URL="$BASEURL/v0/item/$ITEMID.json"
+		echo
+		ITEMPAYLOAD=$(curl -s "$URL")
+		ITEMTYPE="$(echo $ITEMPAYLOAD | jq -r '.type')"
+		if [ "$ITEMTYPE" = "story" ]; then
+			echo $ITEMPAYLOAD \
+				| jq -r '"'''$ITEMCOUNTER'|||\(.title)|||\(.url)|||\(.score)|||\(.by)|||\(.time)|||\(.descendants)|||\(.id)''"' \
+				| gawk -F'\\|\\|\\|' '
+					{
+						itemcounter=$1; title=$2; url=$3; score=$4; by=$5; time=$6; descendants=$7; id=$8;
+						printf "%d.	%s => %s\n", itemcounter, title, url;
+						print ("	" score "pts, by " by " at " strftime("%c",time) " | " descendants " comments: https://news.ycombinator.com/item?id=" id);
+						exit;
+					}'
+		elif [ "$ITEMTYPE" = "comment" ]; then
+			echo $ITEMPAYLOAD \
+				| jq -r '"'''$ITEMCOUNTER'|||\(.by)|||\(.id)|||\(.text | gsub("\n"; "\\n"))|||\(.time)''"' \
+			| gawk -F'\\|\\|\\|' '
+				{
+					itemcounter=$1; by=$2; id=$3; text=$4; time=$5;
+					# Create prefix string for each new line
+					prefix="	"
+					# Print header
+					printf "%d.	%s at %s => %s\n", itemcounter, by, strftime("%c", time), ("https://news.ycombinator.com/item?id=" id)
+					# Print HTML converted to plain text
+					text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
+					gsub(/<p>/, "</p><p>", text)
+					text = "<p>" text "</p>"
+					cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol=crlf"
+					while ((cmd | getline result) > 0) {
+						print prefix result
+					}
+					close(cmd)
+				}'
+		else
+			echo "$ITEMCOUNTER.	https://news.ycombinator.com/item?id=$ITEMID (unknown type)"
+		fi
+		ITEMCOUNTER=$((ITEMCOUNTER + 1))
+	done
+}
+
+item() {
+	# Automatically dispatch item based on type, mostly of use
+	# in scenarios where we only have the item id but don't know
+	# the item type beforehand. Incurs cost of an added API call
+	ITEMID=$1
+	URL="$BASEURL/v0/item/$ITEMID.json"
+	ITEMPAYLOAD=$(curl -s "$URL")
+	ITEMTYPE="$(echo $ITEMPAYLOAD | jq -r '.type')"
+	case $ITEMTYPE in
+		story)
+			story $ITEMID
+			;;
+		comment)
+			comment $ITEMID 0  # assume no starting indent
+			;;
+		job)
+			story $ITEMID
+			;;
+		*)
+			echo 'unknown type' >&2
+			exit 2
+	esac
+}
+
+case $1 in
+	news)
+		news ${2:-10}
+		;;
+	ask)
+		ask ${2:-10}
+		;;
+	show)
+		show ${2:-10}
+		;;
+	jobs)
+		jobs ${2:-20}
+		;;
+	story)
+		if [ -z "$2" ]; then
+			echo 'story action requires a story item id' >&2
+			exit 1
+		fi
+		story $2
+		;;
+	comment)
+		if [ -z "$2" ] || [ -z "$3" ]; then
+			echo 'comment action requires a comment item id and an indent level' >&2
+			exit 1
+		fi
+		comment $2 $3
+		;;
+	user)
+		if [ -z "$2" ]; then
+			echo 'user action requires at least a username' >&2
+			exit 1
+		fi
+		user $2 ${3:-20}
+		;;
+	item)
+		if [ -z "$2" ]; then
+			echo 'item action requires at least an item id' >&2
+			exit 1
+		fi
+		item $2
+		;;
+	*)
+		PROGNAME=$(basename $0)
+		cat >&2 <<EOF
+Command-line HN client.
+
+Usage: $PROGNAME news [<number>, default 10]
+       $PROGNAME ask [<number>, default 10]
+       $PROGNAME show [<number>, default 10]
+       $PROGNAME jobs [<number>, default 20]
+       $PROGNAME story <itemid>
+       $PROGNAME comment <itemid> <indentlevel>
+EOF
+		exit 1
+esac

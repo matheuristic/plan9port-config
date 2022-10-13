@@ -272,6 +272,7 @@ a number of helper scripts available at `~/.acme/bin`:
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
   recent commands are show (i.e., match all commands).
+- `hn`: Command-line [HN](https://news.ycombinator.com) client.
 - `i+`: Indent. Specify an argument to change the indent string from
   the default Tab character.
 - `i-`: Unindent. An arg may be specified as in `i+`.
