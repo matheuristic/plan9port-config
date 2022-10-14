@@ -30,6 +30,7 @@
 
 set -e
 
+# See https://github.com/HackerNews/API for API documentation
 BASEURL="https://hacker-news.firebaseio.com"
 PANDOCEOL=$([ "$(uname)" = "Darwin" ] && printf "lf" || printf "crlf")
 
