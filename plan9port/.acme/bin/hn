@@ -31,18 +31,19 @@
 set -e
 
 BASEURL="https://hacker-news.firebaseio.com"
+PANDOCEOL=$([ "$(uname)" = "Darwin" ] && printf "lf" || printf "crlf")
 
-hascmdp() {
+checkcmd() {
 	if ! command -v "$1" >/dev/null 2>&1; then
 		echo "$1 needs to be installed"
 		exit 1
 	fi
 }
 
-hascmdp curl  # need curl to make queries to the API
-hascmdp gawk  # need gawk for the gensub function
-hascmdp jq    # need jq for processing JSON
-hascmdp pandoc # need pandoc for converting HTML to plain text
+checkcmd curl  # need curl to make queries to the API
+checkcmd gawk  # need gawk for the gensub function
+checkcmd jq    # need jq for processing JSON
+checkcmd pandoc # need pandoc for converting HTML to plain text
 
 tophelper() {
 	if [ "$#" -lt 2 ]; then
@@ -160,7 +161,7 @@ comment() {
 	PAYLOAD=$(sanitize "$PAYLOAD")
 	deletedp "$PAYLOAD" && {
 		for i in $(seq $INDENTLEVEL); do
-			echo -n "	"
+			printf "	"
 		done
 		echo "https://news.ycombinator.com/item?id=$ITEMID is a dead or deleted item"
 		return
@@ -180,7 +181,7 @@ comment() {
 				text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
 				gsub(/<p>/, "</p><p>", text)
 				text = "<p>" text "</p>"
-				cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol=crlf"
+				cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol='$PANDOCEOL'"
 				while ((cmd | getline result) > 0) {
 					print prefix result
 				}
