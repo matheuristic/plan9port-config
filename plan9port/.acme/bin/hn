@@ -182,7 +182,7 @@ comment() {
 				text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
 				gsub(/<p>/, "</p><p>", text)
 				text = "<p>" text "</p>"
-				cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol='$PANDOCEOL'"
+				cmd = "echo '\''" text "'\'' | pandoc --from=html --to=plain --eol='$PANDOCEOL'"
 				while ((cmd | getline result) > 0) {
 					print prefix result
 				}
@@ -195,11 +195,12 @@ comment() {
 
 user() {
 	if [ "$#" -lt 2 ]; then
-		echo 'requires a username and number of recent activity items as arguments' >&2
+		echo 'requires a username, a start index (inclusive) and end index (exclusive) as arguments' >&2
 		exit 1
 	fi
 	USERNAME=$1
-	NUMITEMS=$2
+	STARTINDEX=$2
+	ENDINDEX=$3
 	URL="$BASEURL/v0/user/$USERNAME.json"
 	echo "----------------"
 	echo "https://news.ycombinator.com/user?id=$USERNAME"
@@ -232,9 +233,9 @@ user() {
 				close(cmd)
 			}'
 	echo
-	echo "Most recent $NUMITEMS activity items:"
-	ITEMCOUNTER=1
-	for ITEMID in $(echo $PAYLOAD | jq -c ".submitted[0:$NUMITEMS]|.[]"); do
+	echo "Most recent activity items ($((STARTINDEX + 1))--$ENDINDEX):"
+	ITEMCOUNTER=$((STARTINDEX + 1))
+	for ITEMID in $(echo $PAYLOAD | jq -c ".submitted[$STARTINDEX:$ENDINDEX]|.[]"); do
 		URL="$BASEURL/v0/item/$ITEMID.json"
 		echo
 		ITEMPAYLOAD=$(curl -s "$URL")
@@ -252,23 +253,23 @@ user() {
 		elif [ "$ITEMTYPE" = "comment" ]; then
 			echo $ITEMPAYLOAD \
 				| jq -r '"'''$ITEMCOUNTER'|||\(.by)|||\(.id)|||\(.text | gsub("\n"; "\\n"))|||\(.time)''"' \
-			| gawk -F'\\|\\|\\|' '
-				{
-					itemcounter=$1; by=$2; id=$3; text=$4; time=$5;
-					# Create prefix string for each new line
-					prefix="	"
-					# Print header
-					printf "%d.	%s at %s => %s\n", itemcounter, by, strftime("%c", time), ("https://news.ycombinator.com/item?id=" id)
-					# Print HTML converted to plain text
-					text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
-					gsub(/<p>/, "</p><p>", text)
-					text = "<p>" text "</p>"
-					cmd = "echo \"" text "\" | pandoc --from=html --to=plain --eol=crlf"
-					while ((cmd | getline result) > 0) {
-						print prefix result
-					}
-					close(cmd)
-				}'
+				| gawk -F'\\|\\|\\|' '
+					{
+						itemcounter=$1; by=$2; id=$3; text=$4; time=$5;
+						# Create prefix string for each new line
+						prefix="	"
+						# Print header
+						printf "%d.	%s at %s => %s\n", itemcounter, by, strftime("%c", time), ("https://news.ycombinator.com/item?id=" id)
+						# Print HTML converted to plain text
+						text = gensub(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/, "\\2 (\\1)", "g", text)
+						gsub(/<p>/, "</p><p>", text)
+						text = "<p>" text "</p>"
+						cmd = "echo '\''" text "'\'' | pandoc --from=html --to=plain --eol='$PANDOCEOL'"
+						while ((cmd | getline result) > 0) {
+							print prefix result
+						}
+						close(cmd)
+					}'
 		else
 			echo "$ITEMCOUNTER.	https://news.ycombinator.com/item?id=$ITEMID (unknown type)"
 		fi
@@ -330,7 +331,11 @@ case $1 in
 			echo 'user command requires at least a username' >&2
 			exit 1
 		fi
-		user $2 ${3:-20}
+		if [ "$#" -le 3 ]; then
+			user $2 0 ${3:-30}
+		else
+			user $2 $3 $4
+		fi
 		;;
 	item)
 		if [ -z "$2" ]; then
@@ -350,6 +355,7 @@ Usage: $PROGNAME news [<endnumber> | <startnumber> <endnumber>]
        $PROGNAME ycjobs [<endnumber> | <startnumber> <endnumber>]
        $PROGNAME story <itemid>
        $PROGNAME comment <itemid> <indentlevel>
+       $PROGNAME user <username> [<endnumber> | <startnumber> <endnumber>]
        $PROGNAME item <itemid>
 EOF
 		exit 1
