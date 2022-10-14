@@ -30,5 +30,5 @@ mkdir -p "$RECENTFILEDIR"
 # https://github.com/9fans/plan9port/blob/master/src/cmd/grep/main.c#L88-L93
 9p read acme/log \
 	| 9 sed -l -e '/^[0-9]+ new [^	 ]/!d;s/^[0-9]+ new //' \
-	| 9 grep -v -e '(^|/)([-+][^/]*)$' \
+	| 9 grep -v -e '(^|/)([-+][^/]*|[^/]*/)$' \
 	>> "$RECENTFILE"
