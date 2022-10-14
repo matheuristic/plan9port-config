@@ -764,7 +764,7 @@ For more information on Acme mounting and macOS, see the following
   (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.` is
   the cursor location).
 
-### Typical workflow
+### Typical setup and workflow
 
 **Setup**:
 
@@ -782,6 +782,9 @@ For more information on Acme mounting and macOS, see the following
     (see the _Optional tools_ subsection above).
   - Install [gcat](https://github.com/aaronjanse/gcat) to support
     plumbing Gemini URLs `gemini://...` with output to `+Errors`.
+  - Install `pandoc` to preview Markdown files with the `mdpv` script.
+  - Also install `curl`, `gawk` and `jq` so `hn` can be used to plumb
+    [HN](https://news.ycombinator.com) URLs to the `+Errors` window.
 - Set up an Acme launcher app (macOS) or desktop entry (Linux) to make
   launching Acme easier.
 
