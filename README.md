@@ -242,10 +242,6 @@ a number of helper scripts available at `~/.acme/bin`:
 - `condarun`: `condarun envname cmd arg1 ...` executes `cmd` with the
   given args in the `envname` Conda environment (default environment
   is the one active when Acme was launched, else `base`).
-- `csp`: Wrapper for running
-  [cspell](https://github.com/streetsidesoftware/cspell) installed
-  using [npm](https://www.npmjs.com/) managed by
-  [NVM](https://github.com/nvm-sh/nvm).
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
 - `d`: Diff the current window against the current file on disk.
