@@ -101,7 +101,8 @@ while true; do
 	name=(nameidx > 0) ? substr($0, nameidx) : $6;
 	gsub(/^[ 	]*/, "", name); # trim leading whitespace
 	gsub(/[ 	]*$/, "", name); # trim trailing whitespace
-	if (! (isdir || (length(name) == 0) || match(name, /(^|\/)[+-][^\/]*$/) || match(name, /\.git\/COMMIT_EDITMSG$/))) {
+	# Skip directories, files with empty names, files beginning with + or -, and files in the .git folder of a Git repository
+	if (! (isdir || (length(name) == 0) || match(name, /(^|\/)[+-][^\/]*$/) || match(name, /\/\.git\//))) {
 		gsub(/\//, "%", name); # substitute slashes with "%"
 		gsub(/ /, "+", name); # substitute spaces with "+"
 		gsub(/	/, "=", name); # substitute tabs with "="
