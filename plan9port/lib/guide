@@ -28,7 +28,11 @@ X/^'/ w             # write all modified files
 
 # Other ~/.acme/bin commands
 ci text             # gen case-insensitive regexp for non-regexp text
-csp '**/*.py'       # `cspell` code spell-check for Python files
+
+# Code search (https://github.com/google/codesearch)
+cindex `{pwd}       # run just `cindex` to regenerate index
+csearch -n -f '\.go$' '^func (\([^)]+\))? someFunctionName \('
+find . -name '*.go' | xargs cgrep -i -n '^type someTypeName'
 
 # Git
 git grep -n 'some[Pp]attern'
