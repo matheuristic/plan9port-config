@@ -447,7 +447,7 @@ a number of helper scripts available at `~/.acme/bin`:
   its Go [port](https://github.com/mpl/xplor).
 
 - [issue](https://pkg.go.dev/rsc.io/github/issue)
-  ([Github](https://github.com/rsc/github):
+  ([Github](https://github.com/rsc/github)):
   Acme client for reading and updating Github project tracker issues.
   Note that the project repo defaults to `golang/go` so use the `-p`
   CLI option to specify the appropriate project. In Acme, issues for
@@ -768,14 +768,16 @@ For more information on Acme mounting and macOS, see the following
   prior to building.
 - Create `$HOME/.local/bin/startacme.sh` using the
   `sample-startacme.sh` as a starting point.
-- Make sure all the necessary supporting programs () are installed.
+- Install supporting programs.
   - For the scripts in `$HOME/.acme/bin`, these would be GNU
     coreutils, Conda, `fzf`, `git`, `ripgrep`, or `mamba`, `par` if
-    preferable to GNU coreutils' `fmt`, and `cspell` or `enchant` if
-    spell checking is needed.
+    preferable to GNU coreutils' `fmt`, and `enchant` if spell
+    checking is needed.
   - For direct helper programs, these would be `acme-lsp` (along with
     the relevant LSP servers), `Watch`, and any other programs desired
-    (see the _Optional tools_ subsection above).
+    (see the _Optional tools_ subsection above). Also, other tools
+    like [code search](https://github.com/google/codesearch) and
+    [cspell](https://github.com/streetsidesoftware/cspell) are useful.
   - Install [gcat](https://github.com/aaronjanse/gcat) to support
     plumbing Gemini URLs `gemini://...` with output to `+Errors`.
   - Install `pandoc` to preview Markdown files with the `mdpv` script.
@@ -880,13 +882,6 @@ Plumbing rules can be updated without restarting `plumber` via a Plan
 ```sh
 cat /path/to/plumbing | 9p write plumb/rules
 ```
-
-References:
-
-- [Plan 9 Wiki](https://9p.io/wiki/plan9/plumbing_examples/index.html)
-- [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
-- [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
-- [Plan 9 Desktop Guide > Basics > Plumbing](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html#plumbing)
 
 ## Fonts
 
@@ -1182,7 +1177,7 @@ Version=1.0
 - [telegramfs](https://github.com/nicolagi/telegramfs): 9p Telegram
   file server.
 
-## Other useful links
+## Other useful or reference links
 
 - [Acme plumbing rules for OCaml](https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467)
 
@@ -1190,9 +1185,17 @@ Version=1.0
 
 - [Awesome Acme](https://github.com/mkmik/awesome-acme)
 
+- [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
+
 - [Hints for writing Unix tools](https://monkey.org/~marius/unix-tools-hints.html)
 
+- [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
+
 - [On Some Tools for Plan9's Acme](https://tales.mbivert.com/on-some-tools-for-plan9-acme/)
+
+- [Plan 9 Desktop Guide](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html)
+
+- [Plan 9 Wiki Plumbing Examples](https://9p.io/wiki/plan9/plumbing_examples/index.html)
 
 - [Plan 9 Wiki Tip o' the day](https://9p.io/wiki/plan9/Tip_o'_the_day/index.html)
 
