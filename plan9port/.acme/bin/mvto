@@ -40,6 +40,9 @@ if ! echo $TO | grep -q '^/'; then
 	TO="$PWD/$TO"
 fi
 
+# Canonicalize target filepath
+TO=$(readlink -f "$TO")
+
 # If the window file exists (not always the case), then move it
 # to the new name only if does not clobber an existing file
 if [ -f "$FROM" ]; then
