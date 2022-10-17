@@ -41,7 +41,44 @@ if ! echo $TO | grep -q '^/'; then
 fi
 
 # Canonicalize target filepath
-TO=$(readlink -f "$TO")
+itersed() {
+	PREVSTR="$2"
+	NEXTSTR="$2"
+	while true; do
+		NEXTSTR=$(printf "$NEXTSTR" | 9 sed -e "$1")
+		[ "$PREVSTR" = "$NEXTSTR" ] && break
+		PREVSTR="$NEXTSTR"
+	done
+	echo "$NEXTSTR"
+}
+TO=$(itersed 's;//;/;' "$TO")            # handle //
+TO=$(itersed 's;/\.[/$];/;' "$TO")       # handle /.[/$]
+TO=$(itersed 's;/\.$;;' "$TO")           # handle trailing /.
+TO=$(itersed 's;([^/])/$;\1;' "$TO")     # remove trailing slashes
+TO=$(itersed 's;/[^/]*[^\./][^/]*/\.\./;/;' "$TO")  # handle /somedir/../
+TO=$(itersed 's;/[^/]*[^\./][^/]*/\.\.$;/;' "$TO")  # handle trailing /somedir/..
+
+# Check target filepath does not traverse upward beyond root dir
+if $(echo "$TO" | 9 grep -s '^/?\.\.(/|$)') 1>/dev/null 2>&1; then
+	echo "Unable to resolve target path $1" >&2
+	exit 1
+fi
+
+# Preserve current filename if target path is a directory
+if [ -d "$TO" ]; then
+	FILENAME=$(basename "$FROM")
+	if $(echo "$TO" | 9 grep -v -s '/$'); then  # $TO does not end with /
+		TO="$TO/$FILENAME"
+	else                                        # $TO ends with /
+		TO="$TO$FILENAME"
+	fi
+fi
+
+# Check target filepath is different from initial filepath
+if [ "$FROM" = "$TO" ]; then
+	echo 'target filepath is the same as initial filepath' >&2
+	exit 1
+fi
 
 # If the window file exists (not always the case), then move it
 # to the new name only if does not clobber an existing file
