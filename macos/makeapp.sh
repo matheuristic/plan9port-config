@@ -7,10 +7,19 @@
 PLAN9=${PLAN9:-/usr/local/plan9}
 APPDIR=${APPDIR:-"$HOME/Applications"}
 
-# Check plan9port repository exists
-if [ ! -d "$PLAN9" ]; then
+ICONPATH="$PLAN9/mac/spaceglenda.icns"
+STARTACMEPATH="$HOME/.local/bin/startacme.sh"
+
+# Check needed plan9port repository files exist
+if [ ! -f "$ICONPATH" ]; then
 	echo "plan9port repository not installed at $PLAN9" >&2
 	echo 'Specify path by calling this script with PLAN9=/path/to/plan9port/repository' >&2
+	exit 1
+fi
+
+# Check if launcher script exists
+if [ ! -x "$STARTACMEPATH" ]; then
+	echo "Acme shell launcher script not installed at $STARTACMEPATH" >&2
 	exit 1
 fi
 
@@ -56,7 +65,7 @@ EOF
 echo "Creating $APPDIR/Acme.app/Contents/MacOS/acme"
 cat >MacOS/acme <<EOF
 #!/bin/zsh
-$HOME/.local/bin/startacme.sh
+$STARTACMEPATH
 EOF
 chmod +x MacOS/acme
 
@@ -67,7 +76,7 @@ APPL????
 EOF
 
 # Copy icon from plan9port repository
-echo "Copying $PLAN9/mac/spaceglenda.icns -> $APPDIR/Acme.app/Contents/Resources/spaceglenda.icns"
-cp -a "$PLAN9/mac/spaceglenda.icns" Resources/spaceglenda.icns
+echo "Copying $ICONPATH -> $APPDIR/Acme.app/Contents/Resources/spaceglenda.icns"
+cp -a "$ICONPATH" Resources/spaceglenda.icns
 
 echo "All done, it is recommended to add Acme.app to the macOS Dock."
