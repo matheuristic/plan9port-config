@@ -1,21 +1,22 @@
 #!/bin/sh
 
-# mdpv (markdown preview)
-# Preview current Acme window's or a given Markdown file in a browser
-# Assumes the Markdown-to-HTML converter writes its output to stdout
+# codepv (code preview)
+# Preview current Acme window code file or a code file in a browser
+# with syntax-highlighting and line numbers
 
 set -e
 
-# Process command line options and their arguments
 while [ "$#" -gt 0 ]; do
 	case $1 in
 		-h)
 			cat <<EOF
-Preview current Acme window's or a given Markdown file in a browser.
+Preview current Acme window code file or a code file in a browser
+with syntax highlighting and line numbers.
 
-Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
+Usage: $(basename $0) [-h] [-n] [-b browsecmd] [-t tmpfile] [mdfile]
 
 -h shows usage and exits
+-n numbers the code lines (only works with pandoc)
 -c convertcmd sets the conversion command to convertcmd
     (default: "pandoc --standalone" or "multimarkdown --full")
 -b browsecmd sets the browser launch command to browsecmd
@@ -25,13 +26,14 @@ Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
 mdfile is the path to a Markdown file
     (default: current window file if run from within Acme)
 
-Note that the specified converter command is expected to output the
-resulting HTML code to stdout.
-
-Additionally, the temporary HTML file is not automatically cleaned up
-by this script.
+Note that the temporary HTML file is not automatically cleaned up by
+this script.
 EOF
 			exit
+			;;
+		-n)
+			NUMBERLINES=true
+			shift
 			;;
 		-c)
 			if [ -n "$2" ]; then
@@ -98,9 +100,9 @@ fi
 
 # Automatically set conversion command if not specified
 if [ -z "$CONVERT" ]; then
-	if command -v pandoc 1>/dev/null 2>&1; then
+	if command -v pandoc >/dev/null 2>&1; then
 		CONVERT="pandoc --standalone"
-	elif command -v multimarkdown 1>/dev/null 2>&1; then
+	elif command -v multimarkdown >/dev/null 2>&1; then
 		CONVERT="multimarkdown --full"
 	else
 		echo 'convert command not set using -c option and no auto-detected Markdown converter installed'
@@ -120,8 +122,28 @@ if [ -z "$TMPFILE" ]; then
 	fi
 fi
 
-# Convert Markdown to HTML, assumes converter writes output to stdout
-$CONVERT "$MDFILE" >"$TMPFILE"
+# Get code file suffix to infer programming language
+FILESUFFIX=${MDFILE##*.}
+
+# Wrap code file contents in Markdown code block and convert to HTML
+# (note that assumes converter writes output to stdout)
+cat "$MDFILE" | awk '
+	BEGIN{
+		print "# `'$MDFILE'`"
+		print ""
+		if ("'$NUMBERLINES'" == "true") {
+			print "``` { .'$FILESUFFIX' .numberLines }"
+		}
+		else {
+			print "```'$FILESUFFIX'"
+		}
+	}
+	{
+		print $0
+	}
+	END{
+		print "```"
+	}' | $CONVERT > "$TMPFILE"
 
 # Open HTML file in browser
 $BROWSER "$TMPFILE"
