@@ -40,7 +40,7 @@ EOF
 				CONVERT="$2"
 				shift; shift
 			else
-				echo "-c requires a non-empty option argument that is a command (with args if needed)" 1>&2
+				echo "-c requires a non-empty option argument that is a command (with args if needed)" >&2
 				exit 1
 			fi
 			;;
@@ -49,7 +49,7 @@ EOF
 				BROWSER="$2"
 				shift; shift
 			else
-				echo "-b requires a non-empty option argument that is a command (with args if needed)" 1>&2
+				echo "-b requires a non-empty option argument that is a command (with args if needed)" >&2
 				exit 1
 			fi
 			;;
@@ -58,7 +58,7 @@ EOF
 				TMPFILE="$2"
 				shift; shift
 			else
-				echo "-t requires a non-empty option argument that is a file path" 1>&2
+				echo "-t requires a non-empty option argument that is a file path" >&2
 				exit 1
 			fi
 			;;
@@ -71,7 +71,7 @@ done
 
 # Check that there are no extra arguments
 if [ "$#" -gt 1 ]; then
-	echo 'must specify exactly zero or one file' 1>&2
+	echo 'must specify exactly zero or one file' >&2
 	exit 1
 fi
 
@@ -88,11 +88,11 @@ fi
 # Automatically set browser command if not specified
 if [ -z "$BROWSER" ]; then
 	# Try Crostini (ChromeOS) > Linux > macOS URL handlers
-	if command -v garcon-url-handler 1>/dev/null 2>&1; then
+	if command -v garcon-url-handler >/dev/null 2>&1; then
 		BROWSER=garcon-url-handler
-	elif command -v xdg-open 1>/dev/null 2>&1; then
+	elif command -v xdg-open >/dev/null 2>&1; then
 		BROWSER=xdg-open
-	elif command -v open 1>/dev/null 2>&1; then
+	elif command -v open >/dev/null 2>&1; then
 		BROWSER=open
 	else
 		echo 'BROWSER variable not set and no auto-detected URL handler installed'
@@ -131,6 +131,10 @@ FILESUFFIX=${MDFILE##*.}
 # (note that assumes converter writes output to stdout)
 cat "$MDFILE" | awk '
 	BEGIN{
+		print "---"
+		print "title: Code previewer"
+		print "---"
+		print "<style> body { font-size: 16px; min-width: 80% !important; } </style>"
 		print "## `'$MDFILE'`"
 		print ""
 		if ("'$NUMBERLINES'" == "true") {
