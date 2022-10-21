@@ -63,6 +63,8 @@ EOF
 			fi
 			;;
 		*)
+			MDFILE=$1
+			shift
 			break
 	esac
 done
@@ -129,7 +131,7 @@ FILESUFFIX=${MDFILE##*.}
 # (note that assumes converter writes output to stdout)
 cat "$MDFILE" | awk '
 	BEGIN{
-		print "# `'$MDFILE'`"
+		print "## `'$MDFILE'`"
 		print ""
 		if ("'$NUMBERLINES'" == "true") {
 			print "``` { .'$FILESUFFIX' .numberLines }"
