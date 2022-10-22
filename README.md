@@ -132,6 +132,12 @@ works best with a 3-button mouse, although keyboard modifiers can be
 used to simulate secondary mouse buttons on systems without a 3-button
 mouse (like laptops with touchpads).
 
+See `9 man 1 acme` for information about the Acme graphical user
+interface, `9 man 4 acme` for information about interacting with Acme
+using its file interface (useful for writing scripts that integrate
+with Acme), and `9 man 1 sam` for information about the Sam command
+language which is supported within Acme through its `Edit` command.
+
 ### Acme fonts
 
 The default main font is `/lib/font/bit/lucsans/euro.8.font`
@@ -344,11 +350,12 @@ a number of helper scripts available at `~/.acme/bin`:
   go install github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
-  Create helper scripts in `$HOME/.acme/bin/` by running in `rc`:
+  Create helper scripts by going to a directory in `$path` (for example,
+  `$HOME/.acme/bin/`) and running in `rc`:
 
   ```sh
   for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
-    > $home/.acme/bin/L^$cmd {
+    > L^$cmd {
       echo '#!/usr/bin/env rc'
       echo exec L $cmd '$*'
     }
@@ -502,6 +509,11 @@ a number of helper scripts available at `~/.acme/bin`:
   option indicates the external program is to be run in the specified
   terminal emulator, while the `-g` option indicates the external
   program is a GUI one.
+
+- [uni](https://github.com/arp242/uni): Command-line tool for looking
+  up the [Unicode](https://www.unicode.org/main.html) database. An
+  alternative is [Unicode](https://github.com/robpike/unicode)
+  (installable using `go install robpike.io/cmd/unicode@latest`).
 
 - [Watch](https://pkg.go.dev/9fans.net/go/acme/Watch): Runs a given
   command each time any file in the current directory is written and
@@ -783,7 +795,8 @@ For more information on Acme mounting and macOS, see the following
     [cspell](https://github.com/streetsidesoftware/cspell) are useful.
   - Install [gcat](https://github.com/aaronjanse/gcat) to support
     plumbing Gemini URLs `gemini://...` with output to `+Errors`.
-  - Install `pandoc` to preview Markdown files with the `mdpv` script.
+  - Install `pandoc` to preview Markdown files with the `mdpv` script
+    and code files with the `codepv` script.
   - Also install `curl`, `gawk` and `jq` so `hn` can be used to plumb
     [HN](https://news.ycombinator.com) URLs to the `+Errors` window.
 - Set up an Acme launcher app (macOS) or desktop entry (Linux) to make
@@ -834,6 +847,8 @@ Plan 9 also comes with another editor [Sam](http://sam.cat-v.org/)
 that is the predecessor of Acme, but has the benefit of having a
 client-server that can be better suited for remote file editing under
 high network latency.
+
+See `9 man sam` for more information about using the Sam editor.
 
 ## Plumber
 
@@ -1126,37 +1141,6 @@ Version=1.0
   `9 mount localhost:5640 /path/to/mountpoint` (replace port number
   with set ghfs port, and modify the the mountpoint path as needed).
 
-- [muscle](https://github.com/nicolagi/muscle): 9p file server with
-  revision history and merge, with S3 as the write-once-read-many
-  (WORM) device. Install with:
-
-  ```sh
-  go install github.com/nicolagi/muscle/cmd/...
-  ```
-
-  Create an initial config using `muscle init` and customize.
-
-  After starting `musclefs` and `snapshotfs`, mount using something
-  akin to the following (replicated from the source repo), modifying
-  as needed (e.g. `youruser` or the paths).
-
-  ```sh
-  sudo mount 127.0.0.1 /mnt/muscle -t 9p -o 'trans=tcp,port=2323,dfltuid=1000,dfltgid=1000,uname=youruser'
-  sudo mount `{namespace}^/muscle /mnt/muscle -t 9p -o 'trans=unix,dfltuid=1000,dfltgid=1000,uname=youruser'
-  9pfuse 127.0.0.1:2323 /mnt/muscle
-  9pfuse `{namespace}^/muscle /mnt/muscle
-  ```
-
-  On Linux, an alternative to using `9pfuse` is
-  [v9fs](https://www.kernel.org/doc/html/latest/filesystems/9p.html)
-  which is built into the Linux kernel.
-
-  Similar to [Upspin](https://upspin.io/) but without the need to
-  maintain an always-connected running server.
-
-- [telegramfs](https://github.com/nicolagi/telegramfs): 9p Telegram
-  file server.
-
 ## Other useful or reference links
 
 - [Acme plumbing rules for OCaml](https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467)
@@ -1183,6 +1167,13 @@ Version=1.0
 
 - [plan9port linux environment](https://github.com/gdiazlo/p9penv)
 
+- [Plumbing rules for Puppet manifests](https://blog.aqwari.net/plumber-puppet/)
+
 - [Using the Plan 9 Plumber to Turn Acme into a Git GUI](https://alexkarle.com/blog/plan9-acme-git-gui.html)
 
 - [When You Have Reached Acme](https://mkhl.codeberg.page/acme-setup/)
+
+- Writing a 9P server from scratch parts
+  [one](https://blog.aqwari.net/9p/),
+  [two](https://blog.aqwari.net/9p/parsing/) and
+  [three](https://blog.aqwari.net/9p/server/)
