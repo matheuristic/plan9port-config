@@ -13,10 +13,11 @@ while [ "$#" -gt 0 ]; do
 Preview current Acme window code file or a code file in a browser
 with syntax highlighting and line numbers.
 
-Usage: $(basename $0) [-h] [-n] [-b browsecmd] [-t tmpfile] [mdfile]
+Usage: $(basename $0) [-h] [-n] [-l lang] [-b browsecmd] [-t tmpfile] [mdfile]
 
 -h shows usage and exits
 -n numbers the code lines (only works with pandoc)
+-l lang sets the programming language to lang (defaults to using mdfile suffix)
 -c convertcmd sets the conversion command to convertcmd
     (default: "pandoc --standalone" or "multimarkdown --full")
 -b browsecmd sets the browser launch command to browsecmd
@@ -34,6 +35,15 @@ EOF
 		-n)
 			NUMBERLINES=true
 			shift
+			;;
+		-l)
+			if [ -n "$2" ]; then
+				CODELANG="$2"
+				shift; shift
+			else
+				echo "-l requires a non-empty option argument that is a programming language" >&2
+				exit 1
+			fi
 			;;
 		-c)
 			if [ -n "$2" ]; then
@@ -124,8 +134,14 @@ if [ -z "$TMPFILE" ]; then
 	fi
 fi
 
-# Get code file suffix to infer programming language
-FILESUFFIX=${MDFILE##*.}
+# Set programming language from file suffix if not specified
+if [ -z "$CODELANG" ]; then
+	FILENAME=$(basename "$MDFILE")
+	CODELANG=${FILENAME##*.}
+	if [ "$CODELANG" = "$FILENAME" ]; then
+		CODELANG=text
+	fi
+fi
 
 # Wrap code file contents in Markdown code block and convert to HTML
 # (note that assumes converter writes output to stdout)
@@ -138,10 +154,10 @@ cat "$MDFILE" | awk '
 		print "## `'$MDFILE'`"
 		print ""
 		if ("'$NUMBERLINES'" == "true") {
-			print "``` { .'$FILESUFFIX' .numberLines }"
+			print "``` { .'$CODELANG' .numberLines }"
 		}
 		else {
-			print "```'$FILESUFFIX'"
+			print "```'$CODELANG'"
 		}
 	}
 	{
