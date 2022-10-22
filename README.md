@@ -113,7 +113,9 @@ This will create the symlinks:
 
 Copy `sample-startacme.sh` to `~/.local/bin/startacme.sh` and
 `sample-startsam.sh` to `~/.local/bin/startsam.sh` and modify them to
-create customized launchers for Acme and Sam.
+create customized launchers for Acme and Sam. Note that for macOS,
+it is recommended to launch Acme with `$BROWSER` unset so that
+the plumbing to the web uses the default browser for the system.
 
 ```sh
 cp plan9port/.local/bin/sample-startacme.sh $HOME/.local/bin/startacme.sh
