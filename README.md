@@ -609,6 +609,24 @@ acme -m /tmp/acme
 For more information on Acme mounting and macOS, see the following
 [Github issue](https://github.com/9fans/plan9port/issues/136).
 
+### Working with remote files
+
+One way to work with files on remote systems is by mounting remote
+filesystems to a local mountpoint using [rclone](https://rclone.org/)
+[mount](https://rclone.org/commands/rclone_mount/), so remote files
+can be worked with as if they were local files.
+
+Many remote storage backends are supported, like
+[Azure Blob Storage](https://rclone.org/azureblob/),
+[HDFS](https://rclone.org/hdfs/), [SFTP](https://rclone.org/sftp/),
+[S3](https://rclone.org/s3/), etc.
+
+An alternative is to mount NFS over SSH, though that requires
+superuser permissions and user and group ids be the same across systems,
+see [here](https://gist.github.com/proudlygeek/5721498),
+[here](https://news.ycombinator.com/item?id=31815830), and
+[here](https://www.linuxjournal.com/content/encrypting-nfsv4-stunnel-tls).
+
 ### Usage tips
 
 - Middle-clicking (Button2) executes the region or word under the
