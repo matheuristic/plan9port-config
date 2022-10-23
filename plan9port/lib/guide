@@ -89,7 +89,12 @@ Edit , x g/[Uu]ser/ {
 	=
 	-1,+1p
 }
-# 2. Replace all occurrences of 'From' or 'from' to 'to' in all windows
+# 2. Replace first occurrence of 'def' after each 'abc' to 'xyz' in all windows
 Edit X/^[^\+]./ {
-	, s/[Ffrom]/to/g
+	,x /abc/ /def/ c/xyz/
+}
+# 3. Replace next occurrence of 'abc' to 'xyz' and jump to location in window
+Edit /abc/ {
+	c/xyz/
+	.
 }
