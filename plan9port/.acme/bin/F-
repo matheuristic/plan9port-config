@@ -4,6 +4,8 @@
 # Usage:
 #     F- [N]
 # where N is the number of points (defaults to 1 if unspecified)
+# Use F directly on macOS Retina screens as it automatically doubles
+# font sizes when using Font so this script does not work as intended
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
@@ -28,6 +30,7 @@ cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
 antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
 cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicator
 delta=$1
+if (~ $#antialias 0) antialias=''
 if (~ $#delta 0) delta=1
 
 if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'-'$delta | 9 hoc}
