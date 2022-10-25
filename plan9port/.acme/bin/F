@@ -25,6 +25,8 @@ Change font in current Acme window. Usage:
 Sets window font to newfontname at newfontsize pt, if specified, and
 prints the window font path to stdout after.
 Calling with no args will just print the full path of the current font.
+(Note that on macOS Retina screens, Acme automatically doubles the
+font size set by the user.)
 
 newfontname must be a `fontsrv` available font
 newfontsize is size in points and can be suffixed with 'a' to use the
