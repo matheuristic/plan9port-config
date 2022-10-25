@@ -14,11 +14,11 @@ ifs='
 name = $1^/
 dir = $2^/      # size dir; e.g. '12' or '12a'
 
-mkdir -p $dir
-fontsrv -p $name^$dir^font > $dir^font
+mkdir -p $name^$dir
+fontsrv -p $name^$dir^font > $name^$dir^font
 if(! ~ $status '') exit
 fontsrv -p $name^$dir^font | 
 ssam '1d
 ,x=.* =d
-,s=.+=& > '^$dir^'&=g
+,s=.+=& > '^$name^$dir^'&=g
 ,x=^=i=fontsrv -p '''^$name^$dir^'''=' | rc

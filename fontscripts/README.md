@@ -13,6 +13,9 @@ to be rendered.
 Note that the scripts can be quite slow and generate quite a large
 font folder for fonts that have very wide Unicode coverage.
 
+- `makepresentfont.sh`: Mix different `fontsrv` vector fonts (or
+  different weights and styles) into a new Plan 9 font.
+
 - `subf_get_1_size.rc`: Get a single size of a given font. Example
   usage:
 
