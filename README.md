@@ -371,16 +371,16 @@ a number of helper scripts available at `~/.acme/bin`:
   # acme-lsp config
   # ~/.config/acme-lsp/config.toml - Linux
   # ~/Library/Preferences/Application\ Support/acme-lsp/config.toml - macOS
-  
+
   # acme-lsp source repository: https://github.com/fhs/acme-lsp
-  
+
   # Note that a relative file paths use os.UserCacheDir(), so on Linux
   # "some.log" resolves to "$HOME/.cache/acme-lsp/some.log" and on macOS
   # "some.log" resolves to "$HOME/Library/Caches/acme-lsp/some.log"
-  
+
   # See https://godoc.org/github.com/fhs/acme-lsp/internal/lsp/acmelsp/config#File
   # for more configuration options
-  
+
   [Servers]
 
   	[Servers.pylsp]
@@ -965,12 +965,12 @@ Acme also supports specification of the main and alternate font when
 running its binary from the command line via the `-f` (main font) and
 `-F` (alternate font) flags, illustrated in an earlier section.
 
-Fonts can also be specified in ways that extend the standard behavior:
+Additional notes on scaling fonts and high DPI screens (examples use
+Acme but the behavior holds similarly for other plan9port programs
+where fonts may be specified using `$font` or otherwise):
 
 - If the specified font has format `SCALE*FONT` where `SCALE` is some
-  integer, `FONT` is used scaled by pixel repetition. This can be
-  helpful for high DPI Linux systems where fonts are not automatically
-  scaled (unliked in macOS, where they are). Example:
+  integer, `FONT` is used scaled by pixel repetition. Example:
 
   ```sh
   acme -f 2*/lib/font/bit/lucsans/unicode.8.font
@@ -982,8 +982,34 @@ Fonts can also be specified in ways that extend the standard behavior:
   while other screens are low DPI. Example:
 
   ```sh
-  acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/15a/font
+  acme -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/GoRegular/16a/font
   ```
+
+- If only one font is specified, on high DPI screens the font is
+  swapped out for another (for the code, see `src/libdraw/openfont.c`
+  and `src/libdraw/init.c`). If the font is a Plan 9 bitmap font, the
+  same font 2-times scaled by pixel repetition is used. If the font is
+  a `fontsrv` vector font, the same font with double the point size is
+  used. E.g., the following two commands are effectively the same:
+
+  ```sh
+  acme -f /lib/font/bit/lucsans/euro.8.font \
+       -F /mnt/font/GoMono/9/font
+  ```
+
+  ```sh
+  acme -f /lib/font/bit/lucsans/euro.8.font,2*/lib/font/bit/lucsans/euro.8.font \
+       -F /mnt/font/GoMono/9/font,/mnt/font/GoMono/18/font
+  ```
+
+  However, it can be observed that when only one font is specified
+  with a scaling factor (`acme -f 3*/lib/font/bit/luc/unicode.9.font`)
+  then no font swapping occurs on high DPI screens.
+
+- A screen is considered high DPI if it has DPI of around 200 or more.
+  The code for whether a screen is considered high dpi is
+  `d->dpi >= DefaultDPI*(3/2)` (in `src/libdraw/openfont.c` and
+  `src/libdraw/init.c`) where `DefaultDPI=133` (in `include/draw.h`).
 
 On slower machines, using vector fonts can be slow when rendering many
 unicode characters outside the basic plane on screen. As a workaround,
