@@ -1199,6 +1199,8 @@ Version=1.0
 
 - [Just as Mario: Using the Plan9 plumber utility](https://mostlymaths.net/2013/04/just-as-mario-using-plan9-plumber.html/)
 
+- [My Acme Setup - UNOBTANIUM](https://unobtanium.de/posts/acme/)
+
 - [On Some Tools for Plan9's Acme](https://tales.mbivert.com/on-some-tools-for-plan9-acme/)
 
 - [Plan 9 Desktop Guide](https://pspodcasting.net/dan/blog/2019/plan9_desktop.html)
