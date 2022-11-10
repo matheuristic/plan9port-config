@@ -1,0 +1,3856 @@
+commit 989ecf2db1b2c5aaa21299e7c78108eb29935e11
+Author: Marius Eriksen <meriksen@fb.com>
+Date:   Tue Jan 4 12:29:12 2022 -0800
+
+    acme: acmesrv
+
+diff --git a/man/man1/acme.1 b/man/man1/acme.1
+index 3860b46..2fa8e435 100644
+--- a/man/man1/acme.1
++++ b/man/man1/acme.1
+@@ -23,6 +23,14 @@ acme, win, awd \- interactive text windows
+ .I mtpt
+ ]
+ [
++.B -R
++.I remote
++\&... ]
++[
++.B -s
++.I path
++]
++[
+ .B -l
+ .I file
+ |
+@@ -91,6 +99,14 @@ to mount itself at
+ .IR mtpt .
+ (Experimental.)
+ .PP
++The
++.B -R
++option configures a remoting path.
++A remote name is followed by ":"
++and a path to attach to the remote.
++Repeated options configure additonal paths.
++(Experimental. See below section on remoting.)
++.PP
+ .SS Windows
+ .I Acme
+ windows are in two parts: a one-line
+@@ -744,6 +760,45 @@ programs such as
+ and
+ .I awd
+ reside.
++.SS "Remoting
++Acme can transparently edit files
++and run program (including acme applications)
++on other hosts through an experimental remoting layer.
++Paths with prefixes that are attached to remotes
++(via the
++.B -R
++command line option;
++see above)
++are transparently fetched from the remote host.
++Likewise,
++programs that are run from such paths are run on the remote host.
++Programs are run in an environment
++that includes the acme 9p filesystem and the plumber.
++Thus, most acme programs will also work transparently with remoting.
++.PP
++Remoting is implemented by starting
++.IR acmesrv (1)
++on the remote host via
++.IR ssh (1).
++Acme becomes a client of this server:
++it forwards its local plumber
++and acme 9P services
++to the remote host,
++and imports the remote filesystem (also via 9P)
++for local access.
++.PP
++This results in an experience that is nearly transparent:
++remote files can be edited naturally,
++and commands invoked on these files are run on the remote host itself.
++.PP
++To automatically run a remote command other than
++.IR acmesrv (1)
++when acme establishes an
++.IR ssh (1)
++connection to the remote host, specify that command via the
++.B -s
++command line option.
++
+ .SH FILES
+ .TF $HOME/acme.dump
+ .TP
+diff --git a/src/cmd/acme/acme.c b/src/cmd/acme/acme.c
+index d001a2a8..2ebe5d3d 100644
+--- a/src/cmd/acme/acme.c
++++ b/src/cmd/acme/acme.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 	/* for generating syms in mkfile only: */
+@@ -49,6 +50,8 @@ void	shutdownthread(void*);
+ void	acmeerrorinit(void);
+ void	readfile(Column*, char*);
+ static int	shutdown(void*, char*);
++void waitrelaythread(void*);
++
+ 
+ void
+ derror(Display *d, char *errorstr)
+@@ -61,10 +64,11 @@ void
+ threadmain(int argc, char *argv[])
+ {
+ 	int i;
+-	char *p, *loadfile;
++	char *p, *q, *loadfile;
+ 	Column *c;
+ 	int ncol;
+ 	Display *d;
++	Remote *r;
+ 
+ 	rfork(RFENVG|RFNAMEG);
+ 
+@@ -119,9 +123,35 @@ threadmain(int argc, char *argv[])
+ 		if(winsize == nil)
+ 			goto Usage;
+ 		break;
++	case 's':
++		racmename = ARGF();
++		if(racmename == nil)
++			goto Usage;
++		break;
++	case 'R':
++		p = ARGF();
++		if(p == nil)
++			goto Usage;
++		q = strchr(p, ':');
++		if(q == nil)
++			goto Usage;
++		*q++ = 0;
++		for(r=remotes; r != nil; r = r->next)
++			if(strcmp(r->machine, p) == 0)
++				break;
++		if(r == nil){
++			r = emalloc(sizeof *r);
++			r->machine = estrdup(p);
++			r->next = remotes;
++			remotes = r;
++		}
++		r->nprefix++;
++		r->prefix = erealloc(r->prefix, sizeof(char*)*r->nprefix);
++		r->prefix[r->nprefix-1] = cleanname(estrdup(q));
++		break;
+ 	default:
+ 	Usage:
+-		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize\n");
++		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize -s path -R remotespec\n");
+ 		threadexitsall("usage");
+ 	}ARGEND
+ 
+@@ -184,7 +214,7 @@ threadmain(int argc, char *argv[])
+ 	timerinit();
+ 	rxinit();
+ 
+-	cwait = threadwaitchan();
++	cvwait = chancreate(sizeof(Vwaitmsg*), 0);
+ 	ccommand = chancreate(sizeof(Command**), 0);
+ 	ckill = chancreate(sizeof(Rune*), 0);
+ 	cxfidalloc = chancreate(sizeof(Xfid*), 0);
+@@ -194,10 +224,11 @@ threadmain(int argc, char *argv[])
+ 	cedit = chancreate(sizeof(int), 0);
+ 	cexit = chancreate(sizeof(int), 0);
+ 	cwarn = chancreate(sizeof(void*), 1);
+-	if(cwait==nil || ccommand==nil || ckill==nil || cxfidalloc==nil || cxfidfree==nil || cerr==nil || cexit==nil || cwarn==nil){
++	if(cvwait==nil || ccommand==nil || ckill==nil || cxfidalloc==nil || cxfidfree==nil || cerr==nil || cexit==nil || cwarn==nil){
+ 		fprint(2, "acme: can't create initial channels: %r\n");
+ 		threadexitsall("channels");
+ 	}
++	chansetname(cvwait, "cvwait");
+ 	chansetname(ccommand, "ccommand");
+ 	chansetname(ckill, "ckill");
+ 	chansetname(cxfidalloc, "cxfidalloc");
+@@ -226,7 +257,7 @@ threadmain(int argc, char *argv[])
+ 	if(plumbeditfd < 0)
+ 		fprint(2, "acme: can't initialize plumber: %r\n");
+ 	else{
+-		cplumb = chancreate(sizeof(Plumbmsg*), 0);
++		cplumb = chancreate(sizeof(Plumbmsg*), 0); g
+ 		threadcreate(plumbproc, nil, STACK);
+ 	}
+ 	plumbsendfd = plumbopen("send", OWRITE|OCEXEC);
+@@ -275,6 +306,7 @@ threadmain(int argc, char *argv[])
+ 	threadcreate(xfidallocthread, nil, STACK);
+ 	threadcreate(newwindowthread, nil, STACK);
+ /*	threadcreate(shutdownthread, nil, STACK); */
++	threadcreate(waitrelaythread, nil, STACK);
+ 	threadnotify(shutdown, 1);
+ 	recvul(cexit);
+ 	killprocs();
+@@ -364,6 +396,25 @@ shutdownthread(void *v)
+ }
+ */
+ 
++void
++waitrelaythread(void *v)
++{
++	Channel *c;
++	Waitmsg *w;
++	Vwaitmsg *vw;
++	USED(v);
++
++	c = threadwaitchan();
++	for(;;){
++		w = recvp(c);
++		vw = emalloc(sizeof *vw);
++		vw->vp.id = w->pid;
++		vw->msg = estrdup(w->msg);
++		free(w);
++		sendp(cvwait, vw);
++	}
++}
++
+ void
+ killprocs(void)
+ {
+@@ -374,7 +425,7 @@ killprocs(void)
+ /*		flushimage(display, 1); */
+ 
+ 	for(c=command; c; c=c->next)
+-		postnote(PNGROUP, c->pid, "hangup");
++		vpostnote(c->vp, "hangup");
+ }
+ 
+ static int errorfd;
+@@ -691,9 +742,9 @@ struct Pid
+ void
+ waitthread(void *v)
+ {
+-	Waitmsg *w;
++	Vwaitmsg *vw;
+ 	Command *c, *lc;
+-	uint pid;
++	Vpid vp;
+ 	int found, ncmd;
+ 	Rune *cmd;
+ 	char *err;
+@@ -711,8 +762,8 @@ waitthread(void *v)
+ 	alts[WKill].c = ckill;
+ 	alts[WKill].v = &cmd;
+ 	alts[WKill].op = CHANRCV;
+-	alts[WWait].c = cwait;
+-	alts[WWait].v = &w;
++	alts[WWait].c = cvwait;
++	alts[WWait].v = &vw;
+ 	alts[WWait].op = CHANRCV;
+ 	alts[WCmd].c = ccommand;
+ 	alts[WCmd].v = &c;
+@@ -735,7 +786,7 @@ waitthread(void *v)
+ 			for(c=command; c; c=c->next){
+ 				/* -1 for blank */
+ 				if(runeeq(c->name, c->nname-1, cmd, ncmd) == TRUE){
+-					if(postnote(PNGROUP, c->pid, "kill") < 0)
++					if(vpostnote(c->vp, "kill") < 0)
+ 						warning(nil, "kill %S: %r\n", cmd);
+ 					found = TRUE;
+ 				}
+@@ -745,10 +796,10 @@ waitthread(void *v)
+ 			free(cmd);
+ 			break;
+ 		case WWait:
+-			pid = w->pid;
++			vp = vw->vp;
+ 			lc = nil;
+ 			for(c=command; c; c=c->next){
+-				if(c->pid == pid){
++				if(vpcmp(c->vp, vp)==0){
+ 					if(lc)
+ 						lc->next = c->next;
+ 					else
+@@ -762,10 +813,10 @@ waitthread(void *v)
+ 			textcommit(t, TRUE);
+ 			if(c == nil){
+ 				/* helper processes use this exit status */
+-				if(strncmp(w->msg, "libthread", 9) != 0){
++				if(vp.sess == nil && strncmp(vw->msg, "libthread", 9) != 0){
+ 					p = emalloc(sizeof(Pid));
+-					p->pid = pid;
+-					strncpy(p->msg, w->msg, sizeof(p->msg));
++					p->pid = vp.id;
++					strncpy(p->msg, vw->msg, sizeof(p->msg));
+ 					p->next = pids;
+ 					pids = p;
+ 				}
+@@ -774,14 +825,18 @@ waitthread(void *v)
+ 					textdelete(t, t->q0, t->q1, TRUE);
+ 					textsetselect(t, 0, 0);
+ 				}
+-				if(w->msg[0])
+-					warning(c->md, "%.*S: exit %s\n", c->nname-1, c->name, w->msg);
++				if(vw->msg[0])
++					warning(c->md, "%.*S: exit %s\n", c->nname-1, c->name, vw->msg);
+ 				flushimage(display, 1);
+ 			}
+ 			qunlock(&row.lk);
+-			free(w);
++			free(vw->msg);
++			rclose(vp.sess);  /* XXX hack: session management should be better encapsulated.*/
++			free(vw);
+     Freecmd:
+-			if(c){
++    			if(c){
++    				if(c->sess)
++    					sendp(c->sess->errorc, nil);
+ 				if(c->iseditcmd)
+ 					sendul(cedit, 0);
+ 				free(c->text);
+@@ -793,8 +848,8 @@ waitthread(void *v)
+ 		case WCmd:
+ 			/* has this command already exited? */
+ 			lastp = nil;
+-			for(p=pids; p!=nil; p=p->next){
+-				if(p->pid == c->pid){
++			for(p=pids; c->vp.sess == nil && p!=nil; p=p->next){
++				if(p->pid == c->vp.id){
+ 					if(p->msg[0])
+ 						warning(c->md, "%s\n", p->msg);
+ 					if(lastp == nil)
+diff --git a/src/cmd/acme/acmesrv/cmdfs.c b/src/cmd/acme/acmesrv/cmdfs.c
+new file mode 100644
+index 00000000..c11c8662
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/cmdfs.c
+@@ -0,0 +1,675 @@
++#include <u.h>
++#include <libc.h>
++#include <thread.h>
++#include <fcall.h>
++#include <9p.h>
++#include "dat.h"
++#include "fns.h"
++
++/*
++
++	BUG: There are too many roundtrips to execute simple commands.
++
++*/
++
++enum
++{
++	Qdir,
++	Qnew,
++	Qcmd,
++
++	QCctl,
++	QCstdin,
++	QCstdout,
++	QCstderr,
++	QCwait,
++};
++
++enum
++{
++	Ctlerr,
++	Ctlenv,
++	Ctlcmd,
++	Ctldir,
++
++	Ctlstart,
++	Ctleof,
++	Ctlnote,
++	Ctldel,
++};
++
++enum
++{
++	Ioread,
++	Iowrite,
++	Iowait,
++};
++
++typedef struct Cmd Cmd;
++typedef struct Env Env;
++typedef struct Dirtab Dirtab;
++typedef struct Xfid Xfid;
++typedef struct Io Io;
++
++struct Dirtab
++{
++	char	*name;
++	uchar	type;
++	uint	qid;
++	uint	perm;
++};
++
++struct Xfid
++{
++	Cmd *c;
++	Dirtab dir;
++};
++
++struct Cmd
++{
++	int ref; /* protected by cmdlk */
++
++	int id;
++	int pid;
++
++	char *body;
++	char *dir;
++
++	Env *env;
++
++	/* stdio pipes: */
++	int stdin[2];
++	int stdout[2];
++	int stderr[2];
++
++	Channel *waitc;
++
++	Cmd *next;
++};
++
++struct Env
++{
++	char *name;
++	char *value;
++	Env *next;
++};
++
++struct Io
++{
++	Req *r;
++	Channel *waitc;
++	int op;
++	int fd;
++};
++
++static char *fsowner;
++static Channel *cwait;
++
++static QLock cmdlk;
++static Cmd *cmdlist;
++static int cmdnum;
++
++static Dirtab dirtab[] = {
++	{".",			QTDIR,	Qdir,		0500|DMDIR},
++	{"new",		QTDIR,	Qnew,	0500|DMDIR},
++};
++
++/* write commands into ctl, e.g., "start" */
++/* ctl shows status */
++
++static Dirtab dirtabc[] = {
++	{".",			QTDIR,		Qdir,			0500|DMDIR},
++	{"ctl",		QTAPPEND,	QCctl,		0600},
++	{"stdin",		QTAPPEND,	QCstdin,		0200|DMAPPEND},
++	{"stdout",		QTFILE,		QCstdout,		0400},
++	{"stderr",		QTFILE,		QCstderr,		0400},
++	{"wait",		QTFILE,		QCwait,		0400},
++};
++
++static void		dostat(Xfid*, Dir*, Qid*);
++static Dirtab* 	finddir(Dirtab*, int, char*);
++static int 		dodirgen(int i, Dir *d, void *v);
++static void		printstr(Req*, char*, ...);
++static int		writestr(Req*, char**);
++static char*	cmdctl(Cmd*, int, char*);
++static void		waitproc(void*);
++
++static void		io(Req*, int, int);
++static void		waitio(Req*, Channel*);
++static void		xioproc(void*);
++
++static Cmd*	newcmd();
++static Cmd* 	findcmd(int which);
++static Cmd* 	findcmdpid(int pid);
++static void		decrcmd(Cmd*);
++
++static void
++fsattach(Req *r)
++{
++	Xfid *xfid;
++
++	xfid = emalloc(sizeof *xfid);
++	xfid->dir = dirtab[0];
++	r->fid->aux = xfid;
++	dostat(xfid, nil, &r->fid->qid);
++	r->ofcall.qid = r->fid->qid;
++	respond(r, nil);
++}
++
++static void
++fsstat(Req *r)
++{
++	dostat(r->fid->aux, &r->d, nil);
++	respond(r, nil);
++}
++
++static void
++fsopen(Req *r)
++{
++	respond(r, nil);
++}
++
++static void
++fsread(Req *r)
++{
++	Xfid *xfid;
++
++	xfid = r->fid->aux;
++	switch(xfid->dir.qid){
++	case Qdir:
++		dirread9p(r, dodirgen, xfid);
++		break;
++	case QCctl:
++		printstr(r, "%d %d", xfid->c->id, xfid->c->pid);
++		break;
++	case QCstdout:
++		io(r, xfid->c->stdout[0], Ioread);
++		return;
++	case QCstderr:
++		io(r, xfid->c->stderr[0], Ioread);
++		return;
++	case QCwait:
++		waitio(r, xfid->c->waitc);
++		return;
++	default:
++		respond(r, "bug");
++		return;
++	}
++	respond(r, nil);
++}
++
++static void
++fswrite(Req *r)
++{
++	Xfid *xfid;
++	char *p, *q, *err;
++	int ctl;
++
++	xfid = r->fid->aux;
++	p = nil;
++	err = nil;
++
++	switch(xfid->dir.qid){
++	case QCctl:
++		writestr(r, &p);
++		ctl = Ctlerr;
++		if(strcmp(p, "start") == 0)
++			ctl = Ctlstart;
++		else if(strcmp(p, "eof") == 0)
++			ctl = Ctleof;
++		else if(strcmp(p, "del") == 0)
++			ctl = Ctldel;
++		else{
++			q = strchr(p, ' ');
++			if(q == nil)
++				goto Ctldone;
++			*q++ = 0;
++			if(strcmp(p, "env") == 0)
++				ctl = Ctlenv;
++			else if(strcmp(p, "dir") == 0)
++				ctl = Ctldir;
++			else if(strcmp(p, "cmd") == 0)
++				ctl = Ctlcmd;
++			else if(strcmp(p, "note") == 0)
++				ctl = Ctlnote;
++		}
++
++Ctldone:
++		if(ctl == Ctlerr){
++			free(p);
++			respond(r, "bad command");
++			return;
++		}
++		err = cmdctl(xfid->c, ctl, q);
++		free(p);
++		break;
++	case QCstdin:
++		io(r, xfid->c->stdin[0], Iowrite);
++		return;
++	}
++	respond(r, err);
++}
++
++
++static char*
++fswalk1(Fid *fid, char *name, Qid *qid)
++{
++	Xfid *xfid;
++	Dirtab *dir;
++	char *q;
++	int i;
++	Cmd *c;
++
++	xfid = fid->aux;
++	dir = nil;
++
++	if(strcmp(name, "..") == 0){
++		decrcmd(xfid->c);
++		xfid->c = nil;
++		dir = &dirtab[0];
++	}else if(xfid->c)
++		dir = finddir(dirtabc, nelem(dirtabc), name);
++	else if((dir = finddir(dirtab, nelem(dirtab), name)) != nil){
++		if(dir->qid != Qnew)
++			goto Found;
++		c = newcmd();
++		xfid->c = c;
++		dir = &dirtabc[0];
++	}else{
++		i = strtoul(name, &q, 10);
++		if(q == name)
++			goto Notfound;
++		xfid->c = findcmd(i);
++		if(xfid->c == nil)
++			goto Notfound;
++		dir = &dirtabc[0];
++	}
++	if(dir == nil)
++		goto Notfound;
++Found:
++	xfid->dir = *dir;
++	dostat(xfid, nil, qid);
++	return nil;
++
++Notfound:
++	return "no such file";
++}
++
++static char*
++fsclone(Fid *oldfid, Fid *newfid)
++{
++	Xfid *oldxfid, *newxfid;
++
++	oldxfid = oldfid->aux;
++	newxfid = emalloc(sizeof *newxfid);
++	*newxfid = *oldxfid;
++	if(newxfid->c){
++		qlock(&cmdlk);
++		newxfid->c->ref++;
++		qunlock(&cmdlk);
++	}
++	newfid->aux = newxfid;
++	return nil;
++}
++
++static void
++fsdestroyfid(Fid *fid)
++{
++	Xfid *xfid;
++
++	xfid = fid->aux;
++	if(xfid == nil)
++		return;
++
++	decrcmd(xfid->c);
++	free(xfid);
++}
++
++static void
++dostat(Xfid *xfid, Dir *d, Qid *q)
++{
++	Qid qid;
++
++	qid.path = xfid->dir.qid;
++	if(xfid->c)
++		qid.path |= xfid->c->id << 8;
++	qid.type = xfid->dir.type;
++	qid.vers = 0;
++
++	if(d){
++		d->name = estrdup(xfid->dir.name);
++		d->muid = estrdup("muid");
++		d->mode = xfid->dir.perm;
++		d->uid = estrdup(fsowner);
++		d->gid = estrdup(fsowner);
++		d->length = 0;
++		d->qid = qid;
++	}
++	if(q)
++		*q = qid;
++}
++
++static Dirtab*
++finddir(Dirtab *tab, int n, char *name)
++{
++	int i;
++	for(i=0; i<n; i++)
++	if(strcmp(tab[i].name, name) == 0)
++		return &tab[i];
++	return nil;
++}
++
++static int
++dodirgen(int i, Dir *d, void *v)
++{
++	Xfid *xfid, dxfid;
++
++	xfid = v;
++
++	if(xfid->c){
++		if(i >= nelem(dirtabc))
++			return -1;
++		dxfid.c = xfid->c;
++		dxfid.dir = dirtabc[i];
++	}else{
++		/* TODO: enumerate commands */
++		if(i >= nelem(dirtab))
++			return -1;
++		dxfid.c = nil;
++		dxfid.dir = dirtab[i];
++	}
++	dostat(&dxfid, d, nil);
++	return 0;
++}
++
++static void
++printstr(Req *r, char *fmt, ...)
++{
++	va_list arg;
++
++	va_start(arg, fmt);
++	r->ofcall.count = vsnprint(r->ofcall.data, r->ifcall.count, fmt, arg);
++	va_end(arg);
++
++	memmove(
++		r->ofcall.data,
++		r->ofcall.data + r->ifcall.offset,
++		r->ofcall.count - r->ifcall.offset);
++	r->ofcall.count -= r->ifcall.offset;
++}
++
++static int
++writestr(Req *r, char **p)
++{
++	int n;
++	if(*p)
++		n = strlen(*p);
++	else
++		n = 0;
++
++	*p = erealloc(*p, n+r->ifcall.count+1);
++	memmove(*p+n, r->ifcall.data, r->ifcall.count);
++	(*p)[n+r->ifcall.count] = 0;
++	r->ofcall.count = r->ifcall.count;
++	return r->ifcall.count;
++}
++
++static void
++xioproc(void *v)
++{
++	Io *io;
++	Waitmsg *w;
++	char err[ERRMAX];
++
++	io = v;
++	switch(io->op){
++	case Ioread:
++		io->r->ofcall.count =
++			read(io->fd, io->r->ofcall.data, io->r->ifcall.count);
++		break;
++	case Iowrite:
++		io->r->ofcall.count =
++			write(io->fd, io->r->ifcall.data, io->r->ifcall.count);
++		break;
++	case Iowait:
++		w = recvp(io->waitc);
++		readstr(io->r, w->msg);
++		sendp(io->waitc, w);
++		break;
++	}
++	if(io->r->ofcall.count < 0){
++		io->r->ofcall.count = 0;
++		rerrstr(err, sizeof(err));
++		respond(io->r, err);
++	}else
++		respond(io->r, nil);
++
++	free(io);
++}
++
++static void
++io(Req *r, int fd, int op)
++{
++	Io *io;
++	io = emalloc(sizeof *io);
++	io->r = r;
++	io->fd = fd;
++	io->op = op;
++	proccreate(xioproc, io, 8192);
++}
++
++static void
++waitio(Req *r, Channel *c)
++{
++	Io *io;
++	io = emalloc(sizeof *io);
++	io->r = r;
++	io->op = Iowait;
++	io->waitc = c;
++	proccreate(xioproc, io, 8192);
++}
++
++static char*
++cmdctl(Cmd *c, int ctl, char *arg)
++{
++	char *rcarg[4], *q;
++	int cfd[3];
++	Waitmsg *w;
++	Env *env;
++
++	switch(ctl){
++	case Ctlenv:
++		q = strchr(arg, '=');
++		if(q == nil)
++			return "invalid env";
++		*q++ = 0;
++		for(env=c->env; env && strcmp(env->name, arg)!=0; env=env->next);
++		if(env){
++			free(env->value);
++			env->value = estrdup(q);
++		}else{
++			env = emalloc(sizeof *env);
++			env->name = estrdup(arg);
++			env->value = estrdup(q);
++			env->next = c->env;
++			c->env = env;
++		}
++		break;
++	case Ctlcmd:
++		if(c->body)
++			free(c->body);
++		c->body = estrdup(arg);
++		break;
++	case Ctldir:
++		if(c->dir)
++			free(c->dir);
++		c->dir = estrdup(arg);
++		break;
++	case Ctlstart:
++		rcarg[0] = "rc";
++		rcarg[1] = "-c";
++		rcarg[2] = c->body;
++		rcarg[3] = nil;
++
++		cfd[0] = c->stdin[1];
++		cfd[1] = c->stdout[1];
++		cfd[2] = c->stderr[1];
++		for(env=c->env; env; env=env->next)
++			putenv(env->name, env->value);
++		rfork(RFFDG|RFNOTEG);
++		c->pid = threadspawnd(cfd, rcarg[0], rcarg, c->dir);
++		if(c->pid < 0){
++			w = emalloc(sizeof *w);
++			w->pid = -1;
++			w->time[0] = w->time[1] = w->time[2] = time(nil);
++			w->msg = "failed to start";
++			close(cfd[0]);
++			close(cfd[1]);
++			close(cfd[2]);
++			sendp(c->waitc, w);
++		}
++		break;
++	case Ctleof:
++		close(c->stdin[0]);
++		break;
++	case Ctlnote:
++		if(postnote(PNGROUP, c->pid, arg) < 0)
++			return "could not kill process";
++		break;
++	case Ctldel:
++		decrcmd(c);
++		break;
++	}
++	return nil;
++}
++
++static void
++waitproc(void *v)
++{
++	Waitmsg *w;
++	Cmd *c;
++
++	threadsetname("waitproc");
++
++	USED(v);
++
++	for(;;){
++		w = recvp(cwait);
++		c = findcmdpid(w->pid);
++		if(c == nil)
++			continue;
++		sendp(c->waitc, w);
++		decrcmd(c);
++	}
++
++}
++
++static Cmd*
++newcmd()
++{
++	Cmd *c;
++
++	c = emalloc(sizeof *c);
++	c->ref = 2; /* one for wait, one for the caller */
++	c->id = ++cmdnum;
++	c->waitc = chancreate(sizeof(Waitmsg*), 1);
++	c->pid = -1;
++	if(pipe(c->stdin) < 0 || pipe(c->stdout) < 0 || pipe(c->stderr) < 0)
++		sysfatal("can't create pipe");
++	qlock(&cmdlk);
++	c->next = cmdlist;
++	cmdlist = c;
++	qunlock(&cmdlk);
++	return c;
++}
++
++static Cmd*
++findcmd(int id)
++{
++	Cmd *c;
++	if(id == 0)
++		return nil;
++	qlock(&cmdlk);
++	for(c=cmdlist; c; c=c->next)
++		if(c->id == id)
++			break;
++	if(c != nil)
++		c->ref++;
++	qunlock(&cmdlk);
++	return c;
++}
++
++static Cmd*
++findcmdpid(int pid)
++{
++	Cmd *c;
++	qlock(&cmdlk);
++	for(c=cmdlist; c; c=c->next)
++		if(c->pid == pid)
++			break;
++	if(c != nil)
++		c->ref++;
++	qunlock(&cmdlk);
++	return c;
++}
++
++static void
++decrcmd(Cmd *c)
++{
++	Cmd **p;
++	Env *e;
++
++	if(c == nil)
++		return;
++	qlock(&cmdlk);
++	if(--c->ref > 0){
++		qunlock(&cmdlk);
++		return;
++	}
++	for(p = &cmdlist; *p; p=&(*p)->next)
++		if(*p == c)
++			break;
++	if(*p)
++		*p = (*p)->next;
++	qunlock(&cmdlk);
++
++	free(c->body);
++	free(c->dir);
++	while(c->env){
++		e = c->env->next;
++		free(c->env);
++		c->env = e;
++	}
++	close(c->stdin[0]);
++	close(c->stdout[0]);
++	close(c->stderr[0]);
++	chanfree(c->waitc);
++	free(c);
++}
++
++
++static void
++fsstart()
++{
++	cwait = threadwaitchan();
++	proccreate(waitproc, cwait, 8192);
++}
++
++static Srv fs = {
++	.attach = fsattach,
++	.stat = fsstat,
++	.open = fsopen,
++	.read = fsread,
++	.write = fswrite,
++	.walk1 = fswalk1,
++	.clone = fsclone,
++	.destroyfid = fsdestroyfid,
++	.start = fsstart,
++};
++
++Srv*
++cmdfsinit(char *owner)
++{
++	fsowner = owner;
++	return &fs;
++}
+diff --git a/src/cmd/acme/acmesrv/dat.h b/src/cmd/acme/acmesrv/dat.h
+new file mode 100644
+index 00000000..1da357da
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/dat.h
+@@ -0,0 +1,10 @@
++#define estrdup	estrdup9p
++#define emalloc	emalloc9p
++int 		debug;
++
++enum
++{
++	FALSE,
++	TRUE,
++	XXX
++};
+diff --git a/src/cmd/acme/acmesrv/exportfs.c b/src/cmd/acme/acmesrv/exportfs.c
+new file mode 100644
+index 00000000..cd883118
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/exportfs.c
+@@ -0,0 +1,331 @@
++#include <u.h>
++#include <libc.h>
++#include <thread.h>
++#include <fcall.h>
++#include <9p.h>
++
++#include "dat.h"
++
++struct Efid
++{
++	char *file;
++	int open;
++	int fd;
++};
++
++struct Dirread
++{
++	long n;
++	Dir *dir;
++};
++
++typedef struct Efid Efid;
++typedef struct Dirread Dirread;
++
++char	Ename[] = "illegal name";
++
++static void dircopy(Dir*, Dir*);
++static Efid* newefid(char *file);
++static int dostat(Efid *efid, Qid *qid, Dir *dir);
++static char* pathprint(char *fmt, ...);
++static int dodirgen(int i, Dir *d, void *v);
++static void responderrstr(Req *r);
++
++static Srv 		fs;
++static char 	*fsroot;
++static char 	*fsowner;
++
++static void
++fsattach(Req *r)
++{
++	Efid *efid;
++
++	efid = newefid(fsroot);
++	r->fid->aux = efid;
++	if(dostat(efid, &r->ofcall.qid, nil) < 0){
++		responderrstr(r);
++		return;
++	}
++	r->fid->qid = r->ofcall.qid;
++	respond(r, nil);
++}
++
++static void
++fsstat(Req *r)
++{
++	if(dostat(r->fid->aux, nil, &r->d) < 0){
++		responderrstr(r);
++		return;
++	}
++	respond(r, nil);
++}
++
++static char*
++fswalk1(Fid *fid, char *name, Qid *qid)
++{
++	Efid *efid;
++	char *file, *err;
++
++	err = nil;
++
++	efid = fid->aux;
++	file = pathprint("%s/%s", efid->file, name);
++	if(strlen(file) < strlen(fsroot))
++		strcpy(file, fsroot);
++
++	free(efid->file);
++	efid->file = file;
++	if(dostat(efid, qid, nil) < 0) {
++		err = "could not walk";
++	}
++	fid->qid = *qid;
++	return err;
++}
++
++static void
++fsopen(Req *r)
++{
++	int fd;
++	Efid *efid;
++
++	efid = r->fid->aux;
++	if(efid->open){
++		respond(r, "already open");
++		return;
++	}
++
++	fd = open(efid->file, r->ifcall.mode);
++	if(fd < 0){
++		respond(r, "can't open file");
++		return;
++	}
++
++	efid->open = TRUE;
++	efid->fd = fd;
++	r->ofcall.qid = r->fid->qid;
++	respond(r, nil);
++}
++
++static void
++fscreate(Req *r)
++{
++	Efid *efid;
++	char *file;
++	int fd;
++
++	efid = r->fid->aux;
++
++	if(strcmp(r->ifcall.name, ".") == 0 || strcmp(r->ifcall.name, "..") == 0){
++		respond(r, Ename);
++		return;
++	}
++
++	file = pathprint("%s/%s", efid->file, r->ifcall.name);
++	fd = create(file, r->ifcall.mode, r->ifcall.perm);
++	if(fd < 0){
++		responderrstr(r);
++		return;
++	}
++	free(efid->file);
++	efid->file = file;
++	if(dostat(efid, &r->ofcall.qid, nil) < 0){
++		responderrstr(r);
++		close(fd);
++		return;
++	}
++	r->fid->qid = r->ofcall.qid;
++	efid->open = TRUE;  /* what about ORCLOSE? */
++	efid->fd = fd;
++	respond(r, nil);
++}
++
++static void
++fsread(Req *r)
++{
++	Efid *efid;
++	char *err;
++	int n;
++	Dirread *dr;
++
++	err = nil;
++	efid = r->fid->aux;
++
++	if(r->fid->qid.type&QTDIR){
++		n = seek(efid->fd, 0, 0);
++		if(n != 0){
++			err = "could not seek";
++			goto Done;
++		}
++		dr = emalloc(sizeof *dr);
++		dr->n = dirreadall(efid->fd, &dr->dir);
++		if(dr->n < 0){
++			free(dr);
++			err = "could not dirread";
++			goto Done;
++		}
++		dirread9p(r, dodirgen, dr);
++	}else{
++		n = pread(efid->fd, r->ofcall.data, r->ifcall.count, r->ifcall.offset);
++		if(debug)
++			fprint(2, "pread %d %d %d = %d", r->ofcall.data, r->ifcall.count, r->ifcall.offset, n);
++		/* TODO: errstr? */
++		if(n < 0)
++			n = 0;
++		r->ofcall.count = n;
++	}
++Done:
++	respond(r, err);
++}
++
++static void
++fswrite(Req *r)
++{
++	Efid *efid;
++	int n;
++
++	efid = r->fid->aux;
++
++	if(r->fid->qid.type&QTDIR){
++		respond(r, "cannot write directory");
++		return;
++	}
++
++	n = pwrite(efid->fd, r->ifcall.data, r->ifcall.count, r->ifcall.offset);
++	if(n < 0){
++		respond(r, "cannot write");
++		return;
++	}
++	r->ofcall.count = n;
++	respond(r, nil);
++}
++
++static char*
++fsclone(Fid *oldfid, Fid *newfid)
++{
++	Efid *oldefid, *newefid;
++
++	oldefid = oldfid->aux;
++	if(oldefid == nil)
++		return nil;
++
++	newefid = emalloc(sizeof *newefid);
++	newefid->open = FALSE;
++	newefid->file = estrdup(oldefid->file);
++	newfid->aux = newefid;
++	return nil;
++}
++
++static void
++fsdestroyfid(Fid *fid)
++{
++	Efid *efid;
++
++	if(debug)
++		fprint(2, "destroy fid %d\n", fid->fid);
++
++	if(fid->aux == nil)
++		return;
++
++	efid = fid->aux;
++	/* TODO: what happens when you clone an open fid?
++	  Is that allowed?
++	*/
++	if(efid->open)
++		close(efid->fd);
++
++	free(efid->file);
++	free(efid);
++}
++
++Srv*
++exportfsinit(char *root, char *owner)
++{
++	fsroot = root;
++	fsowner = owner;
++	fs.attach = fsattach;
++	fs.walk1 = fswalk1;
++	fs.stat = fsstat;
++	fs.read = fsread;
++	fs.write = fswrite;
++	fs.open = fsopen;
++	fs.create = fscreate;
++	fs.clone = fsclone;
++	fs.destroyfid = fsdestroyfid;
++	return &fs;
++}
++
++
++static void
++dircopy(Dir *dst, Dir *src)
++{
++	*dst = *src;
++	dst->name = estrdup(dst->name);
++	dst->uid = estrdup(dst->uid);
++	dst->gid = estrdup(dst->gid);
++	dst->muid = estrdup(dst->muid);
++}
++
++static int
++dostat(Efid *efid, Qid *qid, Dir *dir)
++{
++	Dir *d;
++
++	d = dirstat(efid->file);
++	if(d == nil)
++		return -1;
++	if(qid != nil)
++		*qid = d->qid;
++	if(dir != nil){
++		dircopy(dir, d);
++		if(strcmp(efid->file, fsroot) == 0){
++			free(dir->name);
++			dir->name = estrdup("/");
++		}
++	}
++	free(d);
++	return 0;
++}
++
++static int
++dodirgen(int i, Dir *d, void *v)
++{
++	Dirread *dr;
++
++	dr = v;
++
++	if(i >= dr->n){
++		free(dr->dir);
++		return -1;
++	}
++	dircopy(d, &dr->dir[i]);
++	return 0;
++}
++
++static char*
++pathprint(char *fmt, ...)
++{
++	va_list args;
++	char *v;
++
++	va_start(args, fmt);
++	v = vsmprint(fmt, args);
++	va_end(args);
++	return cleanname(v);
++}
++
++static Efid*
++newefid(char *file)
++{
++	Efid *efid;
++	efid = emalloc(sizeof *efid);
++	efid->file = estrdup(file);
++	return efid;
++}
++
++static void responderrstr(Req *r)
++{
++	char err[ERRMAX];
++
++	rerrstr(err, sizeof err);
++	respond(r, err);
++}
+diff --git a/src/cmd/acme/acmesrv/fns.h b/src/cmd/acme/acmesrv/fns.h
+new file mode 100644
+index 00000000..5b4cbbc2
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/fns.h
+@@ -0,0 +1,5 @@
++Srv*	exportfsinit(char *root, char *owner);
++Srv*	cmdfsinit(char *owner);
++
++void*	erealloc(void*, uint);
++
+diff --git a/src/cmd/acme/acmesrv/main.c b/src/cmd/acme/acmesrv/main.c
+new file mode 100644
+index 00000000..81e55ac9
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/main.c
+@@ -0,0 +1,221 @@
++#include <u.h>
++#include <libc.h>
++#include <thread.h>
++#include <fcall.h>
++#include <9p.h>
++#include "dat.h"
++#include "fns.h"
++
++enum
++{
++	STACK = 65536,
++};
++
++QLock	writelk;
++
++void		muxin(void*);
++void		muxout(void*);
++int		post(char *srv);
++void		fatal(char *fmt, ...);
++void		makedir(char*);
++
++int muxfds[4];
++
++void
++usage()
++{
++	fprint(2, "usage: acmesrv [-D] [-d] [-f] [-p exportfs] [-p cmdfs] [-n namespace]\n");
++	threadexitsall("usage");
++}
++
++void
++threadmain(int argc, char *argv[])
++{
++	char *postname, *ns;
++	Srv *exportfs, *cmdfs, *postfs;
++	int p[2], i, foreground;
++
++	debug = FALSE;
++	postname = nil;
++	postfs = nil;
++	foreground = FALSE;
++	ns = nil;
++
++	fmtinstall('D', dirfmt);
++	fmtinstall('M', dirmodefmt);
++
++	ARGBEGIN{
++	default:
++		usage();
++	case 'D':
++		chatty9p++;
++		break;
++	case 'd':
++		debug = TRUE;
++		break;
++	case 'p':
++		postname = EARGF(usage());
++		break;
++	case 'f':
++		foreground = TRUE;
++		break;
++	case 'n':
++		ns = EARGF(usage());
++		break;
++	}ARGEND
++
++	if(argc != 0)
++		usage();
++
++	if(ns != nil){
++		p9putenv("NAMESPACE", ns);
++		makedir(ns);
++	}
++
++	exportfs = exportfsinit("/", getuser());
++	cmdfs = cmdfsinit(getuser());
++
++	if(postname != nil){
++		if(strcmp(postname, "exportfs") == 0)
++			postfs = exportfs;
++		else if(strcmp(postname, "cmdfs") == 0)
++			postfs = cmdfs;
++		else
++			usage();
++
++		postfs->foreground = foreground;
++		threadpostmountsrv(postfs, postname, nil, MREPL|MCREATE);
++		if(postfs->foreground)
++			threadexitsall(nil);
++		else
++			threadexits(nil);
++	}
++
++	if(pipe(p) < 0)
++		threadexitsall("pipe");
++	muxfds[0] = p[0];
++	exportfs->nopipe = TRUE;
++	exportfs->infd = p[1];
++	exportfs->outfd = p[1];
++	threadpostmountsrv(exportfs, nil, nil, MREPL|MCREATE);
++
++	if(pipe(p) < 0)
++		threadexitsall("pipe");
++	muxfds[1] = p[0];
++	cmdfs->nopipe = TRUE;
++	cmdfs->infd = p[1];
++	cmdfs->outfd = p[1];
++	threadpostmountsrv(cmdfs, nil, nil, MREPL|MCREATE);
++
++	muxfds[2] = post("plumb");
++	muxfds[3] = post("acme");
++
++	/* ready to go */
++	write(1, "OK", 2);
++
++	for(i=0; i<nelem(muxfds); i++)
++		proccreate(muxout, (void*)(uintptr)i, STACK);
++
++	muxin(nil);
++
++	threadexitsall("EOF");
++}
++
++void
++muxin(void *v)
++{
++	USED(v);
++	char buf[8192], dest;
++	int n;
++
++	for(;;){
++		if(readn(0, &dest, 1) != 1)
++			break;
++		if(dest >= nelem(muxfds))
++			threadexitsall("invalid mux");
++		if((n = read9pmsg(0, buf, sizeof(buf))) < 0)
++			threadexitsall("invalid 9p message");
++		if(write(muxfds[(int)dest], buf, n) != n)
++			break;
++	}
++
++	free(buf);
++}
++
++void
++muxout(void *v)
++{
++	/* args: */
++		int dest;
++	/* end of args */
++	int fd;
++	char buf[8192+1];
++	int n, ret;
++
++	dest = (uintptr)v;
++	fd = muxfds[dest];
++
++	for(;;){
++		if((n = read9pmsg(fd, buf+1, sizeof(buf)-1)) < 0)
++			threadexitsall("invalid 9p message");
++		buf[0] = dest;
++		qlock(&writelk);
++		ret = write(1, buf, n+1);
++		qunlock(&writelk);
++		if(ret != n+1)
++			break;
++	}
++
++	free(buf);
++}
++
++int
++post(char *srv)
++{
++	int p[2];
++
++	if(pipe(p) < 0)
++		fatal("can't create pipe: %r");
++
++	if(post9pservice(p[1], srv, nil) < 0)
++		fatal("post9pservice %s: %r", srv);
++	close(p[1]);
++
++	return p[0];
++}
++
++void*
++erealloc(void *p, uint n)
++{
++	p = realloc(p, n);
++	if(p == nil)
++		sysfatal("realloc failed");
++	setmalloctag(p, getcallerpc(&n));
++	return p;
++}
++
++void
++fatal(char *fmt, ...)
++{
++	char buf[256];
++	va_list arg;
++
++	va_start(arg, fmt);
++	vseprint(buf, buf+sizeof buf, fmt, arg);
++	va_end(arg);
++
++	fprint(2, "%s: %s\n", argv0 ? argv0 : "<prog>", buf);
++	threadexitsall("fatal");
++}
++
++void
++makedir(char *s)
++{
++	int fd;
++
++	if(access(s, AEXIST) == 0)
++		return;
++	fd = create(s, OREAD, DMDIR | 0777L);
++	if(fd >= 0)
++		close(fd);
++}
+\ No newline at end of file
+diff --git a/src/cmd/acme/acmesrv/mkfile b/src/cmd/acme/acmesrv/mkfile
+new file mode 100644
+index 00000000..98c253ff
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/mkfile
+@@ -0,0 +1,12 @@
++<$PLAN9/src/mkhdr
++
++TARG=acmesrv
++OFILES=\
++		exportfs.$O\
++		cmdfs.$O\
++		main.$O
++
++HFILES=dat.h fns.h
++
++<$PLAN9/src/mkone
++
+diff --git a/src/cmd/acme/acmesrv/slow.acmesrv b/src/cmd/acme/acmesrv/slow.acmesrv
+new file mode 100644
+index 00000000..5d353da2
+--- /dev/null
++++ b/src/cmd/acme/acmesrv/slow.acmesrv
+@@ -0,0 +1,4 @@
++#!/usr/local/plan9/bin/rc
++
++#sleep 10
++/usr/local/plan9/src/cmd/acme/acmesrv/o.acmesrv $*
+diff --git a/src/cmd/acme/addr.c b/src/cmd/acme/addr.c
+index 6aee8993..a5f38815 100644
+--- a/src/cmd/acme/addr.c
++++ b/src/cmd/acme/addr.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/buff.c b/src/cmd/acme/buff.c
+index bb938ca4..2e770e16 100644
+--- a/src/cmd/acme/buff.c
++++ b/src/cmd/acme/buff.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+@@ -232,7 +233,7 @@ bufloader(void *v, uint q0, Rune *r, int nr)
+ }
+ 
+ uint
+-loadfile(int fd, uint q0, int *nulls, int(*f)(void*, uint, Rune*, int), void *arg, DigestState *h)
++loadfile(Vfd fd, uint q0, int *nulls, int(*f)(void*, uint, Rune*, int), void *arg, DigestState *h)
+ {
+ 	char *p;
+ 	Rune *r;
+@@ -249,7 +250,7 @@ loadfile(int fd, uint q0, int *nulls, int(*f)(void*, uint, Rune*, int), void *ar
+ 	 * last pass, possibly representing a partial rune.
+ 	 */
+ 	while(n > 0){
+-		n = read(fd, p+m, Maxblock);
++		n = vread(fd, p+m, Maxblock);
+ 		if(n < 0){
+ 			warning(nil, "read error in Buffer.load");
+ 			break;
+@@ -272,7 +273,7 @@ loadfile(int fd, uint q0, int *nulls, int(*f)(void*, uint, Rune*, int), void *ar
+ }
+ 
+ uint
+-bufload(Buffer *b, uint q0, int fd, int *nulls, DigestState *h)
++bufload(Buffer *b, uint q0, Vfd fd, int *nulls, DigestState *h)
+ {
+ 	if(q0 > b->nc)
+ 		error("internal error: bufload");
+diff --git a/src/cmd/acme/cols.c b/src/cmd/acme/cols.c
+index 63247a84..7b6330a5 100644
+--- a/src/cmd/acme/cols.c
++++ b/src/cmd/acme/cols.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/dat.h b/src/cmd/acme/dat.h
+index 8a81c97d..4908d2c8 100644
+--- a/src/cmd/acme/dat.h
++++ b/src/cmd/acme/dat.h
+@@ -48,14 +48,22 @@ typedef	struct	Elog Elog;
+ typedef	struct	Mntdir Mntdir;
+ typedef	struct	Range Range;
+ typedef	struct	Rangeset Rangeset;
++typedef	struct	Remote Remote;
+ typedef	struct	Reffont Reffont;
+ typedef	struct	Row Row;
+ typedef	struct	Runestr Runestr;
++typedef	struct	Session Session;
+ typedef	struct	Text Text;
+ typedef	struct	Timer Timer;
++typedef	struct	Vfd Vfd;
++typedef	struct	Vpid Vpid;
++typedef	struct	Vwaitmsg Vwaitmsg;
+ typedef	struct	Window Window;
+ typedef	struct	Xfid Xfid;
+ 
++typedef	struct	Completion Completion;
++
++
+ struct Runestr
+ {
+ 	Rune	*r;
+@@ -105,7 +113,7 @@ struct Buffer
+ };
+ void		bufinsert(Buffer*, uint, Rune*, uint);
+ void		bufdelete(Buffer*, uint, uint);
+-uint		bufload(Buffer*, uint, int, int*, DigestState*);
++uint		bufload(Buffer*, uint, Vfd, int*, DigestState*);
+ void		bufread(Buffer*, uint, Rune*, uint);
+ void		bufclose(Buffer*);
+ void		bufreset(Buffer*);
+@@ -153,7 +161,7 @@ void		fileclose(File*);
+ void		filedelete(File*, uint, uint);
+ void		filedeltext(File*, Text*);
+ void		fileinsert(File*, uint, Rune*, uint);
+-uint		fileload(File*, uint, int, int*, DigestState*);
++uint		fileload(File*, uint, Vfd, int*, DigestState*);
+ void		filemark(File*);
+ void		filereset(File*);
+ void		filesetname(File*, Rune*, int);
+@@ -220,6 +228,7 @@ void		textreset(Text*);
+ int		textresize(Text*, Rectangle, int);
+ void		textscrdraw(Text*);
+ void		textscroll(Text*, int);
++void		xtextscroll(Text*, int);
+ void		textselect(Text*);
+ int		textselect2(Text*, uint*, uint*, Text**);
+ int		textselect23(Text*, uint*, uint*, Image*, int);
+@@ -350,14 +359,27 @@ struct Timer
+ 	Timer	*next;
+ };
+ 
++struct Vpid
++{
++	Session *sess;
++	int id;
++};
++
++struct Vwaitmsg
++{
++	Vpid vp;
++	char *msg;
++};
++
+ struct Command
+ {
+-	int		pid;
++	Vpid		vp;
+ 	Rune		*name;
+ 	int		nname;
+ 	char		*text;
+ 	char		**av;
+ 	int		iseditcmd;
++	Session	*sess;
+ 	Mntdir	*md;
+ 	Command	*next;
+ };
+@@ -463,6 +485,65 @@ struct Expand
+ 	int	a1;
+ };
+ 
++enum
++{
++	Pexportfs,
++	Pcmdfs,
++	Pplumb,
++	Pacme,
++	Pmax,
++};
++
++struct Session
++{
++	Remote *r;
++	CFsys *fs;
++	CFsys *cmd;
++
++	int remotepid;
++
++	Channel *localc[Pmax];
++	Channel *remotec;
++
++	Channel *errorc;
++	Channel *refc;
++	Channel *stopc;
++
++	int localfd[Pmax];
++	int remotefd;
++};
++
++struct Remote
++{
++	char* machine;
++
++	int nprefix;
++	char **prefix;
++
++	Remote	*next;
++
++	QLock	lk;
++	Session	*sess;
++};
++
++enum
++{
++	Vlocal,
++	Vremote,
++	Vclosed,
++	Verr,
++};
++
++struct Vfd
++{
++	int which;
++	union{
++		CFid *fid;
++		int fd;
++	};
++	Session *sess;
++};
++
+ enum
+ {
+ 	/* fbufalloc() guarantees room off end of BUFSIZE */
+@@ -555,6 +636,8 @@ int			messagesize;		/* negotiated in 9P version setup */
+ int			globalautoindent;
+ int			dodollarsigns;
+ char*		mtpt;
++char*		racmename;
++Remote*		remotes;
+ 
+ enum
+ {
+@@ -563,7 +646,7 @@ enum
+ };
+ 
+ Channel	*cplumb;		/* chan(Plumbmsg*) */
+-Channel	*cwait;		/* chan(Waitmsg) */
++Channel	*cvwait;		/* chan(Vwaitmsg) */
+ Channel	*ccommand;	/* chan(Command*) */
+ Channel	*ckill;		/* chan(Rune*) */
+ Channel	*cxfidalloc;	/* chan(Xfid*) */
+@@ -578,4 +661,9 @@ Channel	*cwarn;		/* chan(void*)[1] (really chan(unit)[1]) */
+ 
+ QLock	editoutlk;
+ 
++#ifndef Extern
++#define Extern extern
++#endif
++Extern Screen *wscreen;
++
+ #define	STACK	65536
+diff --git a/src/cmd/acme/disk.c b/src/cmd/acme/disk.c
+index c3ada9c3..5e0a30d0 100644
+--- a/src/cmd/acme/disk.c
++++ b/src/cmd/acme/disk.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/ecmd.c b/src/cmd/acme/ecmd.c
+index f7613172..f18d8cb5 100644
+--- a/src/cmd/acme/ecmd.c
++++ b/src/cmd/acme/ecmd.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "edit.h"
+ #include "fns.h"
+@@ -302,6 +303,7 @@ e_cmd(Text *t, Cmd *cp)
+ 	int i, isdir, q0, q1, fd, nulls, samename, allreplaced;
+ 	char *s, tmp[128];
+ 	Dir *d;
++	Vfd v;
+ 
+ 	f = t->file;
+ 	q0 = addr.r.q0;
+@@ -337,7 +339,10 @@ e_cmd(Text *t, Cmd *cp)
+ 	}
+ 	elogdelete(f, q0, q1);
+ 	nulls = 0;
+-	loadfile(fd, q1, &nulls, readloader, f, nil);
++	/* TODO: use vfs. */
++	v.which = Vlocal;
++	v.fd = fd;
++	loadfile(v, q1, &nulls, readloader, f, nil);
+ 	free(s);
+ 	close(fd);
+ 	if(nulls)
+@@ -1002,14 +1007,14 @@ filelooper(Text *t, Cmd *cp, int XY)
+ 	 */
+ 	allwindows(alllocker, (void*)1);
+ 	globalincref = 1;
+-	
++
+ 	/*
+ 	 * Unlock the window running the X command.
+ 	 * We'll need to lock and unlock each target window in turn.
+ 	 */
+ 	if(t && t->w)
+ 		winunlock(t->w);
+-	
++
+ 	for(i=0; i<loopstruct.nw; i++) {
+ 		targ = &loopstruct.w[i]->body;
+ 		if(targ && targ->w)
+diff --git a/src/cmd/acme/edit.c b/src/cmd/acme/edit.c
+index 82a19b0d..b4e4c9e3 100644
+--- a/src/cmd/acme/edit.c
++++ b/src/cmd/acme/edit.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "edit.h"
+ #include "fns.h"
+diff --git a/src/cmd/acme/elog.c b/src/cmd/acme/elog.c
+index 8a8951fb..7960e7d1 100644
+--- a/src/cmd/acme/elog.c
++++ b/src/cmd/acme/elog.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ #include "edit.h"
+diff --git a/src/cmd/acme/exec.c b/src/cmd/acme/exec.c
+index 1dd02288..a44ef699 100644
+--- a/src/cmd/acme/exec.c
++++ b/src/cmd/acme/exec.c
+@@ -697,17 +697,18 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ {
+ 	uint n, m;
+ 	Rune *r;
+-	Biobuf *b;
++/*	Biobuf *b;*/
+ 	char *s, *name;
+-	int i, fd, q, ret, retc;
++	int i, q, ret, retc;
+ 	Dir *d, *d1;
+ 	Window *w;
+ 	int isapp;
+ 	DigestState *h;
++	Vfd fd;
+ 
+ 	w = f->curtext->w;
+ 	name = runetobyte(namer, nname);
+-	d = dirstat(name);
++	d = vdirstat(name);
+ 	if(d!=nil && runeeq(namer, nname, f->name, f->nname)){
+ 		if(f->dev!=d->dev || f->qidpath!=d->qid.path || f->mtime != d->mtime)
+ 			checksha1(name, f, d);
+@@ -723,8 +724,8 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ 		}
+ 	}
+ 
+-	fd = create(name, OWRITE, 0666);
+-	if(fd < 0){
++	fd = vcreate(name, OWRITE, 0666);
++	if(fd.which == Verr){
+ 		warning(nil, "can't create file %s: %r\n", name);
+ 		goto Rescue1;
+ 	}
+@@ -733,12 +734,12 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ 	// necessary; it works around some buggy underlying
+ 	// file systems that mishandle unaligned writes.
+ 	// https://codereview.appspot.com/89550043/
+-	b = emalloc(sizeof *b);
+-	Binit(b, fd, OWRITE);
++/*	b = emalloc(sizeof *b);*/
++/*	Binit(b, fd, OWRITE);*/
+ 	r = fbufalloc();
+ 	s = fbufalloc();
+ 	free(d);
+-	d = dirfstat(fd);
++	d = vdirfstat(fd);
+ 	h = sha1(nil, 0, nil, nil);
+ 	isapp = (d!=nil && d->length>0 && (d->qid.type&QTAPPEND));
+ 	if(isapp){
+@@ -753,19 +754,25 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ 		bufread(&f->b, q, r, n);
+ 		m = snprint(s, BUFSIZE+1, "%.*S", n, r);
+ 		sha1((uchar*)s, m, nil, h);
+-		if(Bwrite(b, s, m) != m){
++/*		if(Bwrite(b, s, m) != m){*/
++		if(vwrite(fd, s, m) != m){
+ 			warning(nil, "can't write file %s: %r\n", name);
+ 			goto Rescue2;
+ 		}
+ 	}
++/*
+ 	if(Bflush(b) < 0) {
+ 		warning(nil, "can't write file %s: %r\n", name);
+ 		goto Rescue2;
+ 	}
+ 	ret = Bterm(b);
+-	retc = close(fd);
++*/
++	ret = 0;
++	retc = vclose(&fd);
++/*
+ 	free(b);
+ 	b = nil;
++*/
+ 	if(ret < 0 || retc < 0) {
+ 		warning(nil, "can't write file %s: %r\n", name);
+ 		goto Rescue2; // flush or close failed
+@@ -786,9 +793,9 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ 			// in case we don't have read permission.
+ 			// (The create above worked, so we probably
+ 			// still have write permission.)
+-			fd = open(name, OWRITE);
+-			d1 = dirfstat(fd);
+-			close(fd);
++			fd = vopen(name, OWRITE);
++			d1 = vdirfstat(fd);
++			vclose(&fd);
+ 			if(d1 != nil){
+ 				free(d);
+ 				d = d1;
+@@ -813,16 +820,18 @@ putfile(File *f, int q0, int q1, Rune *namer, int nname)
+ 	free(d);
+ 	free(namer);
+ 	free(name);
+-	close(fd);
++	vclose(&fd);
+ 	winsettag(w);
+ 	return;
+ 
+     Rescue2:
++/*
+ 	if(b != nil) {
+ 		Bterm(b);
+ 		free(b);
+-		close(fd);
++		vclose(&fd);
+ 	}
++*/
+ 	free(h);
+ 	fbuffree(s);
+ 	fbuffree(r);
+@@ -1501,10 +1510,10 @@ runproc(void *argvp)
+ 		char *argaddr;
+ 		char *arg;
+ 		Command *c;
+-		Channel *cpid;
++		Channel *cvpid;
+ 		int iseditcmd;
+ 	/* end of args */
+-	char *e, *t, *name, *filename, *dir, **av, *news;
++	char *e, *t, *name, *filename, *dir, **av, *news, *p;
+ 	Rune r, **incl;
+ 	int ac, w, inarg, i, n, fd, nincl, winid;
+ 	int sfd[3];
+@@ -1516,6 +1525,8 @@ runproc(void *argvp)
+ 	void **argv;
+ 	CFsys *fs;
+ 	char *shell;
++	Remote *rem;
++	Vpid vp;
+ 
+ 	threadsetname("runproc");
+ 
+@@ -1528,23 +1539,38 @@ runproc(void *argvp)
+ 	argaddr = argv[5];
+ 	arg = argv[6];
+ 	c = argv[7];
+-	cpid = argv[8];
++	cvpid = argv[8];
+ 	iseditcmd = (uintptr)argv[9];
+ 	free(argv);
+ 
++	if(rdir){
++		dir = runetobyte(rdir, ndir);
++		rem = remote(dir);
++		free(dir);
++		dir = nil;
++	}else{
++		rem = nil;
++	}
++
+ 	t = s;
+ 	while(*t==' ' || *t=='\n' || *t=='\t')
+ 		t++;
+ 	for(e=t; *e; e++)
+ 		if(*e==' ' || *e=='\n' || *e=='\t' )
+ 			break;
+-	name = emalloc((e-t)+2);
++	n = e-t;
++	name = emalloc(e-t+2);
+ 	memmove(name, t, e-t);
+ 	name[e-t] = 0;
+ 	e = utfrrune(name, '/');
+ 	if(e)
+ 		memmove(name, e+1, strlen(e+1)+1);	/* strcpy but overlaps */
+ 	strcat(name, " ");	/* add blank here for ease in waittask */
++	if(rem){
++		p = smprint("%s:%s", rem->machine, name);
++		free(name);
++		name = p;
++	}
+ 	c->name = bytetorune(name, &c->nname);
+ 	free(name);
+ 	pipechar = 0;
+@@ -1628,6 +1654,14 @@ runproc(void *argvp)
+ 		putenv("acmeaddr", argaddr);
+ 	if(acmeshell != nil)
+ 		goto Hard;
++	if(rdir != nil){
++		/* TODO: improve */
++		dir = runetobyte(rdir, ndir);
++		rem = remote(dir);
++		free(dir);
++		if(rem)
++			goto Hard;
++	}
+ 	if(strlen(t) > sizeof buf-10)	/* may need to print into stack */
+ 		goto Hard;
+ 	inarg = FALSE;
+@@ -1670,9 +1704,13 @@ runproc(void *argvp)
+ 		dir = runetobyte(rdir, ndir);
+ 	ret = threadspawnd(sfd, av[0], av, dir);
+ 	free(dir);
++
+ 	if(ret >= 0){
+-		if(cpid)
+-			sendul(cpid, ret);
++		if(cvpid){
++			vp.sess = nil;
++			vp.id = ret;
++			send(cvpid, &vp);
++		}
+ 		threadexits("");
+ 	}
+ /* libthread uses execvp so no need to do this */
+@@ -1681,7 +1719,7 @@ runproc(void *argvp)
+ 	if(e[0]=='/' || (e[0]=='.' && e[1]=='/'))
+ 		goto Fail;
+ 	if(cputype){
+-		sprint(buf, "%s/%s", cputype, av[0]);
++		sprint(buf, "%s/%s", cputydpe, av[0]);
+ 		procexec(cpid, sfd, buf, av);
+ 	}
+ 	sprint(buf, "/bin/%s", av[0]);
+@@ -1720,19 +1758,33 @@ Hard:
+ 	dir = nil;
+ 	if(rdir != nil)
+ 		dir = runetobyte(rdir, ndir);
+-	shell = acmeshell;
+-	if(shell == nil)
+-		shell = "rc";
+-	rcarg[0] = shell;
+-	rcarg[1] = "-c";
+-	rcarg[2] = t;
+-	rcarg[3] = nil;
+-	ret = threadspawnd(sfd, rcarg[0], rcarg, dir);
+-	free(dir);
+-	if(ret >= 0){
+-		if(cpid)
+-			sendul(cpid, ret);
+-		threadexits(nil);
++
++	if(rem){
++		shell = "remoterc";
++		vp = vshell(rem, sfd, t, dir);
++		if(vp.id >= 0){
++			if(cvpid)
++				send(cvpid, &vp);
++			threadexits(nil);
++		}
++	}else{
++		shell = acmeshell;
++		if(shell == nil)
++			shell = "rc";
++		rcarg[0] = shell;
++		rcarg[1] = "-c";
++		rcarg[2] = t;
++		rcarg[3] = nil;
++		ret = threadspawnd(sfd, rcarg[0], rcarg, dir);
++		free(dir);
++		if(ret >= 0){
++			if(cvpid){
++				vp.sess = nil;
++				vp.id = ret;
++				send(cvpid, &vp);
++			}
++			threadexits(nil);
++		}
+ 	}
+ 	warning(nil, "exec %s: %r\n", shell);
+ 
+@@ -1742,7 +1794,9 @@ Hard:
+ 	close(sfd[1]);
+ 	if(sfd[2] != sfd[1])
+ 		close(sfd[2]);
+-	sendul(cpid, 0);
++	vp.sess = nil;
++	vp.id = 0;
++	send(cvpid, &vp);
+ 	threadexits(nil);
+ }
+ 
+@@ -1750,19 +1804,19 @@ void
+ runwaittask(void *v)
+ {
+ 	Command *c;
+-	Channel *cpid;
++	Channel *cvpid;
+ 	void **a;
+ 
+ 	threadsetname("runwaittask");
+ 	a = v;
+ 	c = a[0];
+-	cpid = a[1];
++	cvpid = a[1];
+ 	free(a);
+ 	do
+-		c->pid = recvul(cpid);
+-	while(c->pid == ~0);
++		recv(cvpid, &c->vp);
++	while(c->vp.id == ~0); /* TODO: remoting */
+ 	free(c->av);
+-	if(c->pid != 0)	/* successful exec */
++	if(c->vp.id != 0)	/* successful exec */
+ 		sendp(ccommand, c);
+ 	else{
+ 		if(c->iseditcmd)
+@@ -1771,7 +1825,7 @@ runwaittask(void *v)
+ 		free(c->text);
+ 		free(c);
+ 	}
+-	chanfree(cpid);
++	chanfree(cvpid);
+ }
+ 
+ void
+@@ -1779,15 +1833,15 @@ run(Window *win, char *s, Rune *rdir, int ndir, int newns, char *argaddr, char *
+ {
+ 	void **arg;
+ 	Command *c;
+-	Channel *cpid;
++	Channel *cvpid;
+ 
+ 	if(s == nil)
+ 		return;
+ 
+ 	arg = emalloc(10*sizeof(void*));
+ 	c = emalloc(sizeof *c);
+-	cpid = chancreate(sizeof(ulong), 0);
+-	chansetname(cpid, "cpid %s", s);
++	cvpid = chancreate(sizeof(Vpid), 0);
++	chansetname(cvpid, "cvpid %s", s);
+ 	arg[0] = win;
+ 	arg[1] = s;
+ 	arg[2] = rdir;
+@@ -1796,12 +1850,12 @@ run(Window *win, char *s, Rune *rdir, int ndir, int newns, char *argaddr, char *
+ 	arg[5] = argaddr;
+ 	arg[6] = xarg;
+ 	arg[7] = c;
+-	arg[8] = cpid;
++	arg[8] = cvpid;
+ 	arg[9] = (void*)(uintptr)iseditcmd;
+ 	threadcreate(runproc, arg, STACK);
+ 	/* mustn't block here because must be ready to answer mount() call in run() */
+ 	arg = emalloc(2*sizeof(void*));
+ 	arg[0] = c;
+-	arg[1] = cpid;
++	arg[1] = cvpid;
+ 	threadcreate(runwaittask, arg, STACK);
+ }
+diff --git a/src/cmd/acme/file.c b/src/cmd/acme/file.c
+index e1eddc46..6cd9bb7d 100644
+--- a/src/cmd/acme/file.c
++++ b/src/cmd/acme/file.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+@@ -164,7 +165,7 @@ fileunsetname(File *f, Buffer *delta)
+ }
+ 
+ uint
+-fileload(File *f, uint p0, int fd, int *nulls, DigestState *h)
++fileload(File *f, uint p0, Vfd fd, int *nulls, DigestState *h)
+ {
+ 	if(f->seq > 0)
+ 		error("undo in file.load unimplemented");
+diff --git a/src/cmd/acme/fns.h b/src/cmd/acme/fns.h
+index 969db417..4994e2ce 100644
+--- a/src/cmd/acme/fns.h
++++ b/src/cmd/acme/fns.h
+@@ -27,7 +27,7 @@ void	clearmouse(void);
+ void	allwindows(void(*)(Window*, void*), void*);
+ uint seqof(Window*, int);
+ 
+-uint loadfile(int, uint, int*, int(*)(void*, uint, Rune*, int), void*, DigestState*);
++uint loadfile(Vfd, uint, int*, int(*)(void*, uint, Rune*, int), void*, DigestState*);
+ void	movetodel(Window*);
+ 
+ Window*	errorwin(Mntdir*, int);
+@@ -107,3 +107,27 @@ Range range(int, int);
+ #define	runemove(a, b, c)	memmove((a), (b), (c)*sizeof(Rune))
+ 
+ int	ismtpt(char*);
++
++
++Remote*	remote(char*);
++Session*	rconnect(Remote*);
++void		rclose(Session*);
++void		serror(Session*, char*, ...);
++
++Vfd	vopen(char *file, int omode);
++Dir*	vdirfstat(Vfd fd);
++long	vdirread(Vfd fd, Dir **d);
++long vdirreadall(Vfd fd, Dir **d);
++int	vclose(Vfd *fd);
++long	vread(Vfd fd, void *buf, long nbytes);
++long	vwrite(Vfd fd, void *buf, long n);
++Dir*	vdirstat(char *file);
++Vfd	vcreate(char *file, int omode, ulong perm);
++int	vaccess(char *file, int mode);
++
++Completion* vcomplete(char*, char*);
++
++int vpostnote(Vpid vp, char *note);
++int vpcmp(Vpid vp1, Vpid vp2);
++Vpid vshell(Remote *r, int fd[3], char *cmd, char *dir);
++
+diff --git a/src/cmd/acme/fsys.c b/src/cmd/acme/fsys.c
+index d9d4b30d..3b68084d 100644
+--- a/src/cmd/acme/fsys.c
++++ b/src/cmd/acme/fsys.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+@@ -346,8 +347,8 @@ fsysattach(Xfid *x, Fid *f)
+ 	Mntdir *m;
+ 	char buf[128];
+ 
+-	if(strcmp(x->fcall.uname, user) != 0)
+-		return respond(x, &t, Eperm);
++	//if(strcmp(x->fcall.uname, user) != 0)
++	//	return respond(x, &t, Eperm);
+ 	f->busy = TRUE;
+ 	f->open = FALSE;
+ 	f->qid.path = Qdir;
+diff --git a/src/cmd/acme/logf.c b/src/cmd/acme/logf.c
+index 562026c9..0f6a1085 100644
+--- a/src/cmd/acme/logf.c
++++ b/src/cmd/acme/logf.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
+index a7172b50..a0b824f4 100644
+--- a/src/cmd/acme/look.c
++++ b/src/cmd/acme/look.c
+@@ -11,6 +11,7 @@
+ #include <9pclient.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+@@ -411,7 +412,7 @@ includefile(Rune *dir, Rune *file, int nfile)
+ 	m = runestrlen(dir);
+ 	a = emalloc((m+1+nfile)*UTFmax+1);
+ 	sprint(a, "%S/%.*S", dir, nfile, file);
+-	n = access(a, 0);
++	n = vaccess(a, 0);
+ 	free(a);
+ 	if(n < 0)
+ 		return runestr(nil, 0);
+@@ -636,7 +637,7 @@ expandfile(Text *t, uint q0, uint q1, Expand *e)
+ 	if(w != nil)
+ 		goto Isfile;
+ 	/* if it's the name of a file, it's a file */
+-	if(ismtpt(e->bname) || access(e->bname, 0) < 0){
++	if(ismtpt(e->bname) || vaccess(e->bname, 0) < 0){
+ 		free(e->bname);
+ 		e->bname = nil;
+ 		goto Isntfile;
+diff --git a/src/cmd/acme/mkfile b/src/cmd/acme/mkfile
+index 18bea9e0..adf30aa8 100644
+--- a/src/cmd/acme/mkfile
++++ b/src/cmd/acme/mkfile
+@@ -1,7 +1,9 @@
+ <$PLAN9/src/mkhdr
+ 
+ TARG=acme
+-DIRS=mail
++DIRS=\
++	mail\
++	acmesrv\
+ 
+ OFILES=\
+ 	acme.$O\
+@@ -18,11 +20,15 @@ OFILES=\
+ 	logf.$O\
+ 	look.$O\
+ 	regx.$O\
++	remote.$O\
+ 	rows.$O\
+ 	scrl.$O\
+ 	text.$O\
+ 	time.$O\
+ 	util.$O\
++	vcomplete.$O\
++	vfs.$O\
++	vproc.$O\
+ 	wind.$O\
+ 	xfid.$O\
+ 
+diff --git a/src/cmd/acme/regx.c b/src/cmd/acme/regx.c
+index ec574563..93b027ba 100644
+--- a/src/cmd/acme/regx.c
++++ b/src/cmd/acme/regx.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/remote.c b/src/cmd/acme/remote.c
+new file mode 100644
+index 00000000..f94205e6
+--- /dev/null
++++ b/src/cmd/acme/remote.c
+@@ -0,0 +1,571 @@
++#include <u.h>
++#include <libc.h>
++#include <draw.h>
++#include <thread.h>
++#include <cursor.h>
++#include <mouse.h>
++#include <keyboard.h>
++#include <frame.h>
++#include <fcall.h>
++#include <bio.h>
++#include <plumb.h>
++#include <libsec.h>
++#include <9pclient.h>
++#include "dat.h"
++#include "fns.h"
++
++typedef 	struct Emsg	Emsg;
++
++static void	readerproc(void *v);
++static void	writerproc(void *v);
++static void runwriter(Session *sess, char *name, Channel *c, int fd);
++static void rundemuxer(Session *sess, char *name, int fd, int nc, Channel **c);
++static void runmuxer(Session *sess, char *name, int fd, Channel *c, int dest);
++static void	watchdogproc(void*);
++static void sendcommandproc(void *v);
++
++static void* 	srecvp(Session *s, Channel *c);
++static int		ssendp(Session *s, Channel *c, void *p);
++
++static int		dial9p(char *srv);
++
++static Emsg*	eget();
++static void		eput(Emsg*);
++
++/* can be overriden by acme -s */
++char* racmename = "acmesrv";
++
++static int debug = 0;
++static int dfd = -1;
++
++static char *Psrv[Pmax] = {
++	"exportfs",
++	"cmdfs",
++	"plumb",
++	"acme"
++};
++
++enum
++{
++	Msize = 8192,
++};
++
++struct Emsg
++{
++	char port;
++	int n;
++	char buf[Msize];
++	Emsg *free;
++};
++
++static QLock elk;
++static Emsg *elist;
++
++Remote*
++remote(char *path)
++{
++	Remote *r;
++	int i;
++	int len;
++
++	len = strlen(path);
++
++	/* This is not quite right; we should make sure the path is exactly the prefix, or
++	  else contains / after. */
++	for(r=remotes; r; r=r->next)
++	for(i=0; i < r->nprefix; i++)
++		if(strlen(r->prefix[i]) <= len && memcmp(r->prefix[i], path, strlen(r->prefix[i])) == 0)
++			return r;
++	return nil;
++}
++
++Session*
++rconnect(Remote *r)
++{
++	char *av[8];
++	int ac, i, srvfd, ret, remotefd;
++	int sfd[3], p[2];
++	char buf[2];
++	char *name;
++	Command *c;
++	Session *sess;
++
++	if(debug && dfd < 0)
++		dfd = create("/tmp/acme.remote.debug", OWRITE, 0664);
++
++	qlock(&r->lk);
++	if((sess = r->sess) != nil){
++		sendul(sess->refc, 1);
++		qunlock(&r->lk);
++		return sess;
++	}
++
++	if(debug)
++		fprint(dfd, "acme: connect: %s\n", r->machine);
++
++	warning(nil, "remote: connecting %s\n", r->machine);
++	ac = 0;
++	av[ac++] = "ssh";
++	av[ac++] = r->machine;
++	av[ac++] = racmename;
++	av[ac++] = "-n";
++	av[ac++] = "/tmp/ns.acmesrv";
++/*	av[ac++] = "-D";*/
++	av[ac++] = nil;
++
++	if(debug){
++		int i;
++		fprint(dfd, "exec");
++		for(i = 0; av[i]; i++)
++			fprint(dfd, " %s", av[i]);
++		fprint(dfd, "\n");
++	}
++
++	if(pipe(sfd) < 0){
++		warning(nil, "remote: %s: can't create pipe: %r\n", r->machine);
++		goto Error;
++	}
++	rfork(RFFDG|RFNOTEG);
++	remotefd = sfd[0];
++	sfd[0] = dup(sfd[1], -1);
++/*	sfd[2] = dup(2, -1);*/
++	/* Have to use this otherwise we're attached to the same
++	  process group as acme itself. */
++	sfd[2] = dup(erroutfd, -1);
++
++	/* TODO: dial local services first, then use this to determine
++	  of them should be part of the session. */
++
++	if((ret = threadspawn(sfd, av[0], av)) < 0){
++		warning(nil, "remote: %s: can't create remote proc\n", r->machine);
++		goto Error;
++	}
++
++	/* Wait until we reach the remote, then initialize session control. */
++	if(read(remotefd, &buf[0], 1) != 1){
++		warning(nil, "remote: %s: EOF\n", r->machine);
++		goto Error;
++	}
++	for(;;){
++		if(read(remotefd, &buf[1], 1) != 1){
++			warning(nil, "remote: %s: EOF\n", r->machine);
++			goto Error;
++		}
++		/* TODO: print out bytes before "OK". Buffer these and put them in a warning. */
++		if(strncmp(buf, "OK", 2) == 0)
++			break;
++		buf[0] = buf[1];
++	}
++
++	/* Now we're ready to establish a session and monitor it. */
++	sess = emalloc(sizeof *sess);
++	sess->r = r;
++	sess->remotepid = ret;
++	sess->remotefd = remotefd;
++	sess->errorc = chancreate(sizeof(char*), 0);
++	sess->stopc = chancreate(sizeof(int), 0);
++	sess->remotec = chancreate(sizeof(Emsg*), 1);
++	sess->refc = chancreate(sizeof(int), 0);
++	for(i=0; i<nelem(sess->localfd); i++)
++		sess->localfd[i] = -1;
++
++	/* Register the command so that it shows up in the top
++	  and also so that it can be killed. */
++	c = emalloc(sizeof *c);
++	c->vp.sess = nil;
++	c->vp.id = sess->remotepid;
++	name = smprint("%s:remote ", r->machine);
++	c->name = bytetorune(name, &c->nname);
++	free(name);
++	c->text = estrdup("");
++	c->sess = sess;
++
++	/* HACK ALERT: we send the command asynchronously to avoid
++	 * a deadlock between the sending the command and displaying
++	 * errors in the output. This is because we may hold the row.lk
++	 * while connecting. Fix this.
++	 */
++	/* 	sendp(ccommand, c); */
++	threadcreate(sendcommandproc, c, STACK*2);
++
++	/* Monitor the session and provide proper teardown. */
++	threadcreate(watchdogproc, sess, STACK*2);
++	sendul(sess->refc, 1); /* ssh proc */
++	for(i=0; i<nelem(sess->localc); i++){
++		sess->localc[i] = chancreate(sizeof(Emsg*), 1);
++		switch(i){
++		default:
++			/* TODO: just start a proc that returns errors */
++			if((srvfd = dial9p(Psrv[i])) < 0){
++				serror(sess, "could not connect service %s", Psrv[i]);
++				sess = nil; /* so it doesn't get freed */
++				goto Error;
++			}
++			sess->localfd[i] = srvfd;
++			break;
++		case Pexportfs:
++		case Pcmdfs:
++			if(pipe(p) < 0)
++				error("can't create pipe");
++			srvfd = p[0];
++			sess->localfd[i] = p[1];
++			break;
++		}
++		runwriter(sess, smprint("mux->%s", Psrv[i]), sess->localc[i], srvfd);
++		runmuxer(sess, smprint("%s->mux", Psrv[i]), srvfd, sess->remotec, i);
++	}
++
++	rundemuxer(sess, estrdup("remote->mux"), sess->remotefd, nelem(sess->localc), sess->localc);
++	runwriter(sess, estrdup("mux->remote"), sess->remotec, sess->remotefd);
++
++	/* Setup services on top of the session.
++	 * Note: there's a race between potential session errors from the setup
++	 * code above, and setting up here. We should have some sort of lock
++	 * that gates teardown (and also protects sess->fs here.)
++	 */
++	sess->fs = fsmount(sess->localfd[Pexportfs], nil);
++	if(sess->fs == nil){
++		sendul(sess->refc, 1); /* hack to make teardown work */
++		serror(sess, "could not connect exportfs");
++		sess = nil;
++		goto Error;
++	}
++	sess->cmd = fsmount(sess->localfd[Pcmdfs], nil);
++	if(sess->cmd == nil){
++		sendul(sess->refc, 1); /* hack to make teardown work */
++		serror(sess, "could not connect cmdfs");
++		sess = nil;
++		goto Error;
++	}
++
++	warning(nil, "remote: %s: connected \n", r->machine);
++
++
++	r->sess = sess;
++	sendul(sess->refc, 1); /* returned session */
++	qunlock(&r->lk);
++	return sess;
++
++Error:
++	qunlock(&r->lk);
++	free(sess);
++	return nil;
++}
++
++void
++rclose(Session *sess)
++{
++	if(sess == nil)
++		return;
++	sendul(sess->refc, -1);
++}
++
++void
++serror(Session *s, char *fmt, ...)
++{
++	va_list arg;
++	char *msg;
++
++	va_start(arg, fmt);
++	msg = vsmprint(fmt, arg);
++	if(msg == nil)
++		error("malloc");
++	sendp(s->errorc, msg);
++	va_end(arg);
++}
++
++void
++readerproc(void *v)
++{
++	/* args: */
++		Session *sess;
++		char *name;
++		int fd;
++		int wrap;
++		int nc;
++		Channel **c;
++	/* end of args */
++	void **a;
++	Emsg *e;
++	char port;
++
++	a = v;
++	sess = a[0];
++	name = a[1];
++	fd = (uintptr)a[2];
++	wrap = (uintptr)a[3];
++	nc = (uintptr)a[4];
++	c = (Channel**)&a[5];
++
++	for(;;){
++		e = eget();
++		if(wrap >= 0){
++			port = 0;
++			e->port = wrap;
++		}else if(readn(fd, &port, 1) != 1){
++			break;
++		}
++		if((e->n = read9pmsg(fd, e->buf, sizeof(e->buf))) <= 0)
++			break;
++		if(debug && wrap >= 0)
++			fprint(dfd, "%s: read n:%d port:%d\n", name, e->n, e->port);
++		else if(debug)
++			fprint(dfd, "%s: read n:%d port:%d\n", name, e->n, port);
++		if(port >= nc){
++			eput(e);
++			warning(nil, "remote: invalid destination\n");
++		}else if(ssendp(sess, c[(int)port], e) != 0)
++			break;
++	}
++	serror(sess, "%s: read error: %r", name);
++	eput(e);
++	free(a);
++	free(name);
++}
++
++
++static void
++rundemuxer(Session *sess, char *name, int fd, int nc, Channel **c)
++{
++	void **a;
++
++	a = emalloc(sizeof(void*)*5+sizeof(Channel*)*nc);
++	a[0] = sess;
++	a[1] = name;
++	a[2] = (void*)(uintptr)fd;
++	a[3] = (void*)(uintptr)-1;
++	a[4] = (void*)(uintptr)nc;
++	memcpy(&a[5], c, sizeof(Channel*)*nc);
++
++	sendul(sess->refc, 1);
++
++	proccreate(readerproc, a, STACK*2);
++}
++
++static void
++runmuxer(Session *sess, char *name, int fd, Channel *c, int port)
++{
++	void **a;
++
++	a = emalloc(sizeof(void*)*6);
++	a[0] = sess;
++	a[1] = name;
++	a[2] = (void*)(uintptr)fd;
++	a[3] = (void*)(uintptr)port;
++	a[4] = (void*)(uintptr)1;
++	a[5] = c;
++
++	sendul(sess->refc, 1);
++
++	proccreate(readerproc, a, STACK*2);
++}
++
++void
++writerproc(void *v)
++{
++	/* args: */
++		Session *sess;
++		char *name;
++		int fd;
++		Channel *c;
++	/* end of args */
++	void **a;
++	Emsg *e;
++
++	a = v;
++	sess = a[0];
++	name = a[1];
++	fd = (uintptr)a[2];
++	c = a[3];
++	free(a);
++
++	for(;;){
++		if((e = srecvp(sess, c)) == nil)
++			break;
++		if(debug)
++			fprint(dfd, "%s: write n:%d port:%d\n", name, e->n, e->port);
++		if(e->port >= 0 && write(fd, &e->port, 1) != 1)
++			break;
++		if(write(fd, e->buf, e->n) != e->n)
++			break;
++		eput(e);
++	}
++	serror(sess, "%s: write error: %r", name);
++	eput(e);
++	free(name);
++}
++
++static void
++runwriter(Session *sess, char *name, Channel *c, int fd)
++{
++	void **a;
++
++	a = emalloc(sizeof(void*)*4);
++	a[0] = sess;
++	a[1] = name;
++	a[2] = (void*)(uintptr)fd;
++	a[3] = c;
++
++	sendul(sess->refc, 1);
++	proccreate(writerproc, a, STACK*2);
++}
++
++static void
++watchdogproc(void *v)
++{
++	Session *s;
++	char  *msg, err[ERRMAX];
++	enum { Wref, Werror, Wstop, N };
++	int ref, x, stopping, i;
++	Alt alts[N+1];
++
++	s = v;
++	stopping = FALSE;
++	ref = recvul(s->refc);
++
++	while(ref){
++		alts[Wref].c = s->refc;
++		alts[Wref].v = &x;
++		alts[Wref].op = CHANRCV;
++		alts[Werror].c = s->errorc;
++		alts[Werror].v = &msg;
++		alts[Werror].op = CHANRCV;
++		alts[Wstop].op = stopping ? CHANSND : CHANEND;
++		alts[Wstop].v = &stopping;
++		alts[Wstop].c = s->stopc;
++		alts[N].op = CHANEND;
++
++		switch(alt(alts)){
++		case Wref:
++			ref += x;
++			break;
++		case Werror:
++			ref--;
++			if(stopping){
++				free(msg);
++				break;
++			}
++			qlock(&s->r->lk);
++			if(s->r->sess == s)
++				s->r->sess = nil;
++			qunlock(&s->r->lk);
++			if(msg == nil){
++				warning(nil, "remote: %s: remoting process died\n", s->r->machine);
++			}else{
++				warning(nil, "remote: %s: %s\n", s->r->machine, msg);
++				free(msg);
++				if(postnote(PNGROUP, s->remotepid, "kill") < 0){
++					rerrstr(err, sizeof err);
++					if(strcmp(err, "No such process") != 0)
++						warning(nil, "remote: %s: could not kill remoting process: %r\n", s->r->machine);
++				}
++			}
++			for(i=0; i<nelem(s->localfd); i++)
++				if(s->localfd[i] >= 0)
++					close(s->localfd[i]);
++			stopping = TRUE;
++			break;
++		}
++	}
++	if(s->fs != nil)
++		fsunmount(s->fs);
++	for(i=0; i<nelem(s->localc); i++)
++		chanfree(s->localc[i]);
++	chanfree(s->remotec);
++	chanfree(s->errorc);
++	chanfree(s->refc);
++	chanfree(s->stopc);
++	free(s);
++}
++
++static void
++sendcommandproc(void *v)
++{
++	sendp(ccommand, v);
++}
++
++static void*
++srecvp(Session *s, Channel *c)
++{
++	Alt alts[3];
++	void *v;
++
++	v = nil;
++
++	alts[0].c = c;
++	alts[0].v = &v;
++	alts[0].op = CHANRCV;
++	alts[1].c = s->stopc;
++	alts[1].v = nil;
++	alts[1].op = CHANRCV;
++	alts[2].op = CHANEND;
++	alt(alts);
++	return v;
++}
++
++static int
++ssendp(Session *s, Channel *c, void *p)
++{
++
++	Alt alts[3];
++
++	alts[0].c = c;
++	alts[0].v = &p;
++	alts[0].op = CHANSND;
++	alts[1].c = s->stopc;
++	alts[1].v = nil;
++	alts[1].op = CHANRCV;
++	alts[2].op = CHANEND;
++	return alt(alts);
++}
++
++static int
++dial9p(char *srv)
++{
++	char *addr;
++	int fd;
++
++	addr = smprint("unix!%s/%s", getns(), srv);
++	if(debug)
++		fprint(dfd, "dial9p: %s\n", addr);
++
++	fd = dial(addr, 0, 0, 0);
++	if(fd < 0){
++		if(debug)
++			fprint(dfd, "dial9p: %s error: %r\n", addr);
++		return -1;
++	}
++/*	fcntl(fd, F_SETFL, FD_CLOEXEC);*/
++	return fd;
++}
++
++
++static Emsg*
++eget()
++{
++	Emsg *e;
++	e = nil;
++	qlock(&elk);
++	if(elist){
++		e = elist;
++		elist = e->free;
++		e->free = nil;
++	}
++	qunlock(&elk);
++	if(e == nil)
++		e = emalloc(sizeof *e);
++	e->n = 0;
++	e->port = -1;
++	return e;
++}
++
++static void
++eput(Emsg *e)
++{
++	if(e == nil)
++		return;
++	qlock(&elk);
++	e->free = elist;
++	elist = e;
++	qunlock(&elk);
++}
+diff --git a/src/cmd/acme/rows.c b/src/cmd/acme/rows.c
+index 7a64fabf..81363c31 100644
+--- a/src/cmd/acme/rows.c
++++ b/src/cmd/acme/rows.c
+@@ -10,6 +10,7 @@
+ #include <bio.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+@@ -413,7 +414,7 @@ rowdump(Row *row, char *file)
+ 					0, 0,
+ 					100.0*(w->r.min.y-c->r.min.y)/Dy(c->r),
+ 					fontname);
+-			}else if((w->dirty==FALSE && access(a, 0)==0) || w->isdir){
++			}else if((w->dirty==FALSE && vaccess(a, 0)==0) || w->isdir){
+ 				dumped = FALSE;
+ 				t->file->dumpid = w->id;
+ 				Bprint(b, "f%11d %11d %11d %11d %11.7f %s\n", i, w->id,
+diff --git a/src/cmd/acme/scrl.c b/src/cmd/acme/scrl.c
+index 6504699d..7cf84795 100644
+--- a/src/cmd/acme/scrl.c
++++ b/src/cmd/acme/scrl.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
+index 09422dda..8c1a308b 100644
+--- a/src/cmd/acme/text.c
++++ b/src/cmd/acme/text.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include <complete.h>
+ #include "dat.h"
+ #include "fns.h"
+@@ -194,12 +195,13 @@ textload(Text *t, uint q0, char *file, int setqid)
+ {
+ 	Rune *rp;
+ 	Dirlist *dl, **dlp;
+-	int fd, i, j, n, ndl, nulls;
++	int i, j, n, ndl, nulls;
+ 	uint q, q1;
+ 	Dir *d, *dbuf;
+ 	char *tmp;
+ 	Text *u;
+ 	DigestState *h;
++	Vfd fd;
+ 
+ 	if(t->ncache!=0 || t->file->b.nc || t->w==nil || t!=&t->w->body)
+ 		error("text.load");
+@@ -211,12 +213,14 @@ textload(Text *t, uint q0, char *file, int setqid)
+ 		warning(nil, "will not open self mount point %s\n", file);
+ 		return -1;
+ 	}
+-	fd = open(file, OREAD);
+-	if(fd < 0){
++
++
++	fd = vopen(file, OREAD);
++	if(fd.which == Verr){
+ 		warning(nil, "can't open %s: %r\n", file);
+ 		return -1;
+ 	}
+-	d = dirfstat(fd);
++	d = vdirfstat(fd);
+ 	if(d == nil){
+ 		warning(nil, "can't fstat %s: %r\n", file);
+ 		goto Rescue;
+@@ -241,7 +245,7 @@ textload(Text *t, uint q0, char *file, int setqid)
+ 		dlp = nil;
+ 		ndl = 0;
+ 		dbuf = nil;
+-		while((n=dirread(fd, &dbuf)) > 0){
++		while((n=vdirread(fd, &dbuf)) > 0){
+ 			for(i=0; i<n; i++){
+ 				dl = emalloc(sizeof(Dirlist));
+ 				j = strlen(dbuf[i].name);
+@@ -282,7 +286,7 @@ textload(Text *t, uint q0, char *file, int setqid)
+ 		t->file->mtime = d->mtime;
+ 		t->file->qidpath = d->qid.path;
+ 	}
+-	close(fd);
++	vclose(&fd);
+ 	rp = fbufalloc();
+ 	for(q=q0; q<q1; q+=n){
+ 		n = q1-q;
+@@ -313,7 +317,7 @@ textload(Text *t, uint q0, char *file, int setqid)
+ 	return q1-q0;
+ 
+     Rescue:
+-	close(fd);
++	vclose(&fd);
+ 	return -1;
+ }
+ 
+@@ -635,7 +639,7 @@ textcomplete(Text *t)
+ 
+ 	s = smprint("%.*S", nstr, str);
+ 	dirs = smprint("%.*S", dir.nr, dir.r);
+-	c = complete(dirs, s);
++	c = vcomplete(dirs, s);
+ 	free(s);
+ 	if(c == nil){
+ 		warning(nil, "error attempting completion: %r\n");
+@@ -664,6 +668,32 @@ textcomplete(Text *t)
+ 	return rp;
+ }
+ 
++void
++xtextscroll(Text *t, int n)
++{
++	uint q0;
++
++	if(n == 0)
++		return;
++
++	if(t->what == Tag){
++		if(n<0)
++			texttype(t, Kscrolloneup);
++		else
++			texttype(t, Kscrollonedown);
++		return;
++	}
++
++	if(n < 0){
++		n = -n;
++		q0 = t->org+frcharofpt(&t->fr, Pt(t->fr.r.min.x, t->fr.r.min.y+n*t->fr.font->height));
++		textsetorigin(t, q0, TRUE);
++	}else{
++		q0 = textbacknl(t, t->org, n);
++		textsetorigin(t, q0, TRUE);
++	}
++}
++
+ void
+ texttype(Text *t, Rune r)
+ {
+diff --git a/src/cmd/acme/time.c b/src/cmd/acme/time.c
+index 38d70579..136ca93e 100644
+--- a/src/cmd/acme/time.c
++++ b/src/cmd/acme/time.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/util.c b/src/cmd/acme/util.c
+index c153f8c1..b6857a3f 100644
+--- a/src/cmd/acme/util.c
++++ b/src/cmd/acme/util.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/vcomplete.c b/src/cmd/acme/vcomplete.c
+new file mode 100644
+index 00000000..4d3df71e
+--- /dev/null
++++ b/src/cmd/acme/vcomplete.c
+@@ -0,0 +1,149 @@
++#include <u.h>
++#include <libc.h>
++#include <draw.h>
++#include <thread.h>
++#include <cursor.h>
++#include <mouse.h>
++#include <keyboard.h>
++#include <frame.h>
++#include <fcall.h>
++#include <plumb.h>
++#include <libsec.h>
++#include <9pclient.h>
++#include <complete.h>
++#include "dat.h"
++#include "fns.h"
++
++static int
++longestprefixlength(char *a, char *b, int n)
++{
++	int i, w;
++	Rune ra, rb;
++
++	for(i=0; i<n; i+=w){
++		w = chartorune(&ra, a);
++		chartorune(&rb, b);
++		if(ra != rb)
++			break;
++		a += w;
++		b += w;
++	}
++	return i;
++}
++
++
++static int
++strpcmp(const void *va, const void *vb)
++{
++	char *a, *b;
++
++	a = *(char**)va;
++	b = *(char**)vb;
++	return strcmp(a, b);
++}
++
++Completion*
++vcomplete(char *dir, char *s)
++{
++	long i, l, n, nfile, len, nbytes;
++	int minlen;
++	Vfd fd;
++	Dir *dirp;
++	char **name, *p;
++	ulong* mode;
++	Completion *c;
++
++	if(strchr(s, '/') != nil){
++		werrstr("slash character in name argument to complete()");
++		return nil;
++	}
++
++	fd = vopen(dir, OREAD);
++	if(fd.which == Verr)
++		return nil;
++
++	n = vdirreadall(fd, &dirp);
++	if(n <= 0){
++		vclose(&fd);
++		return nil;
++	}
++
++	/* find longest string, for allocation */
++	len = 0;
++	for(i=0; i<n; i++){
++		l = strlen(dirp[i].name) + 1 + 1; /* +1 for /   +1 for \0 */
++		if(l > len)
++			len = l;
++	}
++
++	name = malloc(n*sizeof(char*));
++	mode = malloc(n*sizeof(ulong));
++	c = malloc(sizeof(Completion) + len);
++	if(name == nil || mode == nil || c == nil)
++		goto Return;
++	memset(c, 0, sizeof(Completion));
++
++	/* find the matches */
++	len = strlen(s);
++	nfile = 0;
++	minlen = 1000000;
++	for(i=0; i<n; i++)
++		if(strncmp(s, dirp[i].name, len) == 0){
++			name[nfile] = dirp[i].name;
++			mode[nfile] = dirp[i].mode;
++			if(minlen > strlen(dirp[i].name))
++				minlen = strlen(dirp[i].name);
++			nfile++;
++		}
++
++	if(nfile > 0) {
++		/* report interesting results */
++		/* trim length back to longest common initial string */
++		for(i=1; i<nfile; i++)
++			minlen = longestprefixlength(name[0], name[i], minlen);
++
++		/* build the answer */
++		c->complete = (nfile == 1);
++		c->advance = c->complete || (minlen > len);
++		c->string = (char*)(c+1);
++		memmove(c->string, name[0]+len, minlen-len);
++		if(c->complete)
++			c->string[minlen++ - len] = (mode[0]&DMDIR)? '/' : ' ';
++		c->string[minlen - len] = '\0';
++		c->nmatch = nfile;
++	} else {
++		/* no match, so return all possible strings */
++		for(i=0; i<n; i++){
++			name[i] = dirp[i].name;
++			mode[i] = dirp[i].mode;
++		}
++		nfile = n;
++		c->nmatch = 0;
++	}
++
++	/* attach list of names */
++	nbytes = nfile * sizeof(char*);
++	for(i=0; i<nfile; i++)
++		nbytes += strlen(name[i]) + 1 + 1;
++	c->filename = malloc(nbytes);
++	if(c->filename == nil)
++		goto Return;
++	p = (char*)(c->filename + nfile);
++	for(i=0; i<nfile; i++){
++		c->filename[i] = p;
++		strcpy(p, name[i]);
++		p += strlen(p);
++		if(mode[i] & DMDIR)
++			*p++ = '/';
++		*p++ = '\0';
++	}
++	c->nfile = nfile;
++	qsort(c->filename, c->nfile, sizeof(c->filename[0]), strpcmp);
++
++  Return:
++	free(name);
++	free(mode);
++	free(dirp);
++	vclose(&fd);
++	return c;
++}
+diff --git a/src/cmd/acme/vfs.c b/src/cmd/acme/vfs.c
+new file mode 100644
+index 00000000..f3f2decf
+--- /dev/null
++++ b/src/cmd/acme/vfs.c
+@@ -0,0 +1,187 @@
++#include <u.h>
++#include <libc.h>
++#include <draw.h>
++#include <thread.h>
++#include <cursor.h>
++#include <mouse.h>
++#include <keyboard.h>
++#include <frame.h>
++#include <fcall.h>
++#include <plumb.h>
++#include <libsec.h>
++#include <9pclient.h>
++#include <complete.h>
++#include "dat.h"
++#include "fns.h"
++
++
++Vfd
++vopen(char *file, int omode)
++{
++	Remote *r;
++	Session *sess;
++	Vfd v;
++
++	v.which = Verr;
++
++	if((r = remote(file)) != nil){
++		sess = rconnect(r);
++		if(sess == nil)
++			goto Done;
++		/* TODO: strip prefix */
++		v.fid = fsopen(sess->fs, file, omode);
++		v.sess = sess;
++		if(v.fid != nil)
++			v.which = Vremote;
++	}else{
++		v.fd = open(file, omode);
++		if(v.fd >= 0)
++			v.which = Vlocal;
++	}
++
++Done:
++	return v;
++}
++
++Dir*
++vdirstat(char *file)
++{
++	Remote *r;
++	Session *sess;
++	Dir *d;
++
++	if((r = remote(file)) == nil)
++		return dirstat(file);
++	if((sess = rconnect(r)) == nil)
++		return nil;
++	d = fsdirstat(sess->fs, file);
++	rclose(sess);
++	return d;
++}
++
++Vfd
++vcreate(char *file, int omode, ulong perm)
++{
++	Remote *r;
++	Session *sess;
++	Vfd v;
++
++	v.which = Verr;
++
++	if((r = remote(file)) == nil){
++		v.fd = create(file, omode, perm);
++		if(v.fd >= 0)
++			v.which = Vlocal;
++		return v;
++	}
++	if((sess = rconnect(r)) != nil){
++		v.fid = fscreate(sess->fs, file, omode, perm);
++		if(v.fid != nil){
++			v.which = Vremote;
++			v.sess = sess;
++		}
++	}
++	return v;
++}
++
++
++Dir*
++vdirfstat(Vfd fd)
++{
++	switch(fd.which){
++	default:
++		return nil;
++	case Vlocal:
++		return dirfstat(fd.fd);
++	case Vremote:
++		return fsdirfstat(fd.fid);
++	}
++}
++
++long
++vdirread(Vfd fd, Dir **d)
++{
++	switch(fd.which){
++	default:
++		return -1;
++	case Vlocal:
++		return dirread(fd.fd, d);
++	case Vremote:
++		return fsdirread(fd.fid, d);
++	}
++}
++
++long
++vdirreadall(Vfd fd, Dir **d)
++{
++	switch(fd.which){
++	default:
++		return -1;
++	case Vlocal:
++		return dirreadall(fd.fd, d);
++	case Vremote:
++		return fsdirreadall(fd.fid, d);
++	}
++}
++
++/* TODO: pass by pointer is a hack here. */
++int
++vclose(Vfd *fd)
++{
++	switch(fd->which){
++	case Vlocal:
++		fd->which = Vclosed;
++		return close(fd->fd);
++	case Vremote:
++		fd->which = Vclosed;
++		fsclose(fd->fid);
++		rclose(fd->sess);
++		fd->sess = nil;
++		return 0;
++	}
++	return -1;
++}
++
++long
++vread(Vfd fd, void *buf, long nbytes)
++{
++	switch(fd.which){
++	default:
++		return -1;
++	case Vlocal:
++		return read(fd.fd, buf, nbytes);
++	case Vremote:
++		return fsread(fd.fid, buf, nbytes);
++	}
++
++}
++
++long
++vwrite(Vfd fd, void *buf, long n)
++{
++	switch(fd.which){
++	default:
++		return -1;
++	case Vlocal:
++		return write(fd.fd, buf, n);
++	case Vremote:
++		return fswrite(fd.fid, buf, n);
++	}
++}
++
++int
++vaccess(char *file, int mode)
++{
++	Remote *r;
++	Session *sess;
++	int rv;
++
++	if((r = remote(file)) == nil)
++		return access(file, mode);
++	if((sess = rconnect(r)) == nil)
++		return -1;
++
++	rv = fsaccess(sess->fs, file, mode);
++	rclose(sess);
++	return rv;
++}
+\ No newline at end of file
+diff --git a/src/cmd/acme/vproc.c b/src/cmd/acme/vproc.c
+new file mode 100644
+index 00000000..43c2c592
+--- /dev/null
++++ b/src/cmd/acme/vproc.c
+@@ -0,0 +1,266 @@
++#include <u.h>
++#include <libc.h>
++#include <draw.h>
++#include <thread.h>
++#include <cursor.h>
++#include <mouse.h>
++#include <keyboard.h>
++#include <frame.h>
++#include <fcall.h>
++#include <plumb.h>
++#include <libsec.h>
++#include <9pclient.h>
++#include <complete.h>
++#include "dat.h"
++#include "fns.h"
++
++enum
++{
++	Fd2fid,
++	Fid2fd,
++};
++
++static Vpid
++errorvp()
++{
++	Vpid vp = { nil, -1 };
++	return vp;
++}
++
++static void
++inrelayproc(void *v)
++{
++	/* args: */
++		CFid *fid;
++		int fd;
++	/* end of args */
++	void **a;
++	char buf[256];
++	int n;
++
++	a = v;
++	fid = a[0];
++	fd = (uintptr)a[1];
++	free(a);
++
++	for(;;){
++		if((n = fsread(fid, buf, sizeof buf)) <= 0)
++			break;
++		if(write(fd, buf, n) != n)
++			break;
++		/* TODO: report unexpected failures */
++	}
++	close(fd);
++	fsclose(fid);
++}
++
++static void
++inrelay(CFid *fid, int fd)
++{
++	void **a;
++
++	a = emalloc(sizeof(void*)*2);
++	a[0] = fid;
++	a[1] = (void*)(uintptr)fd;
++	proccreate(inrelayproc, a, STACK);
++}
++
++static void
++outrelayproc(void *v)
++{
++	/* args: */
++		int fd;
++		CFid *fid;
++		CFid *ctl;
++	/* end of args */
++	void **a;
++	char buf[1024];
++	int n;
++
++	a = v;
++	fd = (uintptr)a[0];
++	fid = a[1];
++	ctl = a[2];
++	free(a);
++
++	for(;;){
++		n = read(fd, buf, sizeof buf);
++		if(n <= 0)
++			break;
++		if(fswrite(fid, buf, n) != n)
++			break;
++	}
++	fsprint(ctl, "eof");
++	close(fd);
++	fsclose(fid);
++	fsclose(ctl);
++}
++
++static void
++outrelay(int fd, CFid *fid, CFid *ctl)
++{
++	void **a;
++
++	a = emalloc(sizeof(void*)*3);
++	a[0] = (void*)(uintptr)fd;
++	a[1] = fid;
++	a[2] =ctl;
++	proccreate(outrelayproc, a, STACK);
++}
++
++static void
++waitproc(void *v)
++{
++	Vpid *vp;
++	Vwaitmsg *vw;
++	CFid *fid;
++	char buf[128];
++	int n;
++
++	vp = v;
++	snprint(buf, sizeof buf, "%d/wait", vp->id);
++	fid = fsopen(vp->sess->cmd, buf, OREAD);
++	if(fid == nil){
++		warning(nil, "can't wait for remote process: %r\n");
++		return;
++	}
++	if((n=fsread(fid, buf, sizeof buf-1)) < 0){
++		strcpy(buf, "unknown");
++		n = strlen(buf);
++	}
++	buf[n] = 0;
++
++	vw = emalloc(sizeof *vw);
++	vw->vp = *vp;
++	vw->msg = estrdup(buf);
++	sendp(cvwait, vw);
++	free(vp);
++}
++
++static int
++vputenv(CFid *ctl, char *env)
++{
++	int rv;
++	char *p;
++
++	p = getenv(env);
++	if(p == nil)
++		return 0;
++	rv = fsprint(ctl, "env %s=%s", env, p);
++	free(p);
++	return rv;
++}
++
++int
++vpostnote(Vpid vp, char *note)
++{
++	char buf[128];
++	CFid *fid;
++	int ret;
++
++	if(vp.sess == nil)
++		return postnote(PNGROUP, vp.id, note);
++
++	snprint(buf, sizeof buf, "%d/ctl", vp.id);
++	fid = fsopen(vp.sess->cmd, buf, OWRITE);
++	if(fid == nil)
++		return -1;
++	ret = fsprint(fid, "note %s", note);
++	fsclose(fid);
++
++	return ret < 0 ? -1 : 0;
++}
++
++int
++vpcmp(Vpid vp1, Vpid vp2)
++{
++	if(vp1.sess == vp2.sess)
++		if(vp1.id < vp2.id)
++			return -1;
++		else if(vp1.id > vp2.id)
++			return 1;
++		else
++			return 0;
++	else if(vp1.sess < vp2.sess)
++		return -1;
++	else
++		return 1;
++}
++
++Vpid
++vshell(Remote *r, int fd[3], char *cmd, char *dir)
++{
++	Session *sess;
++	CFsys *fs;
++	CFid *ctl, *fid[3];
++	Vpid vp, *vpp;
++	int id, n;
++	char buf[128];
++
++	sess = nil;
++	ctl = nil;
++	fid[0] = fid[1] = fid[2] = nil;
++	sess = rconnect(r);
++	fs = sess->cmd;
++	ctl = fsopen(fs, "new/ctl", ORDWR);
++	if(ctl == nil){
++		rclose(sess);
++		return errorvp();
++	}
++	n = fsread(ctl, buf, sizeof buf-1);
++	if(n <= 0)
++		goto Error;
++	buf[n] = 0;
++	id = atoi(buf);
++
++	if(fsprint(ctl, "cmd %s", cmd) <= 0)
++		goto Error;
++
++	/* TODO: set this up in a single ctl message to
++	  * avoid the unnecessary roundtrips. These are noticeable
++	  * in high-latency connections. */
++	if(vputenv(ctl, "%") < 0)
++		goto Error;
++	if(vputenv(ctl, "samfile") < 0)
++		goto Error;
++	if(vputenv(ctl, "acmeaddr") < 0)
++		goto Error;
++	if(vputenv(ctl, "winid") < 0)
++		goto Error;
++	if(dir && fsprint(ctl, "dir %s", dir) <= 0)
++		goto Error;
++
++	snprint(buf, sizeof buf, "%d/stdin", id);
++	fid[0] = fsopen(fs, buf, OWRITE);
++	snprint(buf, sizeof buf, "%d/stdout", id);
++	fid[1] = fsopen(fs, buf, OREAD);
++	snprint(buf, sizeof buf, "%d/stderr", id);
++	fid[2] = fsopen(fs, buf, OREAD);
++
++	if(fid[0] == nil || fid[1] == nil || fid[2] == nil)
++		goto Error;
++
++	if(fsprint(ctl, "start") <= 0)
++		goto Error;
++
++	outrelay(fd[0], fid[0], ctl);
++	inrelay(fid[1], dup(fd[1], -1));
++	inrelay(fid[2], dup(fd[2], -1));
++	close(fd[1]);
++	close(fd[2]);
++
++	vp.sess = sess;
++	vp.id = id;
++	vpp = emalloc(sizeof *vpp);
++	*vpp = vp;
++	proccreate(waitproc, vpp, STACK);
++	return vp;
++
++Error:
++	rclose(sess);
++	fsclose(ctl);
++	fsclose(fid[0]);
++	fsclose(fid[1]);
++	fsclose(fid[2]);
++	return errorvp();
++}
+diff --git a/src/cmd/acme/wind.c b/src/cmd/acme/wind.c
+index 98c97368..8db71859 100644
+--- a/src/cmd/acme/wind.c
++++ b/src/cmd/acme/wind.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 
+diff --git a/src/cmd/acme/xfid.c b/src/cmd/acme/xfid.c
+index e7d9f4cb..32ba30d4 100644
+--- a/src/cmd/acme/xfid.c
++++ b/src/cmd/acme/xfid.c
+@@ -9,6 +9,7 @@
+ #include <fcall.h>
+ #include <plumb.h>
+ #include <libsec.h>
++#include <9pclient.h>
+ #include "dat.h"
+ #include "fns.h"
+ 

@@ -1,5 +1,5 @@
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index 852a8f7f..2fdda118 100644
+index 0d10aeb5..1382d9f6 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
 @@ -4,7 +4,7 @@ acme, win, awd \- interactive text windows
@@ -11,7 +11,7 @@ index 852a8f7f..2fdda118 100644
  ]
  [
  .B -f
-@@ -203,6 +203,16 @@ The option
+@@ -219,6 +219,16 @@ The option
  .B -a
  causes each window to start in
  autoindent mode.
@@ -28,7 +28,7 @@ index 852a8f7f..2fdda118 100644
  .SS "Directory context
  Each window's tag names a directory: explicitly if the window
  holds a directory; implicitly if it holds a regular file
-@@ -469,6 +479,17 @@ Place selected text in snarf buffer.
+@@ -485,6 +495,17 @@ Place selected text in snarf buffer.
  Arrange the windows in the column from top to bottom in lexicographical
  order based on their names.
  .TP
@@ -47,10 +47,10 @@ index 852a8f7f..2fdda118 100644
  Set the width of tab stops for this window to the value of the argument, in units of widths of the zero
  character.
 diff --git a/src/cmd/acme/acme.c b/src/cmd/acme/acme.c
-index 0e6bc0fd..9342965d 100644
+index 05f8e089..fdf9da51 100644
 --- a/src/cmd/acme/acme.c
 +++ b/src/cmd/acme/acme.c
-@@ -78,7 +78,7 @@ threadmain(int argc, char *argv[])
+@@ -82,7 +82,7 @@ threadmain(int argc, char *argv[])
  		}
  		break;
  	case 'a':
@@ -59,7 +59,7 @@ index 0e6bc0fd..9342965d 100644
  		break;
  	case 'b':
  		bartflag = TRUE;
-@@ -101,6 +101,9 @@ threadmain(int argc, char *argv[])
+@@ -105,6 +105,9 @@ threadmain(int argc, char *argv[])
  		if(fontnames[1] == nil)
  			goto Usage;
  		break;
@@ -69,20 +69,20 @@ index 0e6bc0fd..9342965d 100644
  	case 'l':
  		loadfile = ARGF();
  		if(loadfile == nil)
-@@ -121,7 +124,7 @@ threadmain(int argc, char *argv[])
+@@ -151,7 +154,7 @@ threadmain(int argc, char *argv[])
  		break;
  	default:
  	Usage:
--		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize\n");
-+		fprint(2, "usage: acme -aibr -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize\n");
+-		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize -s path -R remotespec\n");
++		fprint(2, "usage: acme -aibr -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize -s path -R remotespec\n");
  		threadexitsall("usage");
  	}ARGEND
  
 diff --git a/src/cmd/acme/dat.h b/src/cmd/acme/dat.h
-index 8a81c97d..f3a3791b 100644
+index 4908d2c8..8609fc7c 100644
 --- a/src/cmd/acme/dat.h
 +++ b/src/cmd/acme/dat.h
-@@ -229,6 +229,13 @@ void		textsetselect(Text*, uint, uint);
+@@ -238,6 +238,13 @@ void		textsetselect(Text*, uint, uint);
  void		textshow(Text*, uint, uint, int);
  void		texttype(Text*, Rune);
  
@@ -96,7 +96,7 @@ index 8a81c97d..f3a3791b 100644
  struct Window
  {
  	QLock	lk;
-@@ -240,7 +247,7 @@ struct Window
+@@ -249,7 +256,7 @@ struct Window
  	uchar	isscratch;
  	uchar	filemenu;
  	uchar	dirty;
@@ -105,7 +105,7 @@ index 8a81c97d..f3a3791b 100644
  	uchar	showdel;
  	int		id;
  	Range	addr;
-@@ -552,7 +559,7 @@ extern char		wdir[]; /* must use extern because no dimension given */
+@@ -633,7 +640,7 @@ extern char		wdir[]; /* must use extern because no dimension given */
  int			editing;
  int			erroutfd;
  int			messagesize;		/* negotiated in 9P version setup */
@@ -113,9 +113,9 @@ index 8a81c97d..f3a3791b 100644
 +int			globalindent[NINDENT];
  int			dodollarsigns;
  char*		mtpt;
- 
+ char*		racmename;
 diff --git a/src/cmd/acme/exec.c b/src/cmd/acme/exec.c
-index 1dd02288..deb27810 100644
+index a44ef699..a535177d 100644
 --- a/src/cmd/acme/exec.c
 +++ b/src/cmd/acme/exec.c
 @@ -92,6 +92,7 @@ static Rune LRedo[] = { 'R', 'e', 'd', 'o', 0 };
@@ -143,7 +143,7 @@ index 1dd02288..deb27810 100644
  	{ LTab,		tab,		FALSE,	XXX,		XXX		},
  	{ LUndo,		undo,	FALSE,	TRUE,	XXX		},
  	{ LZerox,		zeroxx,	FALSE,	XXX,		XXX		},
-@@ -915,7 +917,7 @@ put(Text *et, Text *_0, Text *argt, int _1, int _2, Rune *arg, int narg)
+@@ -924,7 +926,7 @@ put(Text *et, Text *_0, Text *argt, int _1, int _2, Rune *arg, int narg)
  		warning(nil, "no file name\n");
  		return;
  	}
@@ -152,7 +152,7 @@ index 1dd02288..deb27810 100644
  		trimspaces(et);
  	namer = bytetorune(name, &nname);
  	putfile(f, 0, f->b.nc, namer, nname);
-@@ -1387,66 +1389,75 @@ incl(Text *et, Text *_0, Text *argt, int _1, int _2, Rune *arg, int narg)
+@@ -1396,66 +1398,75 @@ incl(Text *et, Text *_0, Text *argt, int _1, int _2, Rune *arg, int narg)
  static Rune LON[] = { 'O', 'N', 0 };
  static Rune LOFF[] = { 'O', 'F', 'F', 0 };
  static Rune Lon[] = { 'o', 'n', 0 };
@@ -249,10 +249,10 @@ index 1dd02288..deb27810 100644
  
  void
 diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
-index a7172b50..ce528330 100644
+index a0b824f4..736ec410 100644
 --- a/src/cmd/acme/look.c
 +++ b/src/cmd/acme/look.c
-@@ -797,9 +797,11 @@ openfile(Text *t, Expand *e)
+@@ -798,9 +798,11 @@ openfile(Text *t, Expand *e)
  				runemove(rp, ow->incl[i], n);
  				winaddincl(w, rp, n);
  			}
@@ -267,10 +267,10 @@ index a7172b50..ce528330 100644
  	}
  	if(e->a1 == e->a0)
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..ff2da5b3 100644
+index 8c1a308b..b7dd5ccb 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
-@@ -532,6 +532,27 @@ textreadc(Text *t, uint q)
+@@ -536,6 +536,27 @@ textreadc(Text *t, uint q)
  	return r;
  }
  
@@ -298,7 +298,7 @@ index 09422dda..ff2da5b3 100644
  int
  textbswidth(Text *t, Rune c)
  {
-@@ -540,8 +561,11 @@ textbswidth(Text *t, Rune c)
+@@ -544,8 +565,11 @@ textbswidth(Text *t, Rune c)
  	int skipping;
  
  	/* there is known to be at least one character to erase */
@@ -311,7 +311,7 @@ index 09422dda..ff2da5b3 100644
  	q = t->q0;
  	skipping = TRUE;
  	while(q > 0){
-@@ -887,8 +911,19 @@ texttype(Text *t, Rune r)
+@@ -917,8 +941,19 @@ texttype(Text *t, Rune r)
  			textfill(t->file->text[i]);
  		t->iq1 = t->q0;
  		return;
@@ -333,10 +333,10 @@ index 09422dda..ff2da5b3 100644
  			nnb = textbswidth(t, 0x15); /* ^U case */
  			rp = runemalloc(nnb + 1);
 diff --git a/src/cmd/acme/util.c b/src/cmd/acme/util.c
-index c153f8c1..ecd04503 100644
+index b6857a3f..39339ac0 100644
 --- a/src/cmd/acme/util.c
 +++ b/src/cmd/acme/util.c
-@@ -107,7 +107,8 @@ errorwin1(Rune *dir, int ndir, Rune **incl, int nincl)
+@@ -108,7 +108,8 @@ errorwin1(Rune *dir, int ndir, Rune **incl, int nincl)
  		runemove(r, incl[i], n);
  		winaddincl(w, r, n);
  	}
@@ -347,10 +347,10 @@ index c153f8c1..ecd04503 100644
  }
  
 diff --git a/src/cmd/acme/wind.c b/src/cmd/acme/wind.c
-index 9441bbb7..0cea1694 100644
+index f37b8d01..26a62fcd 100644
 --- a/src/cmd/acme/wind.c
 +++ b/src/cmd/acme/wind.c
-@@ -21,7 +21,7 @@ wininit(Window *w, Window *clone, Rectangle r)
+@@ -22,7 +22,7 @@ wininit(Window *w, Window *clone, Rectangle r)
  	File *f;
  	Reffont *rf;
  	Rune *rp;
@@ -359,7 +359,7 @@ index 9441bbb7..0cea1694 100644
  
  	w->tag.w = w;
  	w->taglines = 1;
-@@ -80,10 +80,12 @@ wininit(Window *w, Window *clone, Rectangle r)
+@@ -81,10 +81,12 @@ wininit(Window *w, Window *clone, Rectangle r)
  	draw(screen, br, button, nil, button->r.min);
  	w->filemenu = TRUE;
  	w->maxlines = w->body.fr.maxlines;
