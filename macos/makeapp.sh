@@ -1,14 +1,22 @@
 #!/bin/sh
 
 # Creates macOS Acme.app in ~/Applications/
-# Set $PLAN9 to specify path to the plan9port repository (defaults to /usr/local/plan9)
-# Set $APPDIR to specify path to the Applications folder (defaults to ~/Applications)
 
-PLAN9=${PLAN9:-/usr/local/plan9}
+# Set $APPDIR to specify path to the Applications folder (defaults to ~/Applications)
+# Set $PLAN9 to specify path to the plan9port repository (defaults to /usr/local/plan9)
+# Set $STARTACMEPATH to specify path to acme launch command or script (defaults to ~/.local/bin/startacme.sh)
+
 APPDIR=${APPDIR:-"$HOME/Applications"}
+PLAN9=${PLAN9:-/usr/local/plan9}
+STARTACMEPATH=${STARTACMEPATH:-"$HOME/.local/bin/startacme.sh"}
 
 ICONPATH="$PLAN9/mac/spaceglenda.icns"
-STARTACMEPATH="$HOME/.local/bin/startacme.sh"
+
+# Check Applications directory exists
+if [ ! -d "$APPDIR" ]; then
+	echo "Applications directory $APPDIR does not exist" >&2
+	exit 1
+fi
 
 # Check needed plan9port repository files exist
 if [ ! -f "$ICONPATH" ]; then
@@ -17,9 +25,9 @@ if [ ! -f "$ICONPATH" ]; then
 	exit 1
 fi
 
-# Check if launcher script exists
+# Check if launch command or script exists
 if [ ! -x "$STARTACMEPATH" ]; then
-	echo "Acme shell launcher script not installed at $STARTACMEPATH" >&2
+	echo "Acme launch command or script not installed at $STARTACMEPATH" >&2
 	exit 1
 fi
 

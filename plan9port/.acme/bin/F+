@@ -48,4 +48,4 @@ if not {
 
 newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
 9 echo font $newfont | 9p write acme/$winid/ctl
-9 echo $newfont
+9p read acme/$winid/ctl | 9 awk '{print $7}'

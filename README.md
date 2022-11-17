@@ -36,7 +36,7 @@ file in the subdirectory for instructions.
 ### Compiling plan9port
 
 The following instructions are for a system-level install at
-`/usr/local/plan9` or a local install at `$HOME/packages/plan9port`.
+`/usr/local/plan9` or a local install at `$HOME/.local/plan9port`.
 Change the target directory as desired. See `install.txt` for what
 compile-time dependencies need to be installed.
 
@@ -54,8 +54,8 @@ easier updating, and code patches should be applied after the
 `git checkout` step):
 
 ```sh
-mkdir -p $HOME/packages
-cd $HOME/packages
+mkdir -p $HOME/.local
+cd $HOME/.local
 git clone https://github.com/9fans/plan9port.git
 cd plan9port
 git checkout -b $(date +%Y%m%d)
@@ -63,20 +63,23 @@ git checkout -b $(date +%Y%m%d)
 ./INSTALL -c -r $PWD
 ```
 
-Follow the instructions to add the plan9port `bin` directory to the
-user shell path, if desired. However, it can be better to avoid mixing
-the GNU or BSD tooling with the Plan 9 tooling, so an alternative
-would be to create a symlink to the `9` command for running the
-plan9port commands. In that case, `ls` runs the regular version of
-`ls` while `9 ls` runs the plan9port version.
-
-I.e., suppose `$HOME/.local/bin` exists and is on the shell search
-path, and plan9port is installed locally as above:
+Follow the instructions to set `$PLAN9` and add `$PLAN9/bin` to
+`$PATH` for the user shell. Note that for Bash, if the plan9port
+install location is `/path/to/plan9port`, adding the suggested
 
 ```sh
-cd $HOME/.local/bin
-ln -s $HOME/packages/plan9port/bin/9
+PLAN9=/path/to/plan9port export PLAN9
+PATH=$PATH:$PLAN9/bin export PATH
 ```
+
+to the profile (`~/.bashrc` or `~/.profile`) works, but for Zsh
+
+```sh
+export PLAN9=/path/to/plan9port
+export PATH=$PATH:$PLAN9/bin
+```
+
+should be added instead (to `~/.zshrc` or `~/.zprofile`).
 
 ### Setting up base configuration files
 
@@ -95,20 +98,15 @@ This will create the symlinks:
   `plumber`.
 - `~/.local/bin/acmeactivens.sh`: Outputs the namespaces
   `/tmp/ns.$USER/*` for which there is a running instance of Acme.
-- `~/.local/bin/rc.sh`: Launcher for the Plan 9 shell `rc`, useful for
-  when the plan9port binaries directory is not added to the search
-  path by default. Assumes the plan9port install directory is
-  `$HOME/packages/plan9port`, so copy this file and modify the
-  necessary paths if plan9port is installed elsewhere.
 - `~/.local/bin/startacme.rc`: Launcher for Acme.
 - `~/.local/bin/startsam.rc`: Launcher for Sam.
 - `~/.local/bin/sample-pylsp`: Sample wrapper showing how to run
   [Python LSP Server](https://github.com/python-lsp/python-lsp-server)
   installed in a Conda environment. Of utility when using `acme-lsp`.
 - `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
-  `startacme.rc` via `rc.sh`.
+  `startacme.rc` via `rc`.
 - `~/.local/bin/sample-startsam.sh`: Sample wrapper to run
-  `startsam.rc` via `rc.sh`.
+  `startsam.rc` via `rc`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
 Copy `sample-startacme.sh` to `~/.local/bin/startacme.sh` and
@@ -755,7 +753,7 @@ see [here](https://gist.github.com/proudlygeek/5721498),
   aliases, e.g. for Bash
 
   ```sh
-  alias aproj='visibleclicks=1 $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
+  alias aproj='visibleclicks=1 $PLAN9/bin/rc $HOME/.local/bin/startacme.rc -f /mnt/font/GoRegular/15a/font -F /mnt/font/GoMono/15a/font -l /path/to/proj/acme.dump'
   ```
 
   or for rc

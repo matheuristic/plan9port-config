@@ -56,7 +56,7 @@
 #     mkdir -p "$NAMESPACE"
 #     shift; shift
 #   fi
-#   $HOME/.local/bin/rc.sh $HOME/.local/bin/startacme.rc "$@"
+#   $PLAN9/bin/rc $HOME/.local/bin/startacme.rc "$@"
 
 # Default width of a tab in 0 glyph width multiples
 if (~ $#tabstop 0) tabstop=4
