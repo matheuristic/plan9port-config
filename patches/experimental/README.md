@@ -68,12 +68,41 @@ More on remoting behavior (again quoted from the first link below):
 > other programs like this too, e.g., acme-lsp, which uses the plumber
 > to coordinate interaction).
 
+From the appropriate Twitter thread (quoted from the fourth link below):
+
+> Because acme was part of Plan 9 and was designed around
+> application-specific file servers, I could use the same mechanism to
+> implement client-server remoting.
+>
+> The remoting implementation exports acme's local filesystems
+> (through which it interacts with external programs) over ssh, using
+> 9p.
+>
+> Similarly, I implemented two 9p servers that were imported from the
+> remote host (through the same server, which acts as a 9p
+> multiplexer).
+>
+> The first exports the remote's file system to the local acme
+> instance.
+>
+> The second server provides a filesystem through which commands can
+> be defined and run.
+>
+> This is really all that's needed for a more-or-less fully fledged
+> remoting implementation.
+>
+> Acme itself is internally quite stateless (buffers are kept in
+> memory; files are read in full and written back), which also helps
+> keep things simple, and the implementation is fully capable of
+> handling remote failures and disconnects, etc.
+
 Links:
 
 - [9fans - plan9port: acme remoting](https://www.mail-archive.com/9fans@9fans.net/msg39249.html)
   (also see [here](https://twitter.com/marius/status/1345956886881865728))
 - [Github Gist - mariusae/acmesrv.patch](https://gist.github.com/mariusae/a7b13730b7c5aa08f32b30a64f31856b)
 - [Github - mariusae/plan9port - marius-snapshot-2022-04-24](https://github.com/mariusae/plan9port/tree/marius-snapshot-2022-04-24)
+- [Twitter thread](https://twitter.com/marius/status/1345956890648317952)
 
 ### Add soft tabs to Acme editor (acmesrv-compatible version)
 
