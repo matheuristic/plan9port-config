@@ -56,9 +56,9 @@ easier updating, and code patches should be applied after the
 ```sh
 mkdir -p $HOME/.local
 cd $HOME/.local
-git clone https://github.com/9fans/plan9port.git
-cd plan9port
-git checkout -b $(date +%Y%m%d)
+git clone https://github.com/9fans/plan9port.git plan9
+cd plan9
+git checkout -b "build-$(date +%Y%m%d)"
 ./INSTALL -b
 ./INSTALL -c -r $PWD
 ```
@@ -1096,6 +1096,11 @@ On macOS, there are also additional keybindings:
 
 A script `makeapp.sh` for creating an Acme launcher application is
 provided in the `macos` folder. See `macos/README.md` for details.
+
+Note that script-only apps are always run under Rosetta 2 on arm macOS
+systems, so make sure to install that if needed (for more information on this
+topic, see the paragraph on **unsigned native (ARM) code**
+[here](https://eclecticlight.co/2022/02/01/what-shouldnt-you-use-an-m1-series-mac-for/)).
 
 ### macOS tips
 
