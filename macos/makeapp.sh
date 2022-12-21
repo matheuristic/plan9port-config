@@ -73,6 +73,7 @@ EOF
 echo "Creating $APPDIR/Acme.app/Contents/MacOS/acme"
 cat >MacOS/acme <<EOF
 #!/bin/zsh
+[[ -e $HOME/.zshrc ]] && source $HOME/.zshrc
 $STARTACMEPATH
 EOF
 chmod +x MacOS/acme
