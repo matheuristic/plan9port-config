@@ -426,7 +426,11 @@ a number of helper scripts available at `~/.acme/bin`:
   ServerKey = "rust-analyzer"
   ```
 
-  An alternative is [acre](https://github.com/mjibson/acre).
+  An alternative is [acre](https://github.com/mjibson/acre). This can
+  be installed by downloading and extracting the source code from the
+  Github repository, `cd`-ing into the extracted directory and running
+  `cargo install --path $PWD` (requires Rust tooling be
+  [installed](https://www.rust-lang.org/tools/install)).
 
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a

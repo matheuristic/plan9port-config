@@ -6,4 +6,4 @@
 # leading indentation in the text
 
 COMMENTCHARS=${1:-"#"}
-9 awk 'BEGIN{n=0} {split($0,a,/[^ \t]/)} (NR==1||a[1]<shortest){shortest=a[1]} {lines[++n]=$0} END{for(i=1;i<=n;i++){sub(shortest, shortest "'"$COMMENTCHARS"'" " ", lines[i]); print lines[i]}}'
+9 awk 'BEGIN{n=0} {split($0,a,/[^ \t]/)} (NR==1||a[1]<shortest){shortest=a[1]} {lines[++n]=$0} END{for(i=1;i<=n;i++){sub(shortest, shortest "'"$COMMENTCHARS"'", lines[i]); print lines[i]}}'

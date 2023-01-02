@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -e
+
+checkcmd() {
+	if ! command -v "$1" >/dev/null 2>&1; then
+		echo "$1 needs to be installed"
+		exit 1
+	fi
+}
+
+checkcmd htmlq
+
+if [ "$1" = "-h" ]; then
+	cat >&2 <<EOF
+Generate Markdown link given a URL with its page title as link label
+
+Usage:
+	`basename $0` [-h]
+	printf url | `basename $0`
+
+-h prints usage info
+url is the url for which to generate a Markdown link
+
+If the webpage corresponding to the URL does not have a title,
+the URL is used as the link label
+EOF
+	exit 0
+fi
+
+URL=$(cat)
+TITLE=$(curl -Ls "$URL" | htmlq --text title)
+
+if [ -z "$TITLE" ]; then
+	TITLE=$URL
+fi
+
+printf "[$TITLE]($URL)"
