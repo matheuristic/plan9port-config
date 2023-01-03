@@ -1195,6 +1195,8 @@ Version=1.0
 
 ## Other useful or reference links
 
+- [Acme and me | ilanpillemer](https://ilanpillemer.github.io/subjects/acme.html)
+
 - [Acme plumbing rules for OCaml](https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467)
 
 - [Acme Tricks](https://blog.silvela.org/post/2021-12-11-acme-tricks/)
