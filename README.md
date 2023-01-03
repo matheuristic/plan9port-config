@@ -283,6 +283,7 @@ a number of helper scripts available at `~/.acme/bin`:
 - `lw`: List Acme windows (including window ID, whether the window is
   a directory window, and if the window is dirty). A fancier version
   of running the `Edit X` Sam command.
+- `mdlink`: Convert URL to Markdown link labeled with its page title.
 - `mdpv`: Preview current Acme window Markdown file in a browser.
 - `mvto`: Rename current Acme window file, and updates the tag after.
   Uses `git mv` if the file part of a Git repository, `mv` otherwise.
