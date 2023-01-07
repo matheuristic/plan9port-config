@@ -23,7 +23,7 @@ winname '/cve/'$name
 rc -c $cmd	| winwrite body
 winctl clean
 
-echo -n '0' | winwrite addr
+9 echo -n '0' | winwrite addr
 winctl 'dot=addr'
 winctl show
 

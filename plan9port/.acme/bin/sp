@@ -55,7 +55,7 @@ RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
 			fi
 			lcolumn=`9 echo -n "$l" | 9 awk '{print $'${lindex}'}' | 9 sed -e 's/^([0-9]+).*/\1/'`
 			lcolumnstart=`9 hoc -e "$lcolumn + 1"`
-			llength=`9 echo -n "$lword" | wc -c`
+			llength=`9 echo -n "$lword" | 9 wc -c`
 			lcolumnend=`9 hoc -e "$lcolumnstart + $llength"`
 			lsuggest=`9 echo -n "$l" | 9 awk -F':' '{print ":" $2}'`
 			9 echo "${RELATIVEPATH}:${lline}:${lcolumnstart},${lline}:${lcolumnend}	$lword $lsuggest"

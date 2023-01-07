@@ -54,10 +54,10 @@ fi
 # Change ssh to https (works for most hosts), cleanup trailing '.git'
 GITURL=$(git remote get-url origin | 9 sed -e 's!^git@([^:]+):!https://\1/!' -e 's/\.git$//')
 # Extract out the URI scheme (in case the repo is on Gemini or non-https)
-URISCHEME=$(echo -n "$GITURL" | 9 awk -F'://' '{print $1; exit}')
-URIPATH=$(echo -n "$GITURL" | 9 sed -e 's;[0-9A-Za-z]+://;;')
+URISCHEME=$(9 echo -n "$GITURL" | 9 awk -F'://' '{print $1; exit}')
+URIPATH=$(9 echo -n "$GITURL" | 9 sed -e 's;[0-9A-Za-z]+://;;')
 # Get Git host
-GITHOST=$(echo -n "$URIPATH" | 9 sed -e 's!/.*$!!')
+GITHOST=$(9 echo -n "$URIPATH" | 9 sed -e 's!/.*$!!')
 case "$GITHOST" in
 	github.com)
 		if [ -n "$FILE" ]; then

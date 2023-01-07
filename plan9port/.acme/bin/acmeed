@@ -33,15 +33,14 @@ fn event {
 }
 
 newwindow
-echo -n 'Undo Putdel'	| winwrite tag
+9 echo -n 'Undo Putdel '	| winwrite tag
 winctl name $"tmpfile
 winctl mark
 
-echo -n '0'			| winwrite addr
+9 echo -n '0'			| winwrite addr
 cat $"tmpfile			| winwrite body
 winctl clean
 winctl 'dot=addr'
 winctl show
 
 wineventloop
-
