@@ -20,45 +20,13 @@ arg isfile $0
 plumb to pdf
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
 
-# jpg image files
+# image files
 type is text
 data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(jpe?g|JPE?G)'
+data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(jpe?g|JPE?G|gif|GIF|tiff?|TIFF?|ppm|bit|png|PNG)'
 arg isfile	$0
 plumb to image
-plumb start 9 jpg $file
-
-# gif image files
-type is text
-data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(gif|GIF)'
-arg isfile	$0
-plumb to image
-plumb start 9 gif $file
-
-# ppm image files
-type is text
-data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(ppm|PPM)'
-arg isfile	$0
-plumb to image
-plumb start 9 ppm $file
-
-# bmp image files
-type is text
-data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(bmp|BMP)'
-arg isfile	$0
-plumb to image
-plumb start 9 bmp $file
-
-# png image files
-type is text
-data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(png|PNG)'
-arg isfile	$0
-plumb to image
-plumb start 9 png $file
+plumb start rc -c 'xdg-open '''$file''' || open '''$file''' || 9 page '''$file''''
 
 # ocaml errors
 # example: in file "foo/bar.ml", line 155, characters 30-62
