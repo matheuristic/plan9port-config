@@ -51,6 +51,21 @@ Sourced with minor changes from [mkhl](https://github.com/mkhl)'s
 branch of [Plan 9 Port](https://github.com/9fans/plan9port)
 which ports spew's acme spaces indent mode from 9front.
 
+### Make scaling of PPI in page optional
+
+To apply the patch, run from the repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-page-optionalscaleppi.patch
+```
+
+The `page` command scales PPI automatically when using high-DPI
+screens like Mac displays (see
+[commit](https://github.com/9fans/plan9port/commit/940f1fd6af2c144d0db087fefa8478d2a36633d5)).
+This patch makes that behavior togglable, so PPI is scaled only when
+the `-s` option is specified, i.e., `page -s somefile.pdf` scales PPI
+while `page somefile.pdf` does not.
+
 ### No remapping of backticks and single quotes on macOS systems
 
 To apply the patch, run from the repository root:
