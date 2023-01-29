@@ -24,15 +24,15 @@ plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
 type is text
 data matches '[a-zA-Z¡-￿0-9_\-./@]+'
 data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(jpe?g|JPE?G|gif|GIF|tiff?|TIFF?|ppm|bit|png|PNG)'
-arg isfile	$0
+arg isfile $0
 plumb to image
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''' || 9 page '''$file''''
 
 # ocaml errors
 # example: in file "foo/bar.ml", line 155, characters 30-62
 # from: https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467
-type	is text
-data	matches '.*[Ff]ile "([^"]+)", line ([0-9]+), characters ([0-9]+)-([0-9]+).*'
+type is text
+data matches '.*[Ff]ile "([^"]+)", line ([0-9]+), characters ([0-9]+)-([0-9]+).*'
 arg isfile $1
 data set $file
 attr add addr=$2-#0+#$3,$2-#0+#$4
@@ -42,8 +42,8 @@ plumb client $editor
 # ocaml errors
 # example: File "tests/dune", line 2, characters 7-22:
 # from: https://discuss.ocaml.org/t/acme-plumbing-rules-for-ocaml/10467
-type	is text
-data	matches '.*[Ff]ile "([^"]+)", lines ([0-9]+)-([0-9]+).*'
+type is text
+data matches '.*[Ff]ile "([^"]+)", lines ([0-9]+)-([0-9]+).*'
 arg isfile $1
 data set $file
 attr add addr=$2,$3
