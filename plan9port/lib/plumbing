@@ -19,14 +19,15 @@ data matches '([a-zA-Z¡-￿0-9_\-./\(\)&][ a-zA-Z¡-￿0-9_\-./\(\)&]*)\.[Pp][D
 arg isfile $0
 plumb to pdf
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
+#plumb start rc -c 'open -a Skim.app '''$file''''
 
 # image files
 type is text
-data matches '[a-zA-Z¡-￿0-9_\-./@]+'
-data matches '([a-zA-Z¡-￿0-9_\-./@]+)\.(jpe?g|JPE?G|gif|GIF|tiff?|TIFF?|ppm|bit|png|PNG)'
+data matches '([a-zA-Z¡-￿0-9_\-./\(\)&][ a-zA-Z¡-￿0-9_\-./\(\)&]*)\.(jpe?g|JPE?G|gif|GIF|tiff?|TIFF?|ppm|bit|png|PNG)'
 arg isfile $0
 plumb to image
-plumb start rc -c 'xdg-open '''$file''' || open '''$file''' || 9 page '''$file''''
+plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
+#plumb start rc -c '9 page '''$file''''
 
 # ocaml errors
 # example: in file "foo/bar.ml", line 155, characters 30-62
