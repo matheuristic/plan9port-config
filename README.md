@@ -276,9 +276,6 @@ a number of helper scripts available at `~/.acme/bin`:
   matching commands are shown. If `STRING` is omitted, then the most
   recent commands are show (i.e., match all commands).
 - `hn`: Command-line [HN](https://news.ycombinator.com) client.
-- `i+`: Indent. Specify an argument to change the indent string from
-  the default Tab character.
-- `i-`: Unindent. An arg may be specified as in `i+`.
 - `lower`: Lowercase text selection.
 - `lw`: List Acme windows (including window ID, whether the window is
   a directory window, and if the window is dirty). A fancier version
@@ -304,8 +301,12 @@ a number of helper scripts available at `~/.acme/bin`:
   in-place (like Python's `black` formatter) and output the temporary
   file to the Error window. Use `|` instead of `>` to replace the text
   selection with the result instead of outputting to the Error window.
-- `s2t`: Replaces spaces with tabs, specify an argument to change the
-  number of spaces to a tab from the default of `$tabwidth`.
+- `s+`: Indent by adding leading spaces, specify an argument to change
+  the number of spaces from the default of `$tabstop`.
+- `s-`: Unindent by removing leading spaces, specify an argument to
+  change the number of spaces from the default of `$tabstop`.
+- `s2t`: Replaces leading spaces with tabs, specify an argument to
+  change number of spaces to a tab from the default of `$tabstop`.
 - `sp`: Wrapper to run [Enchant](https://github.com/AbiWord/enchant)
   spellchecker on the current Acme window with plumbable output.
 - `Slide`: Start slideshow for current directory, where the slides are
@@ -317,8 +318,12 @@ a number of helper scripts available at `~/.acme/bin`:
 - `surround`: Add surrounding brackets, specify a left-side arg (e.g.
   `{` , `[` , `$` , `<` , and so on) to use a specific bracket pair
   other than the default round parentheses `(` and `)`.
+- `t+`: Indent by adding leading tabs, specify an argument to change
+  the number of tabs from the default of 1.
+- `t-`: Unindent by removing leading tabs, specify an argument to
+  change the number of tabs from the default of 1.
 - `t2s`: Replaces tabs with spaces. Specify an argument to change the
-  number of spaces to a tab from the default of `$tabwidth`.
+  number of spaces to a tab from the default of `$tabstop`.
 - `uline`: Underline text selection. Specify an argument to change the
   character for underlining from the default of '-'.
 - `upper`: Uppercase text selection.
