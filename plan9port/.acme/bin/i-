@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Decrease indent of STDIN or piped text using argument as indentation
-# (default indentation is the tab character)
-INDENT=${1:-"	"}
-sed "s/^${INDENT}\(.*\)/\1/"

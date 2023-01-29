@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Increase indent of STDIN or piped text by argument tabs
+# (default number of tabs is 1)
+NUMTABS=${1:-1}
+INDENT=""
+i=1; while [ $i -le $NUMTABS ]; do
+	INDENT="	${INDENT}"
+	i=$(( i + 1 ))
+done
+sed "s/.*/${INDENT}&/"
