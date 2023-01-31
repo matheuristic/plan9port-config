@@ -215,18 +215,13 @@ plan9port comes with several useful commands for working with Acme
   `$EDITOR` so commands that use it to open an editor in a sub-process
   do so using Acme, e.g. `EDITOR=E git commit -a`. See
   [link](https://blog.silvela.org/post/2021-12-11-acme-tricks/) for
-  examples. Or use the `acmeed` script (see next section).
+  examples.
 
 ### Helper scripts
 
 If `stow` was used to symlink the base configuration files, there are
 a number of helper scripts available at `~/.acme/bin`:
 
-- `acmeed` ([source](https://moriendi.org/tools/acme/)): When used as
-  a value for the `$EDITOR` environment variable, programs that
-  utilize that environment variable will open a new window in Acme to
-  edit files (run `Putdel` to confirm the write and delete the window,
-  or run `Del` to cancel the edit). Alternative is the `E` command.
 - `acmeexec`: Execute (Button2) some text in specified Acme window
   number (defaults to number of current Acme window).
 - `alink` ([source](https://moriendi.org/tools/acme/)):
