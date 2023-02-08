@@ -105,6 +105,8 @@ This will create the symlinks:
   installed in a Conda environment. Of utility when using `acme-lsp`.
 - `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
   `startacme.rc` via `rc`.
+- `~/.local/bin/sample-startacme-macos.sh`: Sample wrapper to run
+  `startacme.rc` via `rc` that is more macOS-specific.
 - `~/.local/bin/sample-startsam.sh`: Sample wrapper to run
   `startsam.rc` via `rc`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
