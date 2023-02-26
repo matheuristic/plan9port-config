@@ -780,10 +780,10 @@ see [here](https://gist.github.com/proudlygeek/5721498),
   then shift-click on another position B to selection the region from
   A to B). As a workaround:
 
-  1. Run `Edit =` at a file location to print the file's name and
-     cursor line number in a `+Errors` window. If desired, add a
-     forward search query `/REGEXP/` to the end. This sets the region
-     start location.
+  1. Run `Edit =#` (or `Edit =`) at a file location to print the
+     file's name and character address (or line number) of the cursor
+     in a `+Errors` window. If desired, add a forward search query
+     `/REGEXP/` to the end. This sets the region start location.
 
   1. Click on a later position in the file.
 
@@ -794,9 +794,11 @@ see [here](https://gist.github.com/proudlygeek/5721498),
      window to plumb it, which will select the file region specified.
 
   The final line in the `+Errors` window to be plumbed will look
-  something like `/path/to/file:10,.` or `/path/to/file:10/text/,.`
-  (corresponding to `FILEPATH:STARTLOCATION,ENDLOCATION` where `.` is
-  the cursor location).
+  something like `/path/to/file:#10,.` or `/path/to/file:#10/text/,.`
+  (or `/path/to/file:10,.` or `/path/to/file:10/text/,.`), matching
+  the plumbing pattern `FILEPATH:STARTLOCATION,ENDLOCATION` with the
+  character address (or line) from the `Edit` command and the cursor
+  location `.` used for the start and end locations.
 
 ### Typical setup and workflow
 
@@ -1206,6 +1208,8 @@ Version=1.0
 - [Awesome Acme](https://github.com/mkmik/awesome-acme)
 
 - [Better plumbing in Xorg with plan9port’s plumber](https://dataswamp.org/~lich/musings/plumbing.html)
+
+- [Email Configuration for plan9 Acme on OpenBSD](https://akpoff.com/archive/2018/email_config_plan9_acme_openbsd.html)
 
 - [Hints for writing Unix tools](https://monkey.org/~marius/unix-tools-hints.html)
 
