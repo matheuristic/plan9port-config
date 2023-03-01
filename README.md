@@ -60,7 +60,7 @@ git clone https://github.com/9fans/plan9port.git plan9
 cd plan9
 git checkout -b "build-$(date +%Y%m%d)"
 ./INSTALL -b
-./INSTALL -c -r $PWD
+./INSTALL -c
 ```
 
 Follow the instructions to set `$PLAN9` and add `$PLAN9/bin` to
