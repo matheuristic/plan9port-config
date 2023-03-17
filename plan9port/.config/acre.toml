@@ -1,0 +1,17 @@
+[servers.rust-analyzer]
+files = "\\.rs$"
+#workspace_folders = [
+#	"file:///home/username/some-project",
+#	"file:///home/username/other-project",
+#]
+[servers.rust-analyzer.env]
+CARGO_TARGET_DIR = "target-ra"
+RUSTFLAGS = ""
+
+[servers.gopls]
+files = '\.go$'
+#root_uri = "file:///home/username/go-project"
+actions_on_put = ["source.organizeImports"]
+
+[servers.ruff-lsp]
+files = '\.py$'

@@ -339,7 +339,10 @@ a number of helper scripts available at `~/.acme/bin`:
   the import block as needed using `goimports` but does not write the
   file. Also supports autoformatting Rust files using `rustfmt`. An
   alternative that works on any Acme window using any given command is
-  [acme-autoformat](https://github.com/droyo/acme-autoformat).
+  [acme-autoformat](https://github.com/droyo/acme-autoformat). There
+  are also [several](https://github.com/mjibson/acmewatch)
+  [forks](https://github.com/prodhe/acmefmt) of acmego that extend
+  it to format code files other than Go and Rust ones.
 
 - [acme-lsp](https://github.com/fhs/acme-lsp):
   [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
@@ -433,7 +436,14 @@ a number of helper scripts available at `~/.acme/bin`:
   be installed by downloading and extracting the source code from the
   Github repository, `cd`-ing into the extracted directory and running
   `cargo install --path $PWD` (requires Rust tooling be
-  [installed](https://www.rust-lang.org/tools/install)).
+  [installed](https://www.rust-lang.org/tools/install)). Acre does not
+  auto-detect workspaces
+  ([link](https://github.com/mjibson/acre/issues/10)) so paths to
+  project workspaces should be added to the config file at
+  `$HOME/.config/acre.toml` as needed. A sample config file is
+  provided in this repo at `plan9port/.config/acre.toml` that uses
+  `gopls`, `rust-analyzer` and `ruff-lsp` for Go, Rust and Python code
+  (note that no workspace paths are specified).
 
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a

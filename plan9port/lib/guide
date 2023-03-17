@@ -3,13 +3,14 @@ Edit Font :, :0 :$ :42,49 :/[Ff]oo/ :-/[Ff]oo/ :0+/foo/ :$-/foo/
 Asave Blog Brecent EC F F- F+ d gl gb lw mdpv sp <cl-paste
 |c- |c+ |ct |s- |s+ |s2t |t- |t+ |t2s |lower |upper |surround |uline
 (Indent on) (Space on) (Tab 8) (rg+ '[Ff]oo') (rg- 'bar') (rg-- 'baz')
-(alink wname ls -a) Slide Slide- Slide+
+Slide Slide- Slide+ win
 
 # Edit commands
 =                   # file:linenumber
 =#                  # file:charaddr
 .,3                 # select from cursor to end of line 3
 3,.                 # select from beginning of line 3 to cursor
+.,.+#1d             # delete next char, like ^D in Emacs
 ,d                  # clear whole window, useful for +Error
 ,>wc                # line, word and char counts for whole buffer
 s/[Ff]rom/to/g      # regexp replace across selected text
@@ -48,14 +49,17 @@ git mergetool
 git rebase -i HEAD~3     # NOTE: oldest commit must be set to "pick"
 git checkout BRANCH
 git checkout -b BRANCH
-git bisect         # start > bad > good COMMIT > (bad|good)* > reset
+git bisect <cmd>         # cmd: start > bad > good COMMIT > (bad|good)* > reset [COMMIT]
 
 # Watch (requires 9fans.net/go/acme/Watch Go pkg)
 Watch [-r] COMMAND [ARG1] ...
 
-# LSP (requires github.com/fhs/acme-lsp/cmd/{acme-lsp,L} Go pkgs)
-win acme-lsp
+# acme-lsp (requires github.com/fhs/acme-lsp/cmd/{acme-lsp,L} Go pkgs)
+win LSP
 Lcomp Ldef Lfmt Lhov Limpls Lrefs [Lrn SYM] Lsig Lsyns Ltype Lws+ Lws-
+
+# acre (https://github.com/mjibson/acre)
+acre
 
 # DevSkim (https://github.com/microsoft/DevSkim)
 devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
