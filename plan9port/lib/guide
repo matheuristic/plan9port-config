@@ -41,6 +41,7 @@ git log --oneline -10
 git status
 git diff
 git difftool --dir-diff
+git add --all
 git commit -a
 git push -u origin
 git fetch origin
