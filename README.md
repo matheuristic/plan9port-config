@@ -445,6 +445,12 @@ a number of helper scripts available at `~/.acme/bin`:
   `gopls`, `rust-analyzer` and `ruff-lsp` for Go, Rust and Python code
   (note that no workspace paths are specified).
 
+- [awww](https://github.com/cjacker/awww):
+  Text web browser for Acme. Button2 or Button3 opens links in opened
+  webpages.  Requires [wget](https://www.gnu.org/software/wget/) and
+  [rust-html2text](https://github.com/jugglerchris/rust-html2text/)
+  (compile its example program `examples/html2text.rs`).
+
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a
   dirtree window will set that directory as the new tree root. Button3
