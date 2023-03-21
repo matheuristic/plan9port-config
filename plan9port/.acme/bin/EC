@@ -4,6 +4,9 @@
 # for the current file from project's EditorConfig settings
 # Usage: Add EC to Acme window tag and middle-click (B2) on it
 
+# Note: Support for "indent_style" requires patched Acme where
+# soft-tabs can be toggled using "Spaces on" and "Spaces off"
+
 if ! command -v editorconfig >/dev/null 2>&1; then
 	9 echo 'editorconfig not installed' 1>&2
 	exit 1

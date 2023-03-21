@@ -29,6 +29,21 @@ to apply all patches in this directory:
 
 ## Patches
 
+### Add keybindings to Acme editor
+
+To apply the patch, run from the repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-acme-addkeybindings.patch
+```
+
+This patch adds the following keybindings:
+
+- `C-k`: delete to end of line
+- `C-n`: move point one line down
+- `C-p`: move point one line up
+- `Cmd-s`: execute `Put` (i.e., save file) on macOS
+
 ### Add soft tabs to Acme editor
 
 To apply the patch, run from the repository root:

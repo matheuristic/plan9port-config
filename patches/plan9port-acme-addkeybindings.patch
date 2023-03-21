@@ -1,0 +1,137 @@
+diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
+index 09422dda..dfcce926 100644
+--- a/src/cmd/acme/text.c
++++ b/src/cmd/acme/text.c
+@@ -563,6 +563,35 @@ textbswidth(Text *t, Rune c)
+ 	return t->q0-q;
+ }
+ 
++/* erase to end of line version of textbswidth */
++int
++textfdwidth(Text *t, Rune c)
++{
++	uint q, eq;
++	Rune r;
++	int skipping;
++
++	q = t->q0;
++	skipping = TRUE;
++	while(q < t->file->b.nc){
++		r = textreadc(t, q);
++		if(r == '\n'){		/* eat at most one more character */
++			if(q == t->q0)	/* eat the newline */
++				++q;
++			break;
++		}
++		if(c == 0x17){
++			eq = isalnum(r);
++			if(eq && skipping)	/* found one; stop skipping */
++				skipping = FALSE;
++			else if(!eq && !skipping)
++				break;
++		}
++		++q;
++	}
++	return q-t->q0;
++}
++
+ int
+ textfilewidth(Text *t, uint q0, int oneelement)
+ {
+@@ -760,10 +789,48 @@ texttype(Text *t, Rune r)
+ 			q0++;
+ 		textshow(t, q0, q0, TRUE);
+ 		return;
++	case 0x0E:	/* ^N: move one line down */
++		typecommit(t);
++		q0 = t->q0;
++		nnb = 0;
++		if(q0>0 && textreadc(t, q0-1)!='\n')
++			nnb = textbswidth(t, 0x15);
++		while(q0<t->file->b.nc && textreadc(t, q0)!='\n')
++			q0++;
++		if (q0+1 <= t->file->b.nc)
++			q0++;
++		while(q0<t->file->b.nc && textreadc(t, q0)!='\n' && nnb--)
++			q0++;
++		textshow(t, q0, q0, TRUE);
++		return;
++	case 0x10:	/* ^P: move one line up */
++		typecommit(t);
++		q0 = t->q0;
++		nnb = 0;
++		n = 0;
++		if(q0>0 && textreadc(t, q0-1)!='\n')
++			nnb = textbswidth(t, 0x15);
++		q0 -= nnb;
++		if (q0>0)
++			q0--;
++		while (q0>0 && textreadc(t, q0-1)!='\n')
++			if (q0 == 0)
++				break;
++			else {
++				q0--;
++				n++;
++			}
++		q0 += (nnb > n) ? n : nnb;
++		textshow(t, q0, q0, TRUE);
++		return;
+ 	case Kcmd+'c':	/* %C: copy */
+ 		typecommit(t);
+ 		cut(t, t, nil, TRUE, FALSE, nil, 0);
+ 		return;
++	case Kcmd+'s':	/* %S: save */
++		typecommit(t);
++		put(&(t->w)->body, nil, nil, XXX, XXX, nil, 0);
++		return;
+ 	case Kcmd+'z':	/* %Z: undo */
+ 	 	typecommit(t);
+ 		undo(t, nil, nil, TRUE, 0, nil, 0);
+@@ -844,6 +911,47 @@ texttype(Text *t, Rune r)
+ 			typecommit(t);
+ 		t->iq1 = t->q0;
+ 		return;
++	case 0x0B:	/* ^K: erase to end of line */
++		if(t->q0 == t->file->b.nc) /* nothing to erase */
++			return;
++		nnb = textfdwidth(t, r);
++		q0 = t->q0;
++		q1 = q0+nnb;
++		/* if selection is at beginning of window, avoid deleting invisible text */
++		if(q0 < t->org){
++			q0 = t->org;
++			nnb = q1-q0;
++		}
++		if(nnb <= 0)
++			return;
++		for(i=0; i<t->file->ntext; i++){
++			u = t->file->text[i];
++			u->nofill = TRUE;
++			nb = nnb;
++			n = u->ncache;
++			if(n > 0){
++				if(q1 != u->cq0+n)
++					error("text.type backspace");
++				if(n > nb)
++					n = nb;
++				u->ncache -= n;
++				textdelete(u, q1-n, q1, FALSE);
++				nb -= n;
++			}
++			if(u->eq0==q1 || u->eq0==~0)
++				u->eq0 = q0;
++			if(nb && u==t)
++				textdelete(u, q0, q0+nb, TRUE);
++			if(u != t)
++				textsetselect(u, u->q0, u->q1);
++			else
++				textsetselect(t, q0, q0);
++			u->nofill = FALSE;
++		}
++		for(i=0; i<t->file->ntext; i++)
++			textfill(t->file->text[i]);
++		t->iq1 = t->q0;
++		return;
+ 	case 0x08:	/* ^H: erase character */
+ 	case 0x15:	/* ^U: erase line */
+ 	case 0x17:	/* ^W: erase word */
