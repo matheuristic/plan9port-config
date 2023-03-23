@@ -39,13 +39,11 @@ patch -p1 < /path/to/plan9port-acme-addkeybindings.patch
 
 This patch adds the following keybindings:
 
-- `C-k`: delete to end of line
 - `C-n`: move point one line down
 - `C-p`: move point one line up
 - `Cmd-s`: execute `Put` (i.e., save file) on macOS
 
-Parts of the patch were sourced from
-[plan9port](https://github.com/9fans/plan9port) forks by
+Sourced from [plan9port](https://github.com/9fans/plan9port) forks by
 [prodhe](https://github.com/prodhe/plan9port) (for `C-n` and `C-p`),
 and [ixtenu](https://github.com/ixtenu/plan9port) (for `Cmd-s`).
 
