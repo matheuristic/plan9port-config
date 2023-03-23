@@ -334,6 +334,10 @@ a number of helper scripts available at `~/.acme/bin`:
   run. Installable via a package manager (e.g. APT or Homebrew or
   MacPorts), or download a binary release from the website.
 
+- [Rust](https://www.rust-lang.org/): Some tools below are compiled
+  with Rust tooling. These use the `cargo` command. To install Rust
+  tooling, see [link](https://www.rust-lang.org/tools/install).
+
 - [acmego](https://pkg.go.dev/9fans.net/go/acme/acmego): When Go files
   are written, automatically makes adjustments in the window body to
   the import block as needed using `goimports` but does not write the
@@ -344,18 +348,38 @@ a number of helper scripts available at `~/.acme/bin`:
   [forks](https://github.com/prodhe/acmefmt) of acmego that extend
   it to format code files other than Go and Rust ones.
 
-- [acme-lsp](https://github.com/fhs/acme-lsp):
+- [acre](https://github.com/mjibson/acre):
   [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
-  client. See its website for how to configure it and use it with LSP
-  servers. Install acme-lsp with:
+  client. Can be installed with (change paths or versions as needed):
+
+  ```sh
+  cd /some/path
+  curl -LO https://github.com/mjibson/acre/archive/refs/tags/v0.5.5.tar.gz
+  tar xzf v0.5.5.tar.gz
+  cd acre-0.5.5
+  cargo install --path $PWD
+  cd ~/.local/bin
+  ln -s /some/path/acre-0.5.5/target/release/acre
+  ```
+
+  Acre does not auto-detect workspaces
+  ([link](https://github.com/mjibson/acre/issues/10)) so paths to
+  project workspaces should be added to the config file at
+  `$HOME/.config/acre.toml` as needed. A sample config file is
+  provided in this repo at `plan9port/.config/acre.toml` that uses
+  `gopls`, `rust-analyzer` and `ruff-lsp` for Go, Rust and Python code
+  (note that no workspace paths are specified).
+
+  An alternative is [acme-lsp](https://github.com/fhs/acme-lsp),
+  which can be installed with:
 
   ```sh
   go install github.com/fhs/acme-lsp/cmd/acme-lsp@latest
   go install github.com/fhs/acme-lsp/cmd/L@latest
   ```
 
-  Create helper scripts by going to a directory in `$path` (for example,
-  `$HOME/.acme/bin/`) and running in `rc`:
+  Some helper scripts for acme-lsp can be created in `rc` while at a
+  directory in `$path`, say `$HOME/.acme/bin/`, and running:
 
   ```sh
   for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
@@ -367,83 +391,10 @@ a number of helper scripts available at `~/.acme/bin`:
   }
   ```
 
-  Config params can be saved in a [TOML](https://toml.io/) file
-  `$HOME/Library/Application Support/acme-lsp/config.toml` for macOS
-  or `$HOME/.config/acme-lsp/config.toml` for Unix or Linux. Example:
-
-  ```toml
-  # acme-lsp config
-  # ~/.config/acme-lsp/config.toml - Linux
-  # ~/Library/Preferences/Application\ Support/acme-lsp/config.toml - macOS
-
-  # acme-lsp source repository: https://github.com/fhs/acme-lsp
-
-  # Note that a relative file paths use os.UserCacheDir(), so on Linux
-  # "some.log" resolves to "$HOME/.cache/acme-lsp/some.log" and on macOS
-  # "some.log" resolves to "$HOME/Library/Caches/acme-lsp/some.log"
-
-  # See https://godoc.org/github.com/fhs/acme-lsp/internal/lsp/acmelsp/config#File
-  # for more configuration options
-
-  [Servers]
-
-  	[Servers.pylsp]
-  	Command = ["pylsp"]
-  	StderrFile = "pylsp.stderr.log"
-  	LogFile = "pylsp.log"
-
-  	[Servers.gopls]
-  	Command = ["gopls", "serve", "-rpc.trace"]
-  	StderrFile = "gopls.stderr.log"
-  	LogFile = "gopls.log"
-  		# These settings get passed to gopls
-  		[Servers.gopls.Options]
-  		hoverKind = "FullDocumentation"
-
-  	[Servers.rust-analyzer]
-  	Command = ["rust-analyzer"]
-  	StderrFile = "rust-analyzer.stderr.log"
-  	Logfile = "rust-analyzer.log"
-  		# These settings get passed to rust-analyzer
-  		[Servers.rust-analyzer.Options]
-                  # "checkOnSave.enable" = false
-
-  [[FilenameHandlers]]
-  Pattern = "\\.py$"
-  ServerKey = "pylsp"
-
-  [[FilenameHandlers]]
-  Pattern = "[/\\\\]go\\.mod$"
-  LanguageID = "go.mod"
-  ServerKey = "gopls"
-
-  [[FilenameHandlers]]
-  Pattern = "[/\\\\]go\\.sum$"
-  LanguageID = "go.sum"
-  ServerKey = "gopls"
-
-  [[FilenameHandlers]]
-  Pattern = "\\.go$"
-  LanguageID = "go"
-  ServerKey = "gopls"
-
-  [[FilenameHandlers]]
-  Pattern = "\\.rs$"
-  ServerKey = "rust-analyzer"
-  ```
-
-  An alternative is [acre](https://github.com/mjibson/acre). This can
-  be installed by downloading and extracting the source code from the
-  Github repository, `cd`-ing into the extracted directory and running
-  `cargo install --path $PWD` (requires Rust tooling be
-  [installed](https://www.rust-lang.org/tools/install)). Acre does not
-  auto-detect workspaces
-  ([link](https://github.com/mjibson/acre/issues/10)) so paths to
-  project workspaces should be added to the config file at
-  `$HOME/.config/acre.toml` as needed. A sample config file is
-  provided in this repo at `plan9port/.config/acre.toml` that uses
-  `gopls`, `rust-analyzer` and `ruff-lsp` for Go, Rust and Python code
-  (note that no workspace paths are specified).
+  Configure acme-lsp via CLI params or a [TOML](https://toml.io/) file
+  `$HOME/Library/Application Support/acme-lsp/config.toml` (macOS) or
+  `$HOME/.config/acme-lsp/config.toml` (Unix/Linux). A sample config
+  is provided in the repo at `plan9port/.config/acme-lsp/config.toml`.
 
 - [awww](https://github.com/cjacker/awww):
   Text web browser for Acme. Button2 or Button3 opens links in opened
