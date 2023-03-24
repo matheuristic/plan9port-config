@@ -11,5 +11,5 @@ startparams="$@"
 visibleclicks=1 SHELL=rc \
     $PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
     -f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/30a/font \
-    -F /lib/font/bit/lucm/unicode.9.font,/mnt/font/AndaleMono/32a/font \
+    -F /lib/font/bit/pelm/unicode.8.font,/mnt/font/AndaleMono/32a/font \
     $startparams
