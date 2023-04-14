@@ -14,8 +14,15 @@ if ! command -v rg >/dev/null 2>&1; then
 	exit 1
 fi
 
-if ! command -v realpath >/dev/null 2>&1; then
-	echo 'realpath not installed' 1>&2
+# GNU version of realpath is needed, so use grealpath on macOS
+# installable via the coreutils package using MacPorts or Homebrew
+REALPATHCMD=realpath
+if [ "$(uname)" = "Darwin" ]; then
+	REALPATHCMD=grealpath
+fi
+
+if ! command -v $REALPATHCMD >/dev/null 2>&1; then
+	echo "$REALPATHCMD not installed" 1>&2
 	exit 1
 fi
 
@@ -27,7 +34,7 @@ EOF
 	exit 1
 fi
 
-RELATIVEPATH=`realpath --relative-to="$PWD" "$samfile"`
+RELATIVEPATH=`$REALPATHCMD --relative-to="$PWD" "$samfile"`
 
 9p read acme/$winid/body | \
   rg --no-heading --color=never --line-number "$@" | \
