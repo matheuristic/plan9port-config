@@ -39,13 +39,15 @@ patch -p1 < /path/to/plan9port-acme-addkeybindings.patch
 
 This patch adds the following keybindings:
 
+- `C-k`: forward erase to end of line
 - `C-n`: move point one line down
 - `C-p`: move point one line up
 - `Cmd-s`: execute `Put` (i.e., save file) on macOS
 
-Sourced from [plan9port](https://github.com/9fans/plan9port) forks by
-[prodhe](https://github.com/prodhe/plan9port) (for `C-n` and `C-p`),
-and [ixtenu](https://github.com/ixtenu/plan9port) (for `Cmd-s`).
+Some portions of this patch are sourced from
+[plan9port](https://github.com/9fans/plan9port) forks by
+[prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
+[ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
 ### Add soft tabs to Acme editor
 

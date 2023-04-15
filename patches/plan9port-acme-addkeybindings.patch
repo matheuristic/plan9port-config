@@ -14,10 +14,39 @@ index 852a8f7f..cdc2c888 100644
  as in other programs.
  Especially on Mac laptops, these keyboard shortcuts are
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..8d8d5bdb 100644
+index 09422dda..8f7b3ae5 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
-@@ -760,10 +760,48 @@ texttype(Text *t, Rune r)
+@@ -563,6 +563,28 @@ textbswidth(Text *t, Rune c)
+ 	return t->q0-q;
+ }
+ 
++/* erase to end of line version of textbswidth */
++int
++textfewidth(Text *t, Rune c)
++{
++	uint q, eq;
++	Rune r;
++	int skipping;
++
++	q = t->q0;
++	skipping = TRUE;
++	while(q < t->file->b.nc){
++		r = textreadc(t, q);
++		if(r == '\n'){          /* eat at most one more character */
++			if(q == t->q0)  /* eat the newline */
++				++q;
++			break;
++		}
++		++q;
++	}
++	return q-t->q0;
++}
++
+ int
+ textfilewidth(Text *t, uint q0, int oneelement)
+ {
+@@ -760,10 +782,48 @@ texttype(Text *t, Rune r)
  			q0++;
  		textshow(t, q0, q0, TRUE);
  		return;
@@ -66,3 +95,29 @@ index 09422dda..8d8d5bdb 100644
  	case Kcmd+'z':	/* %Z: undo */
  	 	typecommit(t);
  		undo(t, nil, nil, TRUE, 0, nil, 0);
+@@ -847,11 +907,20 @@ texttype(Text *t, Rune r)
+ 	case 0x08:	/* ^H: erase character */
+ 	case 0x15:	/* ^U: erase line */
+ 	case 0x17:	/* ^W: erase word */
+-		if(t->q0 == 0)	/* nothing to erase */
+-			return;
+-		nnb = textbswidth(t, r);
+-		q1 = t->q0;
+-		q0 = q1-nnb;
++	case 0x0B:      /* ^K: forward erase line */
++		if(r == 0x0B){
++			typecommit(t);
++			nnb = textfewidth(t, r);
++			q0 = t->q0;
++			q1 = q0+nnb;
++			textshow(t, q1, q1, TRUE);
++		}else{
++			if(t->q0 == 0)	/* nothing to erase */
++				return;
++			nnb = textbswidth(t, r);
++			q1 = t->q0;
++			q0 = q1-nnb;
++		}
+ 		/* if selection is at beginning of window, avoid deleting invisible text */
+ 		if(q0 < t->org){
+ 			q0 = t->org;
