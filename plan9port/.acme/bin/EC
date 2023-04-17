@@ -1,11 +1,21 @@
 #!/bin/sh
 
-# Load indentation (tabs or spaces, and indent width) settings
-# for the current file from project's EditorConfig settings
+# Apply project's EditorConfig settings to current Acme window's file
+
+# Supported EditorConfig properties:
+# - indent_style: set using "Spaces on" and "Spaces off"
+#   (**requires patched Acme** using plan9port-acme-soft-tabs.patch)
+# - indent_size: set using "Tab N" command where N is the target width
+# - trim_trailing_whitespace: set using "Indent on" and "Indent off"
+#   which, besides auto-indentation, also controls whether trailing
+#   whitespace is removed automatically when the file is Put
+
 # Usage: Add EC to Acme window tag and middle-click (B2) on it
 
-# Note: Support for "indent_style" requires patched Acme where
-# soft-tabs can be toggled using "Spaces on" and "Spaces off"
+if ! command -v acmeexec >/dev/null 2>&1; then
+	9 echo 'acmeexec not installed' 1>&2
+	exit 1
+fi
 
 if ! command -v editorconfig >/dev/null 2>&1; then
 	9 echo 'editorconfig not installed' 1>&2
@@ -26,14 +36,20 @@ fi
 # https://stackoverflow.com/questions/9899001/how-to-escape-a-single-quote-inside-awk
 editorconfig $samfile | \
 	awk -F'=' '
+($1=="indent_size" && $2~/[0-9]+/){
+	cmd="acmeexec \047Tab " $2 "\047"
+	printf "%s => ", $0
+	system(cmd)
+	print cmd
+}
 $1=="indent_style"{
 	cmd="acmeexec \047Spaces " (($2=="space") ? "on" : "off") "\047"
 	printf "%s => ", $0
 	system(cmd)
 	print cmd
 }
-$1=="tab_width"{
-	cmd="acmeexec \047Tab " $2 "\047"
+$1=="trim_trailing_whitespace"{
+	cmd="acmeexec \047Indent " (($2=="true") ? "on" : "off") "\047"
 	printf "%s => ", $0
 	system(cmd)
 	print cmd
