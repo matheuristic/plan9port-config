@@ -24,8 +24,10 @@ There are some patches in the `patches` subdirectory. Apply desired
 patches to the source code prior to compilation. See the `README.md`
 file in the subdirectory for instructions.
 
-- `plan9port-acme-addkeybindings.patch`: Adds `C-k`, `C-n`, `C-p` and
-  `Cmd-s` Acme key bindings.
+- `plan9port-acme-bindings.patch`: Adds `C-k`, `C-n`, `C-p` and
+  `Cmd-s` Acme key bindings for their usual Linux and macOS actions.
+- `plan9port-acme-lookb.patch`: Adds a `Lookb` command to Acme for
+  backwards search.
 - `plan9port-acme-soft-tabs.patch`: Adds soft tabs support to Acme
   toggleable via a `Spaces [on|off|ON|OFF]` command and an `-i` CLI
   option.

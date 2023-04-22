@@ -1,0 +1,161 @@
+diff --git a/man/man1/acme.1 b/man/man1/acme.1
+index 852a8f7f..2d1a436e 100644
+--- a/man/man1/acme.1
++++ b/man/man1/acme.1
+@@ -438,6 +438,10 @@ is recognized as a prefix, but has no effect on the command being executed.
+ Search in body for occurrence of literal text indicated by the argument or,
+ if none is given, by the selected text in the body.
+ .TP
++.B Lookb
++Search backwards in body for occurrence of literal text indicated by the argument or,
++if none is given, by the selected text in the body.
++.TP
+ .B New
+ Make new window.  With arguments, load the named files into windows.
+ .TP
+diff --git a/src/cmd/acme/exec.c b/src/cmd/acme/exec.c
+index 1dd02288..73236049 100644
+--- a/src/cmd/acme/exec.c
++++ b/src/cmd/acme/exec.c
+@@ -47,6 +47,7 @@ void	indent(Text*, Text*, Text*, int, int, Rune*, int);
+ void	xkill(Text*, Text*, Text*, int, int, Rune*, int);
+ void	local(Text*, Text*, Text*, int, int, Rune*, int);
+ void	look(Text*, Text*, Text*, int, int, Rune*, int);
++void	lookb(Text*, Text*, Text*, int, int, Rune*, int);
+ void	newcol(Text*, Text*, Text*, int, int, Rune*, int);
+ void	paste(Text*, Text*, Text*, int, int, Rune*, int);
+ void	put(Text*, Text*, Text*, int, int, Rune*, int);
+@@ -83,6 +84,7 @@ static Rune LKill[] = { 'K', 'i', 'l', 'l', 0 };
+ static Rune LLoad[] = { 'L', 'o', 'a', 'd', 0 };
+ static Rune LLocal[] = { 'L', 'o', 'c', 'a', 'l', 0 };
+ static Rune LLook[] = { 'L', 'o', 'o', 'k', 0 };
++static Rune LLookb[] = { 'L', 'o', 'o', 'k', 'b', 0 };
+ static Rune LNew[] = { 'N', 'e', 'w', 0 };
+ static Rune LNewcol[] = { 'N', 'e', 'w', 'c', 'o', 'l', 0 };
+ static Rune LPaste[] = { 'P', 'a', 's', 't', 'e', 0 };
+@@ -114,6 +116,7 @@ Exectab exectab[] = {
+ 	{ LLoad,		dump,	FALSE,	FALSE,	XXX		},
+ 	{ LLocal,		local,	FALSE,	XXX,		XXX		},
+ 	{ LLook,		look,		FALSE,	XXX,		XXX		},
++	{ LLookb,		lookb,		FALSE,	XXX,		XXX		},
+ 	{ LNew,		new,		FALSE,	XXX,		XXX		},
+ 	{ LNewcol,	newcol,	FALSE,	XXX,		XXX		},
+ 	{ LPaste,		paste,	TRUE,	TRUE,	XXX		},
+@@ -1097,6 +1100,32 @@ look(Text *et, Text *t, Text *argt, int _0, int _1, Rune *arg, int narg)
+ 	}
+ }
+ 
++void
++lookb(Text *et, Text *t, Text *argt, int _0, int _1, Rune *arg, int narg)
++{
++	Rune *r;
++	int n;
++
++	USED(_0);
++	USED(_1);
++
++	if(et && et->w){
++		t = &et->w->body;
++		if(narg > 0){
++			rsearch(t, arg, narg);
++			return;
++		}
++		getarg(argt, FALSE, FALSE, &r, &n);
++		if(r == nil){
++			n = t->q1-t->q0;
++			r = runemalloc(n);
++			bufread(&t->file->b, t->q0, r, n);
++		}
++		rsearch(t, r, n);
++		free(r);
++	}
++}
++
+ static Rune Lnl[] = { '\n', 0 };
+ 
+ void
+diff --git a/src/cmd/acme/fns.h b/src/cmd/acme/fns.h
+index 969db417..a0830e53 100644
+--- a/src/cmd/acme/fns.h
++++ b/src/cmd/acme/fns.h
+@@ -63,6 +63,7 @@ void	fontx(Text*, Text*, Text*, int, int, Rune*, int);
+ #define isalnum acmeisalnum
+ int	isalnum(Rune);
+ void	execute(Text*, uint, uint, int, Text*);
++int	rsearch(Text*, Rune*, uint);
+ int	search(Text*, Rune*, uint);
+ void	look3(Text*, uint, uint, int);
+ void	editcmd(Text*, Rune*, uint);
+diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
+index a7172b50..19fa0107 100644
+--- a/src/cmd/acme/look.c
++++ b/src/cmd/acme/look.c
+@@ -302,6 +302,68 @@ plumbshow(Plumbmsg *m)
+ 	xfidlog(w, "new");
+ }
+ 
++int
++rsearch(Text *ct, Rune *r, uint n)
++{
++	uint q, nb, maxn;
++	int around;
++	Rune *s, *b, *c;
++	Rune r0;
++
++	if(n==0 || n>ct->file->b.nc)
++		return FALSE;
++	if(2*n > RBUFSIZE){
++		warning(nil, "string too long\n");
++		return FALSE;
++	}
++	r0 = r[0];
++	maxn = max(2*n, RBUFSIZE);
++	s = fbufalloc();
++	b = s;
++	nb = 0;
++	b[nb] = 0;
++	around = 0;
++	q = ct->q0;
++	for(;;){
++		/* reload if buffer covers neither string nor rest of file */
++		if(nb<n && nb!=q){
++			nb = q;
++			if(nb >= maxn)
++				nb = maxn-1;
++			bufread(&ct->file->b, q-nb, s, nb);
++			b = s+nb;
++			*b = 0;
++		}
++		/* this runeeq is fishy but the null at b[nb] makes it safe */
++		if(runeeq(b, n, r, n)==TRUE){
++			if(ct->w){
++				textshow(ct, q, q+n, 1);
++				winsettag(ct->w);
++			}else{
++				ct->q0 = q;
++				ct->q1 = q+n;
++			}
++			seltext = ct;
++			fbuffree(s);
++			return TRUE;
++		}
++		--nb;
++		b--;
++		if(q == 0){
++			q = ct->file->b.nc;
++			around = 1;
++			nb = 0;
++			b[nb] = 0;
++		}else{
++			q--;
++		}
++		if(around && q<=ct->q0)
++			break;
++	}
++	fbuffree(s);
++	return FALSE;
++}
++
+ int
+ search(Text *ct, Rune *r, uint n)
+ {

@@ -29,12 +29,12 @@ to apply all patches in this directory:
 
 ## Patches
 
-### Add keybindings to Acme editor
+### Add keyboard bindings to Acme editor
 
 To apply the patch, run from the repository root:
 
 ```sh
-patch -p1 < /path/to/plan9port-acme-addkeybindings.patch
+patch -p1 < /path/to/plan9port-acme-bindings.patch
 ```
 
 This patch adds the following keybindings:
@@ -48,6 +48,20 @@ Some portions of this patch are sourced from
 [plan9port](https://github.com/9fans/plan9port) forks by
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
+
+### Add `Lookb` command to Acme editor
+
+To apply the patch, run from the repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-acme-lookb.patch
+```
+
+This patch adds a `Lookb` command to Acme, which works like the
+`Look` command but searches backwards instead of forwards.
+
+This is adapted from an unmerged plan9port pull request by
+bd339 ([link](https://github.com/9fans/plan9port/pull/552)).
 
 ### Add soft tabs to Acme editor
 
