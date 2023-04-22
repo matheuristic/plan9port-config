@@ -87,7 +87,7 @@ index 969db417..a0830e53 100644
  void	look3(Text*, uint, uint, int);
  void	editcmd(Text*, Rune*, uint);
 diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
-index a7172b50..19fa0107 100644
+index a7172b50..966b9ac5 100644
 --- a/src/cmd/acme/look.c
 +++ b/src/cmd/acme/look.c
 @@ -302,6 +302,68 @@ plumbshow(Plumbmsg *m)
@@ -139,14 +139,14 @@ index a7172b50..19fa0107 100644
 +			fbuffree(s);
 +			return TRUE;
 +		}
-+		--nb;
-+		b--;
 +		if(q == 0){
 +			q = ct->file->b.nc;
 +			around = 1;
 +			nb = 0;
 +			b[nb] = 0;
 +		}else{
++			--nb;
++			b--;
 +			q--;
 +		}
 +		if(around && q<=ct->q0)
