@@ -2,15 +2,16 @@
 
 ## Creating and using patches
 
-To create a patch from a Git repo diff (provide arguments to the
-`git diff` command as necessary):
+To create a patch from a Git repo diff (provide arguments like a
+commit range to `git diff` as necessary), run in the Git repo:
 
 ```sh
 git diff > /path/to/save.patch
 ```
 
 To apply a patch created using the above (the `-p1` option is to
-ignore the leading `a/` and `b/` prefixes created by `git diff`):
+ignore the leading `a/` and `b/` prefixes created by `git diff`),
+run from the Git repo root:
 
 ```sh
 patch -p1 < /path/to/save.patch
@@ -21,7 +22,8 @@ See this
 for more info.
 
 For convenience, a shell script `apply-patches.sh` can be run
-to apply all patches in this directory:
+to apply all patches in this directory to a specified plan9port
+repository:
 
 ```sh
 ./apply-patches.sh /path/to/plan9port/repository
@@ -31,7 +33,7 @@ to apply all patches in this directory:
 
 ### Add keyboard bindings to Acme editor
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-acme-bindings.patch
@@ -51,7 +53,7 @@ Some portions of this patch are sourced from
 
 ### Add `Lookb` command to Acme editor
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-acme-lookb.patch
@@ -65,7 +67,7 @@ bd339 ([link](https://github.com/9fans/plan9port/pull/552)).
 
 ### Add soft tabs to Acme editor
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-acme-soft-tabs.patch
@@ -87,7 +89,7 @@ which ports spew's acme spaces indent mode from 9front.
 
 ### Make scaling of PPI in page optional
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-page-optionalscaleppi.patch
@@ -102,7 +104,7 @@ while `page somefile.pdf` does not.
 
 ### No remapping of backticks and single quotes on macOS systems
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-mac-noquotemap.patch
@@ -113,7 +115,7 @@ This patch removes the default behavior of remapping characters
 
 ### Press shift to send Button1 when mouse button is depressed on X11
 
-To apply the patch, run from the repository root:
+To apply the patch, run from the plan9port repository root:
 
 ```sh
 patch -p1 < /path/to/plan9port-x11-shiftpressbutton1.patch
