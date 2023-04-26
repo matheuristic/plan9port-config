@@ -553,7 +553,8 @@ a number of helper scripts available at `~/.acme/bin`:
       unfunction preexec
     fi
     # Set prompt so middle-clicking whole line reruns line's command
-    PROMPT=": %m; "
+    # Show last exit code if non-zero
+    PROMPT=": %(?..{%?} )%m; "
     RPROMPT=""
   fi
   ```
