@@ -87,6 +87,20 @@ Sourced with minor changes from [mkhl](https://github.com/mkhl)'s
 branch of [Plan 9 Port](https://github.com/9fans/plan9port)
 which ports spew's acme spaces indent mode from 9front.
 
+### Add command line option for setting window title to Acme editor
+
+To apply the patch, run from the plan9port repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-acme-windowtitle.patch
+```
+
+This patch adds a command line option `-t TITLE` which sets the
+window title of the launched Acme instance to `TITLE`.
+
+Sourced from [this](https://github.com/9fans/plan9port/pull/51)
+unmerged pull request by [afh](https://github.com/afh).
+
 ### Make scaling of PPI in page optional
 
 To apply the patch, run from the plan9port repository root:

@@ -1,0 +1,59 @@
+diff --git a/man/man1/acme.1 b/man/man1/acme.1
+index 852a8f7f..45d24f9c 100644
+--- a/man/man1/acme.1
++++ b/man/man1/acme.1
+@@ -23,6 +23,10 @@ acme, win, awd \- interactive text windows
+ .I mtpt
+ ]
+ [
++.B -t
++.I title
++]
++[
+ .B -l
+ .I file
+ |
+@@ -91,6 +95,9 @@ to mount itself at
+ .IR mtpt .
+ (Experimental.)
+ .PP
++The
++.B -t
++option sets the window title (default is "acme").
+ .SS Windows
+ .I Acme
+ windows are in two parts: a one-line
+diff --git a/src/cmd/acme/acme.c b/src/cmd/acme/acme.c
+index 0e6bc0fd..6242cc08 100644
+--- a/src/cmd/acme/acme.c
++++ b/src/cmd/acme/acme.c
+@@ -43,6 +43,8 @@ char		*fontnames[2] =
+ 	"/lib/font/bit/lucm/unicode.9.font"
+ };
+ 
++char	*title = "acme";
++
+ Command *command;
+ 
+ void	shutdownthread(void*);
+@@ -114,6 +116,11 @@ threadmain(int argc, char *argv[])
+ 	case 'r':
+ 		swapscrollbuttons = TRUE;
+ 		break;
++	case 't':
++		title = ARGF();
++		if(title == nil)
++			goto Usage;
++		break;
+ 	case 'W':
+ 		winsize = ARGF();
+ 		if(winsize == nil)
+@@ -163,7 +170,7 @@ threadmain(int argc, char *argv[])
+ 		threadexitsall("geninitdraw");
+ 	}
+ */
+-	if(initdraw(derror, fontnames[0], "acme") < 0){
++	if(initdraw(derror, fontnames[0], title) < 0){
+ 		fprint(2, "acme: can't open display: %r\n");
+ 		threadexitsall("initdraw");
+ 	}

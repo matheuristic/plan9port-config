@@ -31,6 +31,8 @@ file in the subdirectory for instructions.
 - `plan9port-acme-soft-tabs.patch`: Adds soft tabs support to Acme
   toggleable via a `Spaces [on|off|ON|OFF]` command and an `-i` CLI
   option.
+- `plan9port-acme-windowtitle.patch`: Adds a `-t TITLE` CLI option
+  for setting the window title of a launched Acme instance.
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
   `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
 - `plan9port-page-optionalscaleppi.patch`: Make scaling PPI on
