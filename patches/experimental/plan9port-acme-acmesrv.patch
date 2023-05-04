@@ -1,11 +1,5 @@
-commit 989ecf2db1b2c5aaa21299e7c78108eb29935e11
-Author: Marius Eriksen <meriksen@fb.com>
-Date:   Tue Jan 4 12:29:12 2022 -0800
-
-    acme: acmesrv
-
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index 3860b46..2fa8e435 100644
+index 852a8f7f..9b6e3f27 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
 @@ -23,6 +23,14 @@ acme, win, awd \- interactive text windows
@@ -85,7 +79,7 @@ index 3860b46..2fa8e435 100644
  .TF $HOME/acme.dump
  .TP
 diff --git a/src/cmd/acme/acme.c b/src/cmd/acme/acme.c
-index d001a2a8..2ebe5d3d 100644
+index 0e6bc0fd..90d42e12 100644
 --- a/src/cmd/acme/acme.c
 +++ b/src/cmd/acme/acme.c
 @@ -9,6 +9,7 @@
@@ -304,10 +298,9 @@ index d001a2a8..2ebe5d3d 100644
 +			rclose(vp.sess);  /* XXX hack: session management should be better encapsulated.*/
 +			free(vw);
      Freecmd:
--			if(c){
-+    			if(c){
-+    				if(c->sess)
-+    					sendp(c->sess->errorc, nil);
+ 			if(c){
++				if(c->sess)
++					sendp(c->sess->errorc, nil);
  				if(c->iseditcmd)
  					sendul(cedit, 0);
  				free(c->text);
@@ -1675,7 +1668,7 @@ index bb938ca4..2e770e16 100644
  	if(q0 > b->nc)
  		error("internal error: bufload");
 diff --git a/src/cmd/acme/cols.c b/src/cmd/acme/cols.c
-index 63247a84..7b6330a5 100644
+index a53280c4..f7831db9 100644
 --- a/src/cmd/acme/cols.c
 +++ b/src/cmd/acme/cols.c
 @@ -9,6 +9,7 @@
@@ -1687,7 +1680,7 @@ index 63247a84..7b6330a5 100644
  #include "fns.h"
  
 diff --git a/src/cmd/acme/dat.h b/src/cmd/acme/dat.h
-index 8a81c97d..4908d2c8 100644
+index e540605a..23470e73 100644
 --- a/src/cmd/acme/dat.h
 +++ b/src/cmd/acme/dat.h
 @@ -48,14 +48,22 @@ typedef	struct	Elog Elog;
@@ -2419,7 +2412,7 @@ index a7172b50..a0b824f4 100644
  		e->bname = nil;
  		goto Isntfile;
 diff --git a/src/cmd/acme/mkfile b/src/cmd/acme/mkfile
-index 18bea9e0..adf30aa8 100644
+index 18bea9e0..70123e33 100644
 --- a/src/cmd/acme/mkfile
 +++ b/src/cmd/acme/mkfile
 @@ -1,7 +1,9 @@
@@ -3831,7 +3824,7 @@ index 00000000..43c2c592
 +	return errorvp();
 +}
 diff --git a/src/cmd/acme/wind.c b/src/cmd/acme/wind.c
-index 98c97368..8db71859 100644
+index 9441bbb7..f37b8d01 100644
 --- a/src/cmd/acme/wind.c
 +++ b/src/cmd/acme/wind.c
 @@ -9,6 +9,7 @@
@@ -3843,7 +3836,7 @@ index 98c97368..8db71859 100644
  #include "fns.h"
  
 diff --git a/src/cmd/acme/xfid.c b/src/cmd/acme/xfid.c
-index e7d9f4cb..32ba30d4 100644
+index dc7bf75b..c83684f9 100644
 --- a/src/cmd/acme/xfid.c
 +++ b/src/cmd/acme/xfid.c
 @@ -9,6 +9,7 @@
