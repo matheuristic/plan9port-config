@@ -66,40 +66,41 @@
 #
 # Note the default namespace and title are /tmp/ns.$USER.$DISPLAY and "acme".
 #
-# Example script code incorporating all elements above.
+# Example script with all the elements above, needs patched Acme with `-t`
+# option. Run `startacme.sh -n testns` to launch in namespace `testns`.
 #
-#    if [ -z "$PLAN9" ]; then
-#        export PLAN9="$HOME/.local/plan9port"
-#        export PATH=$PATH:$PLAN9/bin
-#    fi
-#    titleparams=""
-#    if [ "$1" = "-n" ]; then
-#        if [ -z "$2" ]; then
-#            echo "-n specified but namespace not provided" 1>&2
-#    	exit 1
-#        fi
-#        export NAMESPACE=/tmp/ns.$USER.$2
-#        mkdir -p "$NAMESPACE"
-#        titleparams="-t $2"
-#        # Uncomment below line if to maintain a cleaner /tmp/ directory
-#        # (the /tmp/ directory gets cleaned on reboots in any case)
-#        # trap 'rm -rf "$NAMESPACE"' EXIT
-#        shift; shift
-#    fi
-#    startparams="$@"
-#    startfile=$HOME/.acme/start
-#    if [ "$startparams" = "" ]; then
-#        if [ -f "$startfile" ]; then
-#            startparams="-c 1 $startfile"
-#        else
-#            echo "Start file does not exist, skipping load: $startfile" 1>&2
-#        fi
-#    fi
-#    visibleclicks=1 SHELL=rc BROWSER=garcon-url-handler \
-#        $PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
-#        -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
-#        $titleparams \
-#        $startparams
+#     if [ -z "$PLAN9" ]; then
+#         export PLAN9="$HOME/.local/plan9port"
+#         export PATH=$PATH:$PLAN9/bin
+#     fi
+#     titleparams=""
+#     if [ "$1" = "-n" ]; then
+#         if [ -z "$2" ]; then
+#             echo "-n specified but namespace not provided" 1>&2
+#     	exit 1
+#         fi
+#         export NAMESPACE=/tmp/ns.$USER.$2
+#         mkdir -p "$NAMESPACE"
+#         titleparams="-t $2"
+#         # Uncomment below line if to maintain a cleaner /tmp/ directory
+#         # (the /tmp/ directory gets cleaned on reboots in any case)
+#         # trap 'rm -rf "$NAMESPACE"' EXIT
+#         shift; shift
+#     fi
+#     startparams="$@"
+#     startfile=$HOME/.acme/start
+#     if [ "$startparams" = "" ]; then
+#         if [ -f "$startfile" ]; then
+#             startparams="-c 1 $startfile"
+#         else
+#             echo "Start file does not exist, skipping load: $startfile" 1>&2
+#         fi
+#     fi
+#     visibleclicks=1 SHELL=rc BROWSER=garcon-url-handler \
+#         $PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
+#         -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
+#         $titleparams \
+#         $startparams
 
 if [ -z "$PLAN9" ]; then
     export PLAN9=/usr/local/plan9port
