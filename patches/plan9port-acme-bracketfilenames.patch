@@ -1,0 +1,13 @@
+diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
+index a7172b50..4816ada5 100644
+--- a/src/cmd/acme/look.c
++++ b/src/cmd/acme/look.c
+@@ -610,7 +610,7 @@ expandfile(Text *t, uint q0, uint q1, Expand *e)
+ 	if(nname == -1)
+ 		nname = n;
+ 	for(i=0; i<nname; i++)
+-		if(!isfilec(r[i]) && r[i] != ' ')
++		if(!isfilec(r[i]) && r[i] != ' ' && r[i] != '(' && r[i] != ')' && r[i] != '[' && r[i] != ']')
+ 			goto Isntfile;
+ 	/*
+ 	 * See if it's a file name in <>, and turn that into an include

@@ -51,6 +51,18 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
+### Allow round and square brackets in file and dir names in Acme
+
+To apply the patch, run from the plan9port repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-acme-bracketfilenames.patch
+```
+
+Contrary to expectation, Button3 in Acme does not open files and
+directories with round and square brackets (`(`, `)`, `[`, `]`) in
+their name. This patch makes it so Acme will open them as expected.
+
 ### Add `Lookb` command to Acme editor
 
 To apply the patch, run from the plan9port repository root:

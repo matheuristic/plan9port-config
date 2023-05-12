@@ -26,6 +26,8 @@ file in the subdirectory for instructions.
 
 - `plan9port-acme-bindings.patch`: Adds `C-k`, `C-n`, `C-p` and
   `Cmd-s` Acme key bindings for their usual Linux and macOS actions.
+- `plan9port-acme-bracketfilenames.patch`: Allow round and square
+  brackets in file and directory names in Acme.
 - `plan9port-acme-lookb.patch`: Adds a `Lookb` command to Acme for
   backwards search.
 - `plan9port-acme-soft-tabs.patch`: Adds soft tabs support to Acme
