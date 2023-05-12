@@ -1,13 +1,21 @@
 diff --git a/src/cmd/acme/look.c b/src/cmd/acme/look.c
-index a7172b50..4816ada5 100644
+index a7172b50..ddeee21d 100644
 --- a/src/cmd/acme/look.c
 +++ b/src/cmd/acme/look.c
-@@ -610,7 +610,7 @@ expandfile(Text *t, uint q0, uint q1, Expand *e)
+@@ -528,6 +528,7 @@ texthas(Text *t, uint q0, Rune *r)
+ int
+ expandfile(Text *t, uint q0, uint q1, Expand *e)
+ {
++	static Rune Lx[] = { ' ', '(', ')', '[', ']', 0 };
+ 	int i, n, nname, colon, eval;
+ 	uint amin, amax;
+ 	Rune *r, c;
+@@ -610,7 +611,7 @@ expandfile(Text *t, uint q0, uint q1, Expand *e)
  	if(nname == -1)
  		nname = n;
  	for(i=0; i<nname; i++)
 -		if(!isfilec(r[i]) && r[i] != ' ')
-+		if(!isfilec(r[i]) && r[i] != ' ' && r[i] != '(' && r[i] != ')' && r[i] != '[' && r[i] != ']')
++		if(!isfilec(r[i]) && !runestrchr(Lx, r[i]))
  			goto Isntfile;
  	/*
  	 * See if it's a file name in <>, and turn that into an include
