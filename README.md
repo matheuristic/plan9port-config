@@ -474,6 +474,13 @@ a number of helper scripts available at `~/.acme/bin`:
   [Jira](https://www.atlassian.com/software/jira) issues. See package
   website or repository for how to set up appropriate plumbing rules.
 
+- [match-paren](https://github.com/ChristopherSegale/match-paren) or
+  [paren-matcher](https://github.com/ChristopherSegale/paren-matcher):
+  Takes stdin and inserts closing parentheses at the end to balance
+  out opening parentheses. `match-paren` is implemented in C while
+  `paren-matcher` is implemented in Common Lisp and requires
+  [SBCL](https://www.sbcl.org/). Can be useful when writing Lisp code.
+
 - [Nyne](https://github.com/dnjp/nyne): Tools for Acme, including
   `nynetab` which expands tabs and indents text (best used with a
   hotkey daemon like [skhd](https://github.com/koekeishiya/skhd) or

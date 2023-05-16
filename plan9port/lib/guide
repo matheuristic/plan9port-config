@@ -19,6 +19,7 @@ X                   # list all windows
 X/^'/               # list all modified files
 X/^'/ w             # write all modified files
 ,|dtw               # delete all trailing whitespace in window
+-/\(/,+/\)/         # select to prev left parens and next right parens
 
 # Characters
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
@@ -104,3 +105,7 @@ Edit /abc/ {
 	c/xyz/
 	.
 }
+# 4. Find line numbers of comments in a HTML file
+Edit ,x/<!--/ .;/-->/ =
+# 5. Print comment lines, including non-comments on the same lines, in a HTML file to stdout
+Edit ,x/<!--/ .+-;/-->/+- > cat
