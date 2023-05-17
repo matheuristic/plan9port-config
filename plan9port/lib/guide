@@ -3,7 +3,7 @@ Edit Font :, :0 :$ :42,49 :/[Ff]oo/ :-/[Ff]oo/ :0+/foo/ :$-/foo/
 Asave Blog Brecent EC F F- F+ d gl gb lw mdpv sp <cl-paste
 |c- |c+ |ct |s- |s+ |s2t |t- |t+ |t2s |lower |upper |surround |uline
 (Indent on) (Space on) (Tab 8) (rg+ '[Ff]oo') (rg- 'bar') (rg-- 'baz')
-Slide Slide- Slide+ win
+Slide Slide- Slide+ (win zsh)
 
 # Edit commands
 =                   # file:linenumber
@@ -20,6 +20,7 @@ X/^'/               # list all modified files
 X/^'/ w             # write all modified files
 ,|dtw               # delete all trailing whitespace in window
 -/\(/,+/\)/         # select to prev left parens and next right parens
+s/([\(\)])/\\\1/g   # escape all parentheses in selection
 
 # Characters
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
@@ -107,5 +108,5 @@ Edit /abc/ {
 }
 # 4. Find line numbers of comments in a HTML file
 Edit ,x/<!--/ .;/-->/ =
-# 5. Print comment lines, including non-comments on the same lines, in a HTML file to stdout
+# 5. Print to stdout comment lines, and non-comments on the same line, in an HTML file
 Edit ,x/<!--/ .+-;/-->/+- > cat
