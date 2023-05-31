@@ -15,3 +15,6 @@ actions_on_put = ["source.organizeImports"]
 
 [servers.ruff-lsp]
 files = '\.py$'
+
+[servers.zls]
+files = '\.zig$'

@@ -380,8 +380,8 @@ a number of helper scripts available at `~/.acme/bin`:
   project workspaces should be added to the config file at
   `$HOME/.config/acre.toml` as needed. A sample config file is
   provided in this repo at `plan9port/.config/acre.toml` that uses
-  `gopls`, `rust-analyzer` and `ruff-lsp` for Go, Rust and Python code
-  (note that no workspace paths are specified).
+  `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
+  and Zig code (note that no workspace paths are specified).
 
   An alternative is [acme-lsp](https://github.com/fhs/acme-lsp),
   which can be installed with:
