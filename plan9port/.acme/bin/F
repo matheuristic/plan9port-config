@@ -2,7 +2,7 @@
 
 # Change font in current Acme window
 
-defaultfontsize=22a
+defaultfontsize=15a
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
@@ -22,8 +22,8 @@ Change font in current Acme window. Usage:
 
     F [newfontname [newfontsize]]
 
-Sets window font to newfontname at newfontsize pt, if specified, and
-prints the window font path to stdout after.
+Sets window font to variable font newfontname at newfontsize pt, if
+specified, and prints the window font path to stdout after.
 Calling with no args will just print the full path of the current font.
 (Note that on macOS Retina screens, Acme automatically doubles the
 font size set by the user.)
@@ -48,4 +48,16 @@ if (test $#* -gt 0) {
 }
 
 # Print current font to stderr
-9p read acme/$winid/ctl | 9 awk '{print $7}'
+curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+isvarfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+if (test $isvarfont -eq 1) {
+	ishighdpi=`{ishidpi}
+	curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
+	cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
+	antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
+	cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicator
+	if (~ $#antialias 0) antialias=''
+	if (test $ishighdpi -eq 1) cursize=`{9 echo $cursize'/2' | 9 hoc}
+	echo `{9 echo $curfont | 9 sed -e 's:^(.*)/[^/]+/[0-9a]+/font:\1:g'}'/'$curname'/'$cursize$antialias'/font'
+}
+if not echo $curfont

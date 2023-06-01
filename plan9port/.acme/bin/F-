@@ -2,19 +2,26 @@
 
 # Decrement font size in current Acme window, and print new font path.
 # Usage:
-#     F- [-R] [N]
+#     F- [-lodpi] [-hidpi] [N]
 # where N is the number of points (defaults to 1 if unspecified),
-# and -R indicates Acme is currently on a macOS Retina display
-# (in which case this scripts works around Acme's behavior of doubling
-# the user-specified font size automatically)
+# and -lodpi or -hidpi overrides autodetection of DPI and assumes Acme
+# is on a low DPI or high DPI screen (the script works around Acme's
+# auto-doubling of the user-specified font size on high DPI screens)
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
 	exit 1
 }
 
-if ((test $#* -gt 0) && (test $1 = '-R')) {
-	retina=1
+ishighdpi=`{ishidpi}
+
+if ((test $#* -gt 0) && (test $1 = '-lodpi')) {
+	ishighdpi=0
+	shift
+}
+
+if ((test $#* -gt 0) && (test $1 = '-hidpi')) {
+	ishighdpi=1
 	shift
 }
 
@@ -38,7 +45,7 @@ cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicat
 delta=$1
 if (~ $#antialias 0) antialias=''
 if (~ $#delta 0) delta=1
-if (test $#retina -gt 0) cursize=`{9 echo $cursize'/2' | 9 hoc}
+if (test $#ishighdpi -gt 0) cursize=`{9 echo $cursize'/2' | 9 hoc}
 
 if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'-'$delta | 9 hoc}
 if not {
@@ -53,4 +60,4 @@ if (test $newsize -lt 1) {
 
 newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
 9 echo font $newfont | 9p write acme/$winid/ctl
-9p read acme/$winid/ctl | 9 awk '{print $7}'
+9 echo $newfont

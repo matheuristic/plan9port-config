@@ -284,6 +284,7 @@ a number of helper scripts available at `~/.acme/bin`:
   matching commands are shown. If `STRING` is omitted, then the most
   recent commands are show (i.e., match all commands).
 - `hn`: Command-line [HN](https://news.ycombinator.com) client.
+- `ishidpi`: Prints to stdout 1 if screen is high DPI or 0 otherwise.
 - `lower`: Lowercase text selection.
 - `lw`: List Acme windows (including window ID, whether the window is
   a directory window, and if the window is dirty). A fancier version

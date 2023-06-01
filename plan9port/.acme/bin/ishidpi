@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Prints 1 to stdout if screen is high DPI or 0 if it is not
+
+# Store AppleScript code for getting backingScaleFactor for macOS in a variable
+# https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
+read  -d '' BACKINGSCALEFACTORAPPLESCRIPT <<EOF
+use framework "Foundation"
+use framework "AppKit"
+property curApp : current application
+set v to curApp's NSScreen's mainScreen()'s backingScaleFactor()
+copy v to stdout
+EOF
+
+set -e
+
+checkcmd() {
+	if ! command -v "$1" >/dev/null 2>&1; then
+		echo "$1 needs to be installed" 1>&2
+		exit 1
+	fi
+}
+
+ISHIGHDPI=0
+case "$(uname)" in
+	Darwin)
+		checkcmd osascript
+		BACKINGSCALEFACTOR=$(osascript -e "$BACKINGSCALEFACTORAPPLESCRIPT")
+		ISHIGHDPI=$(echo "$BACKINGSCALEFACTOR > 1.0" | bc)
+		;;
+	Linux)
+		checkcmd xrdb
+		XFTDPI=$(xrdb -query | grep dpi | awk '{print $2}')
+		ISHIGHDPI=$(echo "$XFTDPI > 199.5" | bc)
+		;;
+	*)
+		echo "unsupported architecture: $(uname)" 1>&2
+		exit 2
+esac
+
+echo $ISHIGHDPI
