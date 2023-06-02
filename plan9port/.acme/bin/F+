@@ -45,7 +45,7 @@ cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicat
 delta=$1
 if (~ $#antialias 0) antialias=''
 if (~ $#delta 0) delta=1
-if (test $#ishighdpi -gt 0) cursize=`{9 echo $cursize'/2' | 9 hoc}
+if (test $ishighdpi -eq 1) cursize=`{9 echo $cursize'/2' | 9 hoc}
 
 if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'+'$delta | 9 hoc}
 if not {
