@@ -2,15 +2,18 @@
 
 # Prints 1 to stdout if screen is high DPI or 0 if it is not
 
-# Store AppleScript code for getting backingScaleFactor for macOS in a variable
+# Prints AppleScript code to get backingScaleFactor in macOS
 # https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
-read  -d '' BACKINGSCALEFACTORAPPLESCRIPT <<EOF
+# https://stackoverflow.com/a/35049057
+_generateapplescript () {
+	cat <<'EOF'
 use framework "Foundation"
 use framework "AppKit"
 property curApp : current application
 set v to curApp's NSScreen's mainScreen()'s backingScaleFactor()
 copy v to stdout
 EOF
+}
 
 set -e
 
@@ -25,7 +28,7 @@ ISHIGHDPI=0
 case "$(uname)" in
 	Darwin)
 		checkcmd osascript
-		BACKINGSCALEFACTOR=$(osascript -e "$BACKINGSCALEFACTORAPPLESCRIPT")
+		BACKINGSCALEFACTOR=$(osascript -e "$(_generateapplescript)")
 		ISHIGHDPI=$(echo "$BACKINGSCALEFACTOR > 1.0" | bc)
 		;;
 	Linux)
