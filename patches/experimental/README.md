@@ -119,3 +119,20 @@ been modified to be compatible with the codebase after applying
 If using `plan9port-acme-acmesrv.patch` above to add remoting
 capability and additionally soft tabs are desired, use this patch
 instead of `plan9port-acme-soft-tabs.patch`.
+
+### Use slashed zero variant for Lucida Grande font on macOS
+
+To apply the patch, run from the repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-fontsrv-lucida-grande-slashed-zero.patch
+```
+
+This is a patch for `fontsrv` by
+[mariusae](https://gist.github.com/mariusae/d3856206297706ea90d30abc177a7100)
+that substitutes the regular zero glyph with an alternative slashed
+version from the same font when serving Lucida Grande on macOS.
+
+Links:
+
+- [[9fans] Slashed zero in Lucida Grande (macOS)](https://marc.info/?l=9fans&m=155425543915808)
