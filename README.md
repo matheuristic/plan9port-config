@@ -279,6 +279,8 @@ a number of helper scripts available at `~/.acme/bin`:
 - `gl`: Wrapper for `git log` of file in current Acme window.
 - `ghurl`: Hurl the specified or current Acme window file in current
   or given branch to a web browser.
+- `git`: Wrapper for `git` that automatically sets the `GPG_TTY`
+  environment variable when in a TTY.
 - `h`: `hcount=N h STRING` shows the last `N` commands in a win window
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
