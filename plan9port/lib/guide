@@ -21,6 +21,7 @@ X/^'/ w             # write all modified files
 ,|dtw               # delete all trailing whitespace in window
 -/\(/,+/\)/         # select to prev left parens and next right parens
 s/([\(\)])/\\\1/g   # escape all parentheses in selection
+>unicode -n `{cat}  # print Unicode code points of selected chars
 
 # Characters
 αβγδεζηθλμνξπρστφψωΓΔΘΛΞΠΣΦΨΩ   # Greek
