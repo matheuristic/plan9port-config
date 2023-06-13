@@ -85,6 +85,22 @@ LOGFILE=${LOGFILE:-/dev/null}
 # Create autosave directory path if needed
 mkdir -p "$AUTOSAVEDIR"
 
+# Exit with error code 2 if there are any files in AUTOSAVEDIR,
+# as they exist only if dirty files were not saved before closing
+UNSAVEDFILES=$(ls -A "$AUTOSAVEDIR")
+if [ "$UNSAVEDFILES" ]; then
+	echo "Not starting as there are existing autosaves for:" 1>&2
+	echo "$UNSAVEDFILES" | 9 awk '
+{
+	name=$0;
+	gsub(/%/, "/", name); # "%" -> "/"
+	gsub(/\+/, " ", name); # "+" -> " " (space)
+	gsub(/=/, "	", name); # "=" -> "	" (tab)
+	print(name " -> '"$AUTOSAVEDIR"'/" $0)
+}' 1>&2
+	exit 2
+fi
+
 # Convert save interval to deciseconds
 AUTOSAVEINTDS=$(echo "$AUTOSAVEINT * 10" | 9 hoc)
 
@@ -109,7 +125,7 @@ while true; do
 		filepath=("'$AUTOSAVEDIR'/" name)
 		print ("windowid=" wid " ; isdir=" isdir " ; ismodified=" ismodified " ; name=" name " ; backupfilepath=" filepath)
 		if (ismodified) {
-			cmd=("9p read acme/" wid "/body > \"" filepath"\"")
+			cmd=("9p read acme/" wid "/body > \"" filepath "\"")
 		}
 		else {
 			cmd=("rm -f \"" filepath "\"")
