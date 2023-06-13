@@ -8,8 +8,8 @@ EXCLUDEDIRS=("$HOME/.acme/bin")
 
 NOPWDPATH=$PATH
 for d in $EXCLUDEDIRS; do
-	NOPWDPATH=$(echo "$NOPWDPATH" | sed -e 's%:'"$d"'%%g')
-	NOPWDPATH=$(echo "$NOPWDPATH" | sed -e 's%'"$d"':%%g')
+	NOPWDPATH=$(echo "$NOPWDPATH" | sed -e 's|:'"$d"'||g')
+	NOPWDPATH=$(echo "$NOPWDPATH" | sed -e 's|'"$d"':||g')
 done
 
 GITBINPATH=$(PATH="$NOPWDPATH" command -v git)
