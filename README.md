@@ -268,7 +268,7 @@ a number of helper scripts available at `~/.acme/bin`:
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
 - `F`: Show font for current Acme window or set its font to an
-  available variable font in `fontsrv` (`9p ls font` to list fonts).
+  available fontsrv font in `fontsrv` (`9p ls font` to list fonts).
 - `F+`: Increment font size for the current Acme window by the given
   number of points (defaults to 1 if called with no arg). Only works
   if the current font is a variable font served by `fontsrv`.
@@ -835,7 +835,7 @@ see [here](https://gist.github.com/proudlygeek/5721498),
     or as scratch. Add `/guide` to `.gitignore`.
   - Useful `Edit` commands can be added to `guide`, and they can be
     used using by 2-1 chording to `Edit` to a file window tag.
-  - Change the font by executing `Font` or `F <fontname> <fontsize>`
+  - Change the font by executing `Font` (or using the `F` script)
     in the window tag.
   - If there is an EditorConfig setting for the project, execute `EC`
     in the window tag.

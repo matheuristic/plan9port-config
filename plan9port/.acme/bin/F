@@ -1,8 +1,6 @@
 #!/usr/bin/env rc
 
-# Change font in current Acme window
-
-defaultfontsize=15a
+# Change vector font in current Acme window
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
@@ -20,44 +18,62 @@ if (~ $1 '-h') {
 }
 Change font in current Acme window. Usage:
 
-    F [newfontname [newfontsize]]
+    F [newfontsize [newfontname]]
 
-Sets window font to variable font newfontname at newfontsize pt, if
-specified, and prints the window font path to stdout after.
-Calling with no args will just print the full path of the current font.
-(Note that on macOS Retina screens, Acme automatically doubles the
-font size set by the user.)
+Sets window font to newfontsize pt and, if specified, to a host system
+font newfontname served by fontsrv (these have path
+/mnt/font/NAME/SIZE/font). Calling with no args will print the full
+path of the current window's font. Note that on macOS Retina screens,
+Acme automatically doubles the font size set by the user.
 
-newfontname must be a `fontsrv` available font
 newfontsize is size in points and can be suffixed with 'a' to use the
-font antialiased (defaults to '$defaultfontsize' if unspecified)
+font antialiased.
+
+newfontname must be a `fontsrv` available font.
+
+If the newfontname is not specified and the current font is not a
+host system font, exits with error code 1.
 
 Example:
-    F GoMono 23a
+    F 23a GoMono
 
-Run `9p ls font` to list available fonts
+Run `9p ls font` to list available fonts.
 EOF
 
-# Set new font and size if changing font
+curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+
+# Set new font size and change to new font, if specified
 if (test $#* -gt 0) {
-	newfontname=$1
-	newfontsize=$2
-	if (~ $#newfontsize 0) newfontsize=$defaultfontsize
-	newfont='/mnt/font/'$newfontname'/'$newfontsize'/font'
+	cursize=$1
+	curname=$2
+	isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+	if (~ $#curname 0) {
+		if (test $isfontsrvfont -eq 1) {
+			curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
+		}
+		if not {
+			9 cat 'Current font is non-host system font and no new font specified'
+			exit 1
+		}
+	}
+	newfont='/mnt/font/'$curname'/'$cursize'/font'
 	9 echo font $newfont | 9p write acme/$winid/ctl
 }
-
-# Print current font to stderr
-curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-isvarfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
-if (test $isvarfont -eq 1) {
-	ishighdpi=`{ishidpi}
-	curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
-	cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
-	antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
-	cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicator
-	if (~ $#antialias 0) antialias=''
-	if (test $ishighdpi -eq 1) cursize=`{9 echo $cursize'/2' | 9 hoc}
-	echo `{9 echo $curfont | 9 sed -e 's:^(.*)/[^/]+/[0-9a]+/font:\1:g'}'/'$curname'/'$cursize$antialias'/font'
+# Else print current font to stderr
+if not {
+	isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+	if (test $isfontsrvfont -eq 1) {
+		if (~ $#cursize 0) {
+			ishighdpi=`{ishidpi}
+			curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
+			cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
+			antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
+			cursizenoaa=`{9 echo $cursize | 9 sed 's/a$//'}       # remove antialias indicator
+			if (~ $#antialias 0) antialias=''
+			if (test $ishighdpi -eq 1) cursizenoaa=`{9 echo $cursizenoaa'/2' | 9 hoc}
+			cursize=$cursizenoaa^$antialias
+			curfont='/mnt/font/'^$curname^'/'^$cursize^'/font'
+		}
+	}
+	9 echo $curfont
 }
-if not echo $curfont

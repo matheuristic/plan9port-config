@@ -1,6 +1,6 @@
 #!/usr/bin/env rc
 
-# Increment font size in current Acme window, and print new font path.
+# Increment font size in current Acme window.
 # Usage:
 #     F+ [-lodpi] [-hidpi] [N]
 # where N is the number of points (defaults to 1 if unspecified),
@@ -32,9 +32,9 @@ if (test $#* -gt 1) {
 
 curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
 
-isvarfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
-if (test $isvarfont -eq 0) {
-	9 echo Resizing not supported for bitmap font, currently $curfont >[1=2]
+isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+if (test $isfontsrvfont -eq 0) {
+	9 echo Resizing not supported for non-fontsrv font, currently $curfont >[1=2]
 	exit 1
 }
 
@@ -55,4 +55,3 @@ if not {
 
 newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
 9 echo font $newfont | 9p write acme/$winid/ctl
-9 echo $newfont
