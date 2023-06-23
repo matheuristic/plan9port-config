@@ -18,8 +18,6 @@ Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
 -h shows usage and exits
 -c convertcmd sets the conversion command to convertcmd
     (default: "pandoc --standalone" or "multimarkdown --full")
--b browsecmd sets the browser launch command to browsecmd
-    (default: garcon-url-handler or xdg-open or open)
 -t tmpfile sets the temporary HTML file generated to tmpfile
     (default: ~/Downloads/__tmp__.html for garcon-url-handler or /tmp/tmp.html otherwise)
 mdfile is the path to a Markdown file
@@ -30,6 +28,9 @@ resulting HTML code to stdout.
 
 Additionally, the temporary HTML file is not automatically cleaned up
 by this script.
+
+$PLAN9/bin/web is used to launch a browser, that can be set using the
+BROWSER environment variable.
 EOF
 			exit
 			;;
@@ -39,15 +40,6 @@ EOF
 				shift; shift
 			else
 				echo "-c requires a non-empty option argument that is a command (with args if needed)" 1>&2
-				exit 1
-			fi
-			;;
-		-b)
-			if [ -n "$2" ]; then
-				BROWSER="$2"
-				shift; shift
-			else
-				echo "-b requires a non-empty option argument that is a command (with args if needed)" 1>&2
 				exit 1
 			fi
 			;;
@@ -83,21 +75,6 @@ if [ -z "$MDFILE" ]; then
 	fi
 fi
 
-# Automatically set browser command if not specified
-if [ -z "$BROWSER" ]; then
-	# Try Crostini (ChromeOS) > Linux > macOS URL handlers
-	if command -v garcon-url-handler 1>/dev/null 2>&1; then
-		BROWSER=garcon-url-handler
-	elif command -v xdg-open 1>/dev/null 2>&1; then
-		BROWSER=xdg-open
-	elif command -v open 1>/dev/null 2>&1; then
-		BROWSER=open
-	else
-		echo 'BROWSER variable not set and no auto-detected URL handler installed'
-		exit 1
-	fi
-fi
-
 # Automatically set conversion command if not specified
 if [ -z "$CONVERT" ]; then
 	if command -v pandoc 1>/dev/null 2>&1; then
@@ -126,4 +103,4 @@ fi
 $CONVERT "$MDFILE" >"$TMPFILE"
 
 # Open HTML file in browser
-$BROWSER "$TMPFILE"
+web "$TMPFILE"
