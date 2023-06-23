@@ -128,6 +128,18 @@ This patch makes that behavior togglable, so PPI is scaled only when
 the `-s` option is specified, i.e., `page -s somefile.pdf` scales PPI
 while `page somefile.pdf` does not.
 
+### Don't fully hide menubar and dock when fullscreen on macOS
+
+To apply the patch, run from the plan9port repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-mac-nofullscreenautohidemenu.patch
+```
+
+By default, devdraw is configured so it fully hides the menu bar and
+dock when plan9port GUI program windows are full screen. This patch
+reverts those changes so window behavior is per normal.
+
 ### No remapping of backticks and single quotes on macOS systems
 
 To apply the patch, run from the plan9port repository root:

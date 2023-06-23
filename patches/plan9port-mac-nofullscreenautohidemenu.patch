@@ -1,0 +1,16 @@
+diff --git a/src/cmd/devdraw/mac-screen.m b/src/cmd/devdraw/mac-screen.m
+index f07054cf..3d7dc876 100644
+--- a/src/cmd/devdraw/mac-screen.m
++++ b/src/cmd/devdraw/mac-screen.m
+@@ -966,8 +966,9 @@ rpc_setmouse(Client *c, Point p)
+ 	// That's OK.
+ 	NSApplicationPresentationOptions o;
+ 	o = proposedOptions;
+-	o &= ~(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar);
+-	o |= NSApplicationPresentationHideDock | NSApplicationPresentationHideMenuBar;
++	// Commented out lines below to revert full-screen behavior described above.
++	//o &= ~(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar);
++	//o |= NSApplicationPresentationHideDock | NSApplicationPresentationHideMenuBar;
+ 	return o;
+ }
+ 
