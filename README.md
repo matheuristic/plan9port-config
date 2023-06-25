@@ -366,53 +366,60 @@ a number of helper scripts available at `~/.acme/bin`:
   [forks](https://github.com/prodhe/acmefmt) of acmego that extend
   it to format code files other than Go and Rust ones.
 
-- [acre](https://github.com/mjibson/acre):
-  [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
-  client. Can be installed with (change paths or versions as needed):
+- [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
+  client. Two options (current preference is `acre`):
 
-  ```sh
-  cd /some/path
-  curl -LO https://github.com/mjibson/acre/archive/refs/tags/v0.5.5.tar.gz
-  tar xzf v0.5.5.tar.gz
-  cd acre-0.5.5
-  cargo install --path $PWD
-  cd ~/.local/bin
-  ln -s /some/path/acre-0.5.5/target/release/acre
-  ```
+  - [acme-lsp](https://github.com/fhs/acme-lsp)
 
-  Acre does not auto-detect workspaces
-  ([link](https://github.com/mjibson/acre/issues/10)) so paths to
-  project workspaces should be added to the config file at
-  `$HOME/.config/acre.toml` as needed. A sample config file is
-  provided in this repo at `plan9port/.config/acre.toml` that uses
-  `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
-  and Zig code (note that no workspace paths are specified).
+    Can be installed with:
 
-  An alternative is [acme-lsp](https://github.com/fhs/acme-lsp),
-  which can be installed with:
+    ```sh
+    go install github.com/fhs/acme-lsp/cmd/acme-lsp@latest
+    go install github.com/fhs/acme-lsp/cmd/L@latest
+    ```
 
-  ```sh
-  go install github.com/fhs/acme-lsp/cmd/acme-lsp@latest
-  go install github.com/fhs/acme-lsp/cmd/L@latest
-  ```
+    Some helper scripts for acme-lsp can be created while in the `rc`
+    shell from a `$path` dir, say `$home/.acme/bin/`, and running:
 
-  Some helper scripts for acme-lsp can be created in `rc` while at a
-  directory in `$path`, say `$HOME/.acme/bin/`, and running:
-
-  ```sh
-  for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
-    > L^$cmd {
-      echo '#!/usr/bin/env rc'
-      echo exec L $cmd '$*'
+    ```sh
+    for(cmd in comp def fmt hov impls refs rn sig syms type assist ws ws+ ws-){
+      > L^$cmd {
+        echo '#!/usr/bin/env rc'
+        echo exec L $cmd '$*'
+      }
+      chmod +x L^$cmd
     }
-    chmod +x L^$cmd
-  }
-  ```
+    ```
 
-  Configure acme-lsp via CLI params or a [TOML](https://toml.io/) file
-  `$HOME/Library/Application Support/acme-lsp/config.toml` (macOS) or
-  `$HOME/.config/acme-lsp/config.toml` (Unix/Linux). A sample config
-  is provided in the repo at `plan9port/.config/acme-lsp/config.toml`.
+    Configure acme-lsp via CLI params or a [TOML](https://toml.io/) file
+    `$HOME/Library/Application Support/acme-lsp/config.toml` (macOS) or
+    `$HOME/.config/acme-lsp/config.toml` (Unix/Linux). A sample config
+    is provided in the repo at `plan9port/.config/acme-lsp/config.toml`.
+
+    The `plan9port/.acme/bin/LSP` script `LSP` starts `acme-lsp` with
+    additional workspace dirs set based on the current dir.
+
+  - [acre](https://github.com/mjibson/acre)
+
+    Can be installed with (change paths or versions as needed):
+
+    ```sh
+    cd /some/path
+    curl -LO https://github.com/mjibson/acre/archive/refs/tags/v0.5.5.tar.gz
+    tar xzf v0.5.5.tar.gz
+    cd acre-0.5.5
+    cargo install --path $PWD
+    cd ~/.local/bin
+    ln -s /some/path/acre-0.5.5/target/release/acre
+    ```
+
+    Acre does not auto-detect workspaces
+    ([link](https://github.com/mjibson/acre/issues/10)) so paths to
+    project workspaces should be added to the config file at
+    `$HOME/.config/acre.toml` as needed. A sample config file is
+    provided in this repo at `plan9port/.config/acre.toml` that uses
+    `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
+    and Zig code (note that no workspace paths are specified).
 
 - [awww](https://github.com/cjacker/awww):
   Text web browser for Acme. Button2 or Button3 opens links in opened

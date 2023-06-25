@@ -1,6 +1,6 @@
 # acme-lsp config
 # ~/.config/acme-lsp/config.toml - Linux
-# ~/Library/Preferences/Application\ Support/acme-lsp/config.toml - macOS
+# ~/Library/Application\ Support/acme-lsp/config.toml - macOS
 
 # acme-lsp source repository: https://github.com/fhs/acme-lsp
 
@@ -34,6 +34,11 @@
 		[Servers.rust-analyzer.Options]
                 # "checkOnSave.enable" = false
 
+	[Servers.zls]
+	Command = ["zls"]
+	StderrFile = "zls.stderr.log"
+	Logfile = "zls.log"
+
 [[FilenameHandlers]]
 Pattern = "\\.py$"
 ServerKey = "pylsp"
@@ -56,3 +61,7 @@ ServerKey = "gopls"
 [[FilenameHandlers]]
 Pattern = "\\.rs$"
 ServerKey = "rust-analyzer"
+
+[[FilenameHandlers]]
+Pattern = "\\.zig$"
+ServerKey = "zls"

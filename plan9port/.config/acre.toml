@@ -1,5 +1,5 @@
 [servers.rust-analyzer]
-files = "\\.rs$"
+files = '\.rs$'
 #workspace_folders = [
 #	"file:///home/username/some-project",
 #	"file:///home/username/other-project",
