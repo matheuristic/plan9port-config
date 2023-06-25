@@ -254,7 +254,6 @@ a number of helper scripts available at `~/.acme/bin`:
 - `c+`: Comment. Specify an argument to change the comment prefix from
   the default `#`.
 - `c-`: Uncomment. An argument may be specified as in `c+`.
-- `ci`: Convert an alphanumeric string to a case-insensitive regexp.
 - `condarun`: `condarun envname cmd arg1 ...` executes `cmd` with the
   given args in the `envname` Conda environment (default environment
   is the one active when Acme was launched, else `base`).
@@ -341,6 +340,7 @@ a number of helper scripts available at `~/.acme/bin`:
   number of spaces to a tab from the default of `$tabstop`.
 - `uline`: Underline text selection. Specify an argument to change the
   character for underlining from the default of '-'.
+- `uncase`: Convert an alphanum string to a case-insensitive regexp.
 - `upper`: Uppercase text selection.
 - `w+`: Wrap (format text so each line is under some width in chars),
   specify an arg for a width other than the default of `70`.

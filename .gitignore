@@ -8,3 +8,7 @@
 
 # local Acme guide file
 /guide
+# direnv config
+/.envrc
+# Code search index
+/.csearchindex
