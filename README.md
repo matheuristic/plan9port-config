@@ -260,7 +260,8 @@ a number of helper scripts available at `~/.acme/bin`:
 - `codepv`: Preview current Acme window code file in a browser.
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
-- `d`: Diff the current window against the current file on disk.
+- `d`: Diff the current window against the current file on disk, needs
+  GNU diff (default on Linux; on macOS, install MacPorts `diffutils`).
 - `dtw`: Delete trailing whitespace (spaces/tabs).
 - `EC`: Load [EditorConfig](https://editorconfig.org/) indentation
   settings (spaces or tabs, and width of each indent level) for the

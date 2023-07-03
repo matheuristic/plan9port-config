@@ -9,8 +9,8 @@ if ((test $#winid -eq 0) || (test $#tabstop -eq 0)) {
 	exit 1
 }
 
-# on macOS, MacPorts and Homebrew coreutils (or gnudiff) packages
-# symlink each GNU tool 'xyz' to 'gxyz'
+# if using macOS, GNU diff may be installed via the MacPorts and
+# Homebrew diffutils pkg, which symlinks each GNU tool 'xyz' to 'gxyz'
 diffcmd=diff
 if (gdiff --version >[2]/dev/null >[1=2]) {
 	diffcmd=gdiff
