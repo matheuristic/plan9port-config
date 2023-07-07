@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Strip ANSI color codes from STDIN and write result to STDOUT
+# Sourced from https://superuser.com/a/380778
+
+if ! command -v "perl" >/dev/null 2>&1; then
+	echo "perl needs to be installed" 1>&2
+	exit 1
+fi
+
+perl -pe 's/\e\[[0-9;]*m(?:\e\[K)?//g'

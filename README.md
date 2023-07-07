@@ -297,6 +297,7 @@ a number of helper scripts available at `~/.acme/bin`:
 - `mdpv`: Preview current Acme window Markdown file in a browser.
 - `mvto`: Rename current Acme window file, and updates the tag after.
   Uses `git mv` if the file part of a Git repository, `mv` otherwise.
+- `noansi`: Strip ANSI color codes from stdin, write result to stdout.
 - `rg+`: Wrapper for running
   [ripgrep](https://github.com/BurntSushi/ripgrep) with output that
   can be plumbed. Note that for modified open files in Acme, the saved
