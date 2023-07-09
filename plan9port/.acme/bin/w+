@@ -4,4 +4,4 @@
 # Uses par ( http://www.nicemice.net/par/ ) if installed, otherwise uses fmt
 
 WIDTH=${1:-70}
-par "w${WIDTH}rq" 2>/dev/null || fmt -w "${WIDTH}"
+par "w${WIDTH}rq" 2>/dev/null || fmt -p -w "${WIDTH}"
