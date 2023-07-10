@@ -13,7 +13,7 @@ while [ "$#" -gt 0 ]; do
 Preview current Acme window code file or a code file in a browser
 with syntax highlighting and line numbers.
 
-Usage: $(basename $0) [-h] [-n] [-l lang] [-b browsecmd] [-t tmpfile] [mdfile]
+Usage: $(basename $0) [-h] [-n] [-l lang] [-t tmpfile] [mdfile]
 
 -h shows usage and exits
 -n numbers the code lines (only works with pandoc)

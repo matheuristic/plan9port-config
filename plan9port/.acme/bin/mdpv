@@ -13,11 +13,11 @@ while [ "$#" -gt 0 ]; do
 			cat <<EOF
 Preview current Acme window's or a given Markdown file in a browser.
 
-Usage: $(basename $0) [-h] [-c convertcmd] [-b browsecmd] [-t tmpfile] [mdfile]
+Usage: $(basename $0) [-h] [-c convertcmd] [-t tmpfile] [mdfile]
 
 -h shows usage and exits
 -c convertcmd sets the conversion command to convertcmd
-    (default: "pandoc --standalone" or "multimarkdown --full")
+    (default: "pandoc --mathml --section-divs --standalone" or "multimarkdown --full")
 -t tmpfile sets the temporary HTML file generated to tmpfile
     (default: ~/Downloads/__tmp__.html for garcon-url-handler or /tmp/tmp.html otherwise)
 mdfile is the path to a Markdown file
@@ -78,7 +78,7 @@ fi
 # Automatically set conversion command if not specified
 if [ -z "$CONVERT" ]; then
 	if command -v pandoc 1>/dev/null 2>&1; then
-		CONVERT="pandoc --standalone"
+		CONVERT="pandoc --mathml --section-divs --standalone"
 	elif command -v multimarkdown 1>/dev/null 2>&1; then
 		CONVERT="multimarkdown --full"
 	else
