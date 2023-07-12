@@ -113,6 +113,18 @@ window title of the launched Acme instance to `TITLE`.
 Sourced from [this](https://github.com/9fans/plan9port/pull/51)
 unmerged pull request by [afh](https://github.com/afh).
 
+### Add more keyboard compose sequences for typing runes
+
+To apply the patch, run from the plan9port repository root:
+
+```sh
+patch -p1 < /path/to/plan9port-keyboard-addrunecomposeseq.patch
+```
+
+Adds the following new compose sequences for runes:
+
+- `Alt-l-l` for the lozenge rune ◊
+
 ### Make scaling of PPI in page optional
 
 To apply the patch, run from the plan9port repository root:

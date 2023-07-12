@@ -1,0 +1,12 @@
+diff --git a/lib/keyboard b/lib/keyboard
+index 1a0e85a5..8092f40d 100644
+--- a/lib/keyboard
++++ b/lib/keyboard
+@@ -560,6 +560,7 @@
+ 2329  </          〈 left angle bracket
+ 232a  />          〉 right angle bracket
+ 2423              ␣	open box, visible space
++25CA  ll          ◊	lozenge
+ 2639  :(          ☹ sad face
+ 263A  :)          ☺ smiley face
+ 2654  wk          ♔	white chess king

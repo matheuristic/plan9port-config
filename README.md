@@ -35,6 +35,8 @@ file in the subdirectory for instructions.
   option.
 - `plan9port-acme-windowtitle.patch`: Adds a `-t TITLE` CLI option
   for setting the window title of a launched Acme instance.
+- `plan9port-keyboard-addrunecomposeseq.patch`: Adds new keyboard
+  compose sequences for typing runes. See `patches/README.md`.
 - `plan9port-mac-nofullscreenautohidemenu.patch`: Reverts changes to
   GUI window fully hide menubar when fullscreen behavior.
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
