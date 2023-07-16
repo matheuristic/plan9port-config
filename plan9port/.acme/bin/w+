@@ -2,6 +2,27 @@
 
 # Wrap STDIN or piped text to width given by argument (default is 70)
 # Uses par ( http://www.nicemice.net/par/ ) if installed, otherwise uses fmt
+# When using fmt, preserves indented paragraphs if version supports it
 
 WIDTH=${1:-70}
-par "w${WIDTH}rq" 2>/dev/null || gfmt -c -w "${WIDTH}" || fmt -w "${WIDTH}"
+if command -v par >/dev/null 2>&1; then
+	par "w${WIDTH}rq" 2>/dev/null
+elif command -v gfmt >/dev/null 2>&1; then
+	# macOS MacPorts or Homebrew-installed GNU Coreutils fmt
+	gfmt --crown-margin --width="${WIDTH}"
+else
+	case "$(uname -sr)" in
+		Darwin*)
+			# macOS default fmt
+			/usr/bin/fmt -p -w "${WIDTH}"
+			;;
+		Linux*)
+			# GNU Coreutils fmt
+			fmt --crown-margin --width="${WIDTH}"
+			;;
+		*)
+			# Fall back to no preserve indentation
+			fmt -w "${WIDTH}"
+			;;
+	esac
+fi
