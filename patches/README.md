@@ -45,6 +45,7 @@ This patch adds the following keybindings:
 - `C-n`: move point one line down
 - `C-p`: move point one line up
 - `Cmd-s`: execute `Put` (i.e., save file) on macOS
+- ``Cmd-\``: execute text (like Button2) on macOS
 
 Some portions of this patch are sourced from
 [plan9port](https://github.com/9fans/plan9port) forks by
