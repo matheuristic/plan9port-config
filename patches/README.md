@@ -44,6 +44,7 @@ This patch adds the following keybindings:
 - `C-k`: forward erase to end of line
 - `C-n`: move point one line down
 - `C-p`: move point one line up
+- `Cmd-a`: select all content in window
 - `Cmd-s`: execute `Put` (i.e., save file) on macOS
 - ``Cmd-\``: execute text (like Button2) on macOS
 

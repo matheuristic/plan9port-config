@@ -24,9 +24,9 @@ There are some patches in the `patches` subdirectory. Apply desired
 patches to the source code prior to compilation. See the `README.md`
 file in the subdirectory for instructions.
 
-- `plan9port-acme-bindings.patch`: Adds `C-k`, `C-n`, `C-p` and
-  `Cmd-s` Acme key bindings for their usual Linux and macOS actions,
-  and ``Cmd-\`` binding to execute text (like Button2) on macOS.
+- `plan9port-acme-bindings.patch`: Adds `C-k`, `C-n`, `C-p`, `Cmd-a`
+  and `Cmd-s` Acme key bindings for their usual Linux and macOS
+  actions, and ``Cmd-\`` binding to execute text (like Button2).
 - `plan9port-acme-bracketfilenames.patch`: Allow round and square
   brackets in file and directory names in Acme.
 - `plan9port-acme-lookb.patch`: Adds a `Lookb` command to Acme for
