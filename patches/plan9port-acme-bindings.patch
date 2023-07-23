@@ -20,7 +20,7 @@ index 852a8f7f..bd8e85cc 100644
  .I Win
  creates a new
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..daabc28d 100644
+index 09422dda..1878dc69 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
 @@ -15,6 +15,7 @@
@@ -157,7 +157,7 @@ index 09422dda..daabc28d 100644
 +		else
 +			execute(t, e.q0, e.q1, FALSE, nil);
 +		return;
-+	case Kcmd+'.':	/* %.: look3 */
++	case Kcmd+'.':	/* %.: plumb */
 +		typecommit(t);
 +		look3(t, t->q0, t->q1, FALSE);
 +		return;
