@@ -1,8 +1,8 @@
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index 852a8f7f..94683acd 100644
+index 852a8f7f..bd8e85cc 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
-@@ -662,12 +662,13 @@ a chord, so that for example on Macs selecting text with the trackpad
+@@ -662,12 +662,14 @@ a chord, so that for example on Macs selecting text with the trackpad
  button and then typing Option without letting go of the button will
  cause a 1-2 chord, cutting the selection.
  On Mac systems, the usual keyboard shortcuts
@@ -14,22 +14,13 @@ index 852a8f7f..94683acd 100644
  as in other programs.
  Especially on Mac laptops, these keyboard shortcuts are
  typically much less awkward than the equivalent chords.
-+Also, on Mac laptops, Command-\\ executes text like button 2.
++Also, on Mac laptops, Command-, executes text like button 2
++and Command-. plumbs text like button 3.
  .SS "Support programs
  .I Win
  creates a new
-diff --git a/src/cmd/acme/fns.h b/src/cmd/acme/fns.h
-index 969db417..79caca8b 100644
---- a/src/cmd/acme/fns.h
-+++ b/src/cmd/acme/fns.h
-@@ -107,3 +107,5 @@ Range range(int, int);
- #define	runemove(a, b, c)	memmove((a), (b), (c)*sizeof(Rune))
- 
- int	ismtpt(char*);
-+
-+int	isexecc(int);
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..5cec0fbd 100644
+index 09422dda..daabc28d 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
 @@ -15,6 +15,7 @@
@@ -90,15 +81,16 @@ index 09422dda..5cec0fbd 100644
  void
  texttype(Text *t, Rune r)
  {
-@@ -672,6 +709,7 @@ texttype(Text *t, Rune r)
+@@ -672,6 +709,8 @@ texttype(Text *t, Rune r)
  	int nr;
  	Rune *rp;
  	Text *u;
-+	Rune c;
++	int expanded;
++	Expand e;
  
  	if(t->what!=Body && t->what!=Tag && r=='\n')
  		return;
-@@ -760,10 +798,52 @@ texttype(Text *t, Rune r)
+@@ -760,10 +799,52 @@ texttype(Text *t, Rune r)
  			q0++;
  		textshow(t, q0, q0, TRUE);
  		return;
@@ -151,36 +143,28 @@ index 09422dda..5cec0fbd 100644
  	case Kcmd+'z':	/* %Z: undo */
  	 	typecommit(t);
  		undo(t, nil, nil, TRUE, 0, nil, 0);
-@@ -772,6 +852,28 @@ texttype(Text *t, Rune r)
+@@ -772,6 +853,20 @@ texttype(Text *t, Rune r)
  	 	typecommit(t);
  		undo(t, nil, nil, FALSE, 0, nil, 0);
  		return;
-+	case Kcmd+'\\':	/* %\: execute */
++	case Kcmd+',':	/* %,: execute */
 +		typecommit(t);
-+		q0 = t->q0;
-+		q1 = t->q1;
-+		/* replicated logic from src/cmd/acme/look.c */
-+		if(q1 == q0){	/* expand to find word (actually file name) */
-+			/* if in selection, choose selection */
-+			if(t->q1>t->q0 && t->q0<=q0 && q0<=t->q1){
-+				q0 = t->q0;
-+				q1 = t->q1;
-+			}else{
-+				while(q1<t->file->b.nc && isexecc(c=textreadc(t, q1)) && c!=':')
-+					q1++;
-+				while(q0>0 && isexecc(c=textreadc(t, q0-1)) && c!=':')
-+					q0--;
-+			}
-+		}
-+		if(texthas(t, q0, LDel))
++		expanded = expand(t, t->q0, t->q1, &e);
++		if(!expanded)
++			return;
++		if(texthas(t, e.q0, LDel))
 +			warning(nil, "Del , Delete , Delcol , ... must be executed with mouse\n");
 +		else
-+			execute(t, q0, q1, FALSE, nil);
++			execute(t, e.q0, e.q1, FALSE, nil);
++		return;
++	case Kcmd+'.':	/* %.: look3 */
++		typecommit(t);
++		look3(t, t->q0, t->q1, FALSE);
 +		return;
  
  	Tagdown:
  		/* expand tag to show all text */
-@@ -847,11 +949,20 @@ texttype(Text *t, Rune r)
+@@ -847,11 +942,20 @@ texttype(Text *t, Rune r)
  	case 0x08:	/* ^H: erase character */
  	case 0x15:	/* ^U: erase line */
  	case 0x17:	/* ^W: erase word */
