@@ -46,8 +46,8 @@ This patch adds the following keybindings:
 - `C-p`: move point one line up
 - `Cmd-a`: select all content in window
 - `Cmd-s`: execute `Put` (i.e., save file) on macOS
-- `Cmd-,`: execute text (like Button2) on macOS
-- `Cmd-.`: plumb text (like Button3) on macOS
+- `Cmd-.`: execute text (like Button2) on macOS
+- `Cmd-/`: plumb text (like Button3) on macOS
 
 Some portions of this patch are sourced from
 [plan9port](https://github.com/9fans/plan9port) forks by
