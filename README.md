@@ -292,6 +292,8 @@ a number of helper scripts available at `~/.acme/bin`:
   matching commands are shown. If `STRING` is omitted, then the most
   recent commands are show (i.e., match all commands).
 - `hn`: Command-line [HN](https://news.ycombinator.com) client.
+- `hrule`: Prints to stdout a horizontal line of a given length
+  (defaults to 70) using a given character (defaults to `─`).
 - `ishidpi`: Prints to stdout 1 if screen is high DPI or 0 otherwise.
 - `lower`: Lowercase text selection.
 - `lw`: List Acme windows (including window ID, whether the window is

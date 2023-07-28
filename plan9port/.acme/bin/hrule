@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Prints a horizontal line of given length (or 70 chars if no length provided)
+# using a given char (or Unicode char U+2500 "─" if none is provided)
+
+set -e
+
+DEFAULTLENGTH=70
+DEFAULTCHAR="─"
+
+if [ "$1" = "-h" ]; then
+	cat <<EOF
+Usage: $(basename $0) [length [char]]
+
+Prints a line of given length (default: ${DEFAULTLENGTH}) using char (default: "${DEFAULTCHAR}").
+EOF
+	exit 0
+fi
+
+HRULELENGTH=${1:-$DEFAULTLENGTH}
+HRULECHAR=${2:-$DEFAULTCHAR}
+for i in $(seq 1 "$HRULELENGTH"); do printf "$HRULECHAR"; done
+printf '\n'
