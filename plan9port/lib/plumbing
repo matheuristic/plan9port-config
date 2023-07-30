@@ -7,6 +7,7 @@ data matches '([a-zA-Z¡-￿0-9_\-./\(\)&][ a-zA-Z¡-￿0-9_\-./\(\)&]*)\.[Ee][P
 arg isfile $0
 plumb to epub
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
+#plumb start rc -c 'mupdf-gl '''$file''''
 
 # ms office files (docx?, xlsx?, pptx?)
 data matches '([a-zA-Z¡-￿0-9_\-./\(\)&][ a-zA-Z¡-￿0-9_\-./\(\)&]*)\.([Dd][Oo][Cc][Xx]?|[Xx][Ll][Ss][Xx]?|[Pp][Pp][Tt][Xx]?)'
@@ -20,6 +21,7 @@ arg isfile $0
 plumb to pdf
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
 #plumb start rc -c 'open -a Skim.app '''$file''''
+#plumb start rc -c 'mupdf-gl '''$file''''
 
 # image files
 type is text
