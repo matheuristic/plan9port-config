@@ -66,6 +66,35 @@
 #
 # Note the default namespace and title are /tmp/ns.$USER.$DISPLAY and "acme".
 #
+# An alternative to the above is to automatically determine a new namespace
+# for multiple Acmes. Here, an optional '-N' flag launches Acme in the first
+# available namespace among /tmp/ns.$USER.0 , ... , /tmp/ns.$USER.9 and it is
+# assumed that Acme is patched to support the '-t' option.
+#
+#     if [ "$1" = "-N" ]; then
+#         j=0
+#         while [ $j -lt 10 ]; do
+#             if ! $(NAMESPACE="/tmp/ns.$USER.$j" 9p ls acme >/dev/null 2>&1); then
+#                 break
+#             fi
+#             j=$(( j + 1 ))
+#         done
+#         if [ $j -ge 10 ]; then
+#             echo "All supported namespace numbers 0 through 9 have a running Acme." >&2
+#             exit 2
+#         fi
+#         export NAMESPACE="/tmp/ns.$USER.$j"
+#         [ -d "$NAMESPACE" ] || mkdir -p "$NAMESPACE"
+#         titleparams="-t acme-$j"
+#         # Uncomment below line if to maintain a cleaner /tmp/ directory
+#         # (the /tmp/ directory gets cleaned on reboots in any case)
+#         # trap 'rm -rf "$NAMESPACE"' EXIT
+#         shift;
+#     fi
+#
+# For more info on running multiple instances of Acme, see
+# https://comp.os.plan9.narkive.com/wtiTWkBm/9fans-multiple-acme-instances-with-plan9port
+#
 # Example script with all the elements above, needs patched Acme with `-t`
 # option. Run `startacme.sh -n testns` to launch in namespace `testns`.
 #
@@ -87,6 +116,26 @@
 #         # trap 'rm -rf "$NAMESPACE"' EXIT
 #         shift; shift
 #     fi
+#     if [ "$1" = "-N" ]; then
+#         j=0
+#         while [ $j -lt 10 ]; do
+#             if ! $(NAMESPACE="/tmp/ns.$USER.$j" 9p ls acme >/dev/null 2>&1); then
+#                 break
+#             fi
+#             j=$(( j + 1 ))
+#         done
+#         if [ $j -ge 10 ]; then
+#             echo "All supported namespace numbers 0 through 9 have a running Acme." >&2
+#             exit 2
+#         fi
+#         export NAMESPACE="/tmp/ns.$USER.$j"
+#         [ -d "$NAMESPACE" ] || mkdir -p "$NAMESPACE"
+#         titleparams="-t acme-$j"
+#         # Uncomment below line if to maintain a cleaner /tmp/ directory
+#         # (the /tmp/ directory gets cleaned on reboots in any case)
+#         # trap 'rm -rf "$NAMESPACE"' EXIT
+#         shift;
+#     fi
 #     startparams="$@"
 #     startfile=$HOME/.acme/start
 #     if [ "$startparams" = "" ]; then
@@ -103,7 +152,15 @@
 #         $startparams
 
 if [ -z "$PLAN9" ]; then
-    export PLAN9=/usr/local/plan9port
-    export PATH=$PATH:$PLAN9/bin
+	if [ -d "$HOME/.local/plan9" ]; then
+		export PLAN9=$HOME/.local/plan9
+		export PATH=$PATH:$PLAN9/bin
+	elif [ -d "/usr/local/plan9port" ]; then
+		export PLAN9=/usr/local/plan9port
+		export PATH=$PATH:$PLAN9/bin
+	else
+		echo "PLAN9 undefined and plan9port install not found at /usr/local/plan9 or $HOME/.local/plan9" >&2
+		exit 1
+	fi
 fi
 $PLAN9/bin/rc $HOME/.local/bin/startacme.rc "$@"

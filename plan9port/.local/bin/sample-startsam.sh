@@ -9,7 +9,15 @@
 #        $PLAN9/bin/rc $HOME/.local/bin/startsam.rc "$@"
 
 if [ -z "$PLAN9" ]; then
-    export PLAN9=/usr/local/plan9port
-    export PATH=$PATH:$PLAN9/bin
+	if [ -d "$HOME/.local/plan9" ]; then
+		export PLAN9=$HOME/.local/plan9
+		export PATH=$PATH:$PLAN9/bin
+	elif [ -d "/usr/local/plan9port" ]; then
+		export PLAN9=/usr/local/plan9port
+		export PATH=$PATH:$PLAN9/bin
+	else
+		echo "PLAN9 undefined and plan9port install not found at /usr/local/plan9 or $HOME/.local/plan9" >&2
+		exit 1
+	fi
 fi
 $PLAN9/bin/rc $HOME/.local/bin/startsam.rc "$@"

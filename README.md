@@ -1117,7 +1117,9 @@ provided in the `macos` folder. See `macos/README.md` for details.
 Note that script-only apps are always run under Rosetta 2 on arm macOS
 systems, so make sure to install that if needed (for more information on this
 topic, see the paragraph on **unsigned native (ARM) code**
-[here](https://eclecticlight.co/2022/02/01/what-shouldnt-you-use-an-m1-series-mac-for/)).
+[here](https://eclecticlight.co/2022/02/01/what-shouldnt-you-use-an-m1-series-mac-for/))
+and also see
+[here](https://eclecticlight.co/2021/02/18/code-signing-requirements-for-scripts-and-apps-in-big-sur/).
 
 ### macOS tips
 
