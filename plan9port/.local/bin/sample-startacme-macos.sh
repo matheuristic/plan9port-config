@@ -3,6 +3,8 @@
 # Sample ~/.local/bin/startacme.sh for macOS for launching Acme
 # If plumbing web URLs does not work, set environment var BROWSER=none
 
+set -e
+
 if [ -z "$PLAN9" ]; then
 	if [ -d "$HOME/.local/plan9" ]; then
 		export PLAN9=$HOME/.local/plan9
@@ -15,23 +17,8 @@ if [ -z "$PLAN9" ]; then
 		exit 1
 	fi
 fi
-if ! $(echo "$PATH" | grep "$HOME/macports/bin" >/dev/null 2>&1); then
-	export PATH=$HOME/macports/bin:$PATH
-fi
-if ! $(echo "$PATH" | grep "$HOME/go/bin" >/dev/null 2>&1); then
-	export PATH=$HOME/go/bin:$PATH
-fi
-if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
-	export PATH=$HOME/.local/bin:$PATH
-fi
 if ! $(echo "$PATH" | grep "$HOME/.acme/bin" >/dev/null 2>&1); then
 	export PATH=$HOME/.acme/bin:$PATH
-fi
-if ! $(echo "$PERL5LIB" | grep "/Library/Developer/CommandLineTools/usr/share/git-core/perl" >/dev/null 2>&1); then
-	export PERL5LIB=/Library/Developer/CommandLineTools/usr/share/git-core/perl:$PERL5LIB
-fi
-if ! $(echo "$PERL5LIB" | grep "$HOME/macports/share/perl5" >/dev/null 2>&1); then
-	export PERL5LIB=$HOME/macports/share/perl5:$PERL5LIB
 fi
 titleparams=""
 if [ "$1" = "-N" ]; then

@@ -138,6 +138,8 @@
 #         $titleparams \
 #         $startparams
 
+set -e
+
 if [ -z "$PLAN9" ]; then
 	if [ -d "$HOME/.local/plan9" ]; then
 		export PLAN9=$HOME/.local/plan9
@@ -149,12 +151,6 @@ if [ -z "$PLAN9" ]; then
 		echo "PLAN9 undefined and plan9port install not found at /usr/local/plan9 or $HOME/.local/plan9" >&2
 		exit 1
 	fi
-fi
-if ! $(echo "$PATH" | grep "$HOME/go/bin" >/dev/null 2>&1); then
-	export PATH=$HOME/go/bin:$PATH
-fi
-if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
-	export PATH=$HOME/.local/bin:$PATH
 fi
 if ! $(echo "$PATH" | grep "$HOME/.acme/bin" >/dev/null 2>&1); then
 	export PATH=$HOME/.acme/bin:$PATH

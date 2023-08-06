@@ -59,7 +59,7 @@ WORKSCRIPT="${WORKDIR}/Acme.scpt"
 
 echo "Creating launch script: ${WORKSCRIPT}"
 cat >"${WORKSCRIPT}" <<EOF
-do shell script "${STARTACMEPATH} -N >/dev/null 2>&1 &"
+do shell script "zsh -i -c '${STARTACMEPATH} -N >/dev/null 2>&1' &"
 EOF
 
 echo "Creating application: ${APPBUNDLE}"
