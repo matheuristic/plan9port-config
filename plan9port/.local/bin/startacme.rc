@@ -57,16 +57,9 @@ if (~ $#tabstop 0) tabstop=4
 TERM=dumb
 PAGER=nobs
 
-# Add some directories to the search path if they exist
-# - $home/.acme/bin : Acme helper scripts
-for (d in \
-	$home/.acme/bin \
-) {
-	if (test -d $d) PATH=$d:$PATH
-}
-
-# Use $PLAN9/bin/E as the default editor
-EDITOR=E
+# Use $home/.acme/bin/acmeed or $PLAN9/bin/E as the default editor
+if (test -x $home/.acme/bin/acmeed) EDITOR=$home/.acme/bin/acmeed
+if not EDITOR=E
 
 # Update tag line current dir when using cd in win windows
 fn cd { builtin cd $1 && awd $sysname }

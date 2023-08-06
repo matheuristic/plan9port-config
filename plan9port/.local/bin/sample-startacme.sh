@@ -156,4 +156,7 @@ fi
 if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
 	export PATH=$HOME/.local/bin:$PATH
 fi
+if ! $(echo "$PATH" | grep "$HOME/.acme/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/.acme/bin:$PATH
+fi
 $PLAN9/bin/rc $HOME/.local/bin/startacme.rc "$@"

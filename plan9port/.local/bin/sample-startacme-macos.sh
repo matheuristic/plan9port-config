@@ -24,6 +24,9 @@ fi
 if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
 	export PATH=$HOME/.local/bin:$PATH
 fi
+if ! $(echo "$PATH" | grep "$HOME/.acme/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/.acme/bin:$PATH
+fi
 if ! $(echo "$PERL5LIB" | grep "/Library/Developer/CommandLineTools/usr/share/git-core/perl" >/dev/null 2>&1); then
 	export PERL5LIB=/Library/Developer/CommandLineTools/usr/share/git-core/perl:$PERL5LIB
 fi
