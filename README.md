@@ -1111,8 +1111,9 @@ On macOS, there are also additional keybindings:
 
 #### macOS Acme launcher app
 
-A script `makeapp.sh` for creating an Acme launcher application is
-provided in the `macos` folder. See `macos/README.md` for details.
+Two scripts `makeapp.sh` and `makeapp2.sh` are provided in the
+`macos` folder, either of which can be used for creating an Acme
+launcher application bundle. See `macos/README.md` for details.
 
 Note that script-only apps are always run under Rosetta 2 on arm macOS
 systems, so make sure to install that if needed (for more information on this
