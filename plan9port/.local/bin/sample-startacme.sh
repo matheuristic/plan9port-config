@@ -81,7 +81,7 @@
 #         done
 #         if [ $j -ge 10 ]; then
 #             echo "All supported namespace numbers 0 through 9 have a running Acme." >&2
-#             exit 2
+#             exit 1
 #         fi
 #         export NAMESPACE="/tmp/ns.$USER.$j"
 #         [ -d "$NAMESPACE" ] || mkdir -p "$NAMESPACE"
@@ -95,27 +95,14 @@
 # For more info on running multiple instances of Acme, see
 # https://comp.os.plan9.narkive.com/wtiTWkBm/9fans-multiple-acme-instances-with-plan9port
 #
-# Example script with all the elements above, needs patched Acme with `-t`
-# option. Run `startacme.sh -n testns` to launch in namespace `testns`.
+# Example script with most of the elements above, needs patched Acme with `-t`
+# option. Run `startacme.sh -N` repeatedly to launch multiple Acme instances.
 #
 #     if [ -z "$PLAN9" ]; then
 #         export PLAN9="$HOME/.local/plan9port"
 #         export PATH=$PATH:$PLAN9/bin
 #     fi
 #     titleparams=""
-#     if [ "$1" = "-n" ]; then
-#         if [ -z "$2" ]; then
-#             echo "-n specified but namespace not provided" 1>&2
-#     	exit 1
-#         fi
-#         export NAMESPACE=/tmp/ns.$USER.$2
-#         mkdir -p "$NAMESPACE"
-#         titleparams="-t $2"
-#         # Uncomment below line if to maintain a cleaner /tmp/ directory
-#         # (the /tmp/ directory gets cleaned on reboots in any case)
-#         # trap 'rm -rf "$NAMESPACE"' EXIT
-#         shift; shift
-#     fi
 #     if [ "$1" = "-N" ]; then
 #         j=0
 #         while [ $j -lt 10 ]; do
@@ -126,7 +113,7 @@
 #         done
 #         if [ $j -ge 10 ]; then
 #             echo "All supported namespace numbers 0 through 9 have a running Acme." >&2
-#             exit 2
+#             exit 1
 #         fi
 #         export NAMESPACE="/tmp/ns.$USER.$j"
 #         [ -d "$NAMESPACE" ] || mkdir -p "$NAMESPACE"
@@ -162,5 +149,11 @@ if [ -z "$PLAN9" ]; then
 		echo "PLAN9 undefined and plan9port install not found at /usr/local/plan9 or $HOME/.local/plan9" >&2
 		exit 1
 	fi
+fi
+if ! $(echo "$PATH" | grep "$HOME/go/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/go/bin:$PATH
+fi
+if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/.local/bin:$PATH
 fi
 $PLAN9/bin/rc $HOME/.local/bin/startacme.rc "$@"

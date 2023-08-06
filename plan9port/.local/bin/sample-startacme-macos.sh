@@ -15,6 +15,42 @@ if [ -z "$PLAN9" ]; then
 		exit 1
 	fi
 fi
+if ! $(echo "$PATH" | grep "$HOME/macports/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/macports/bin:$PATH
+fi
+if ! $(echo "$PATH" | grep "$HOME/go/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/go/bin:$PATH
+fi
+if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
+	export PATH=$HOME/.local/bin:$PATH
+fi
+if ! $(echo "$PERL5LIB" | grep "/Library/Developer/CommandLineTools/usr/share/git-core/perl" >/dev/null 2>&1); then
+	export PERL5LIB=/Library/Developer/CommandLineTools/usr/share/git-core/perl:$PERL5LIB
+fi
+if ! $(echo "$PERL5LIB" | grep "$HOME/macports/share/perl5" >/dev/null 2>&1); then
+	export PERL5LIB=$HOME/macports/share/perl5:$PERL5LIB
+fi
+titleparams=""
+if [ "$1" = "-N" ]; then
+	j=0
+	while [ $j -lt 10 ]; do
+		if ! $(NAMESPACE="/tmp/ns.$USER.$j" 9p ls acme >/dev/null 2>&1); then
+			break
+		fi
+		j=$(( j + 1 ))
+	done
+	if [ $j -ge 10 ]; then
+		echo "All supported namespace numbers 0 through 9 have a running Acme." >&2
+		exit 1
+	fi
+	export NAMESPACE="/tmp/ns.$USER.$j"
+	[ -d "$NAMESPACE" ] || mkdir -p "$NAMESPACE"
+	titleparams="-t acme-$j"
+	# Uncomment below line if to maintain a cleaner /tmp/ directory
+	# (the /tmp/ directory gets cleaned on reboots in any case)
+	# trap 'rm -rf "$NAMESPACE"' EXIT
+	shift;
+fi
 startparams="$@"
 visibleclicks=1 SHELL=rc \
 	$PLAN9/bin/rc $HOME/.local/bin/startacme.rc \

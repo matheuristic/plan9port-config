@@ -22,16 +22,8 @@
 # E.g.
 #   acmeshell=/bin/bash acme
 #
-# This launcher can be used as a drop-in replacement for acme that
-# automatically starts fontsrv and plumber if they are not running, sets some
-# environment variables to necessary values and loads the default dump file
-# $HOME/.acme/dump/%NAMESPACE%/acme.dump if it exists, where %NAMESPACE% is the
-# current namespace but with slashes replaced by percents
-#
-# If the ~/.local/bin/acmeautosave.rc script is available, it is used to
-# autosave modified unsaved files (by default to ~/.acme/autosave/ and every 60
-# seconds), and the behavior can be modified using the $acmeautosavedir and
-# $acmeautosaveinterval environment variables
+# This launcher can be used as a drop-in replacement for acme that starts fontsrv and
+# plumber if they are not running, and also sets some environment variables
 #
 # Example command using this launcher
 #   visibleclicks=1 SHELL=rc startacme.rc -f /mnt/font/GoRegular/16a/font -F /mnt/font/GoMono/16a/font
@@ -67,14 +59,7 @@ PAGER=nobs
 
 # Add some directories to the search path if they exist
 # - $home/.acme/bin : Acme helper scripts
-# - $home/go/bin : Go compiled binaries
-# - /opt/local/bin
-# - /usr/local/bin
 for (d in \
-	/usr/local/bin \
-	/opt/local/bin \
-	$home/go/bin \
-	$home/.local/bin \
 	$home/.acme/bin \
 ) {
 	if (test -d $d) PATH=$d:$PATH
