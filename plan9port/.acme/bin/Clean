@@ -1,0 +1,33 @@
+#!/usr/bin/env rc
+
+# Delete clean Acme file windows with names matching a given regex pattern.
+# If no regex pattern is specified, deletes all clean file windows.
+# Usage:
+# 	Clean '<regex>'
+# Example (delete all clean windows for files in a given project dir):
+# 	Clean '^/path/to/project/dir/'
+
+# Sourced and adapted from rsc's Clean script for plan9port
+# https://plan9.io/sources/contrib/rsc/scripts/Clean
+
+rfork e
+
+if(~ $#* 0)
+	pattern=.
+if not
+	pattern=$1
+
+for (i in `{9p ls -l acme | grep '^d' | sed -e 's/.* //g' | grep '^[0-9]*$'}) {
+	tag=`{9p read acme/$i/tag}
+	tagline = $"tag
+	#file=$tag(1) # assumes no whitespace in filename
+	file=`{echo $tag | sed -e 's/ Del Snarf.*//'}
+
+	# must match our pattern if given, must be a clean window,
+	# and must not be a directory, Errors window, win or mail.
+
+	if(! ~ $file */ *+Errors* */-* */mail/* && ! ~ $tagline *Put* 
+	&& echo $file | grep $pattern >/dev/null >[2]/dev/null)
+		9 echo del | 9p write acme/$i/ctl
+}
+status=''

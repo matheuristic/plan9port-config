@@ -261,6 +261,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - `condarun`: `condarun envname cmd arg1 ...` executes `cmd` with the
   given args in the `envname` Conda environment (default environment
   is the one active when Acme was launched, else `base`).
+- `Clean`: `Clean 'REGEX'` deletes clean Acme file windows with names
+  matching the given regular expression. If no regular expression is
+  provided, then all clean Acme file windows are deleted.
 - `codepv`: Preview current Acme window code file in a browser.
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
