@@ -662,15 +662,13 @@ see [here](https://gist.github.com/proudlygeek/5721498),
   moving the viewport across the buffer.
 
   - Left-clicking (Button1) and right-clicking (Button3) on the
-    scrollbar moves the viewport up and down respectively where the
-    clicks near the top of scrollbar move the viewport less and clicks
-    near the bottom of the scrollbar move the viewport more.
-    Specifically, when Button1 or Button3 is clicked on the scrollbar
-    the number of lines the viewport is shifted is the number of lines
-    from the top of the viewport to the line next to where the
-    scrollbar was clicked. This has the effect that right-clicking the
-    scrollbar next to a line will move the viewport so that line is at
-    the top.
+    scrollbar moves the viewport up and down respectively where
+    the clicks near the top of scrollbar move the viewport less and
+    clicks near the bottom of the scrollbar move the viewport more.
+    Specifically, clicking Button1 on the scrollbar moves the top
+    line of the viewport to that horizontal location and clicking
+    Button3 on the scrollbar moves the line at that location to
+    the top of the viewport.
 
   - Middle-clicks (Button2) on the scrollbar will move the viewport so
     that the view indicator is at the position scrollbar was clicked,
