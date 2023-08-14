@@ -438,6 +438,13 @@ a number of helper scripts available at `~/.acme/bin`:
   [rust-html2text](https://github.com/jugglerchris/rust-html2text/)
   (compile its example program `examples/html2text.rs`).
 
+- [bdf2subf](https://post.lurk.org/@320x200/102532617791988449)
+  ([source](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html),
+  [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html)):
+  Patch for plan9port that builds BDF to plan9 font coverter
+  tool [bdf2subf](https://plan9.io/wiki/plan9/fonts/index.html)
+  ([alt](http://plan9.stanleylieber.com/fonts/)) during `INSTALL`.
+
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a
   dirtree window will set that directory as the new tree root. Button3
