@@ -17,8 +17,7 @@ capability to Acme. Specifically, it adds an `acmesrv` program that
 acts as a multiplexer on top of two 9p servers exportfs and cmdfs for
 accessing files and running commands on the remote host from a local
 Acme client along with modifying `acme` to let it connect to `acmesrv`
-on a remote host `acmesrv` via SSH, that is (quoted from the first
-link below):
+on a remote host via SSH, that is (quoted from the first link below):
 
 > The design of the feature is quite simple: a new program, acmesrv
 > <https://github.com/mariusae/plan9port/tree/marius/src/cmd/acme/acmesrv>
