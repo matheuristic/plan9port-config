@@ -104,22 +104,6 @@ Links:
 - [Github - mariusae/plan9port - marius-snapshot-2022-04-24](https://github.com/mariusae/plan9port/tree/marius-snapshot-2022-04-24)
 - [Twitter thread](https://twitter.com/marius/status/1345956890648317952)
 
-### Add soft tabs to Acme editor (acmesrv-compatible version)
-
-To apply the patch, run from the repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-acme-soft-tabs-acmesrv.patch
-```
-
-This is the same as `plan9port-acme-soft-tabs.patch` except it has
-been modified to be compatible with the codebase after applying
-`plan9port-acme-acmesrv.patch` (otherwise there will be conflicts).
-
-If using `plan9port-acme-acmesrv.patch` above to add remoting
-capability and additionally soft tabs are desired, use this patch
-instead of `plan9port-acme-soft-tabs.patch`.
-
 ### Use slashed zero variant for Lucida Grande font on macOS
 
 To apply the patch, run from the repository root:

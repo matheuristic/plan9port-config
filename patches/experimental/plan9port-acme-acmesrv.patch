@@ -79,7 +79,7 @@ index 852a8f7f..9b6e3f27 100644
  .TF $HOME/acme.dump
  .TP
 diff --git a/src/cmd/acme/acme.c b/src/cmd/acme/acme.c
-index 0e6bc0fd..90d42e12 100644
+index 0e6bc0fd..f17a98ba 100644
 --- a/src/cmd/acme/acme.c
 +++ b/src/cmd/acme/acme.c
 @@ -9,6 +9,7 @@
@@ -112,7 +112,7 @@ index 0e6bc0fd..90d42e12 100644
  
  	rfork(RFENVG|RFNAMEG);
  
-@@ -119,9 +123,35 @@ threadmain(int argc, char *argv[])
+@@ -119,6 +123,32 @@ threadmain(int argc, char *argv[])
  		if(winsize == nil)
  			goto Usage;
  		break;
@@ -144,11 +144,7 @@ index 0e6bc0fd..90d42e12 100644
 +		break;
  	default:
  	Usage:
--		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize\n");
-+		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize -s path -R remotespec\n");
- 		threadexitsall("usage");
- 	}ARGEND
- 
+ 		fprint(2, "usage: acme -a -c ncol -f fontname -F fixedwidthfontname -l loadfile -W winsize\n");
 @@ -184,7 +214,7 @@ threadmain(int argc, char *argv[])
  	timerinit();
  	rxinit();
