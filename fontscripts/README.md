@@ -13,8 +13,10 @@ to be rendered.
 Note that the scripts can be quite slow and generate quite a large
 font folder for fonts that have very wide Unicode coverage.
 
-- `makepresentfont.sh`: Mix different `fontsrv` vector fonts (or
-  different weights and styles) into a new Plan 9 font.
+Run `9p ls font` with `fontsrv` running for available vector fonts.
+
+- `mixfont.sh`: Mix different `fontsrv` vector fonts (or different
+  weights and styles) into a new Plan 9 font.
 
 - `subf_get_1_size.rc`: Get a single size of a given font. Example
   usage:
@@ -29,3 +31,16 @@ font folder for fonts that have very wide Unicode coverage.
   ```shell
   subf_get_all_sizes.rc DejaVuSans-Bold
   ```
+
+An alternative to `subf_get_1_size.rc` and `subf_get_all_sizes.rc`
+is using `fontsrv -m mtpt` to mount a virtual directory tree at
+`mtpt` and copying the bitmap font files directly from there
+([source](https://pmikkelsen.com/plan9/fonts)). **This alternative
+approach requires that FUSE be installed on the system**.
+
+```console
+$ mkdir -p /tmp/font
+$ fontsrv -m /tmp/font &
+$ mkdir -p /path/to/font/GoRegular/15a
+$ cp /tmp/font/GoRegular/15a/* /path/to/font/GoRegular/15a/
+```
