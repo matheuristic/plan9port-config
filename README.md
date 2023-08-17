@@ -432,6 +432,22 @@ a number of helper scripts available at `~/.acme/bin`:
     `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
     and Zig code (note that no workspace paths are specified).
 
+- [AI](): Interact with [OpenAI
+  ChatGPT](https://openai.com/blog/chatgpt) endpoint from Acme.
+
+  To install:
+
+  ```sh
+  git clone https://github.com/rogpeppe/AI.git
+  cd AI
+  go install .
+  ```
+
+  To use: Set the `OPENAI_API_KEY` environment variable with an API
+  key. In Acme, run `AI instructions...` to ask ChatGPT to perform
+  the instructions with some selected text as context,  or `AI -c
+  instructions...` for the same but with the whole file as context.
+
 - [awww](https://github.com/cjacker/awww):
   Text web browser for Acme. Button2 or Button3 opens links in opened
   webpages.  Requires [wget](https://www.gnu.org/software/wget/) and

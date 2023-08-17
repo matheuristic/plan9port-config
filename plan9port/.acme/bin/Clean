@@ -10,6 +10,9 @@
 # Sourced and adapted from rsc's Clean script for plan9port
 # https://plan9.io/sources/contrib/rsc/scripts/Clean
 
+# Alternative Go package
+# https://github.com/rogpeppe/acmeclean/tree/main
+
 rfork e
 
 if(~ $#* 0)
