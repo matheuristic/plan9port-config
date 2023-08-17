@@ -574,6 +574,9 @@ a number of helper scripts available at `~/.acme/bin`:
   `-r` flag is specified then Watch is run recursively, i.e. all
   subdirectories are also watched).
 
+- [9pfs](https://github.com/bunny351/9pfs):
+  Replacement for plan9port `9pfuse` that is supposed to be faster.
+
 ### Using POSIX-compatible shells like Bash and Zsh with win
 
 - Add the following snippet to the configuration of a POSIX-compatible
