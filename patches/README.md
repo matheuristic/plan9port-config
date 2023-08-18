@@ -109,49 +109,16 @@ so PPI is scaled only when the `-s` option is specified, i.e.,
 
 ### `plan9port-bdf2subf.patch`
 
-Add the `bdf2subf` program (for converting BDF fonts to Plan 9
-subf) to the plan9port source tree. It will be compiled along with
-the other plan9port programs when running the `INSTALL` script.
+Add the `bdf2subf` program, for converting
+BDF fonts to Plan 9 subf (see the `font(6)`
+[manpage](https://plan9.io/magic/man2html/6/font)), to the plan9port
+source tree. It will be compiled along with the other plan9port
+programs when running the `INSTALL` script.
 
 Sourced from branch of plan9port by
 [bleu255](https://post.lurk.org/@320x200/102532617791988449).
 [Code](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html)
 and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html).
-
-#### Using `bdf2subf`
-
-Given a BDF font `somefont.bdf`, run
-
-```sh
-bdf2subf -f somefont.bdf > somefont.font
-bdf2subf somefont.bdf
-```
-
-to convert it into Plan 9 font and subfont
-files int the same directory (see the `font(6)`
-[manpage](https://plan9.io/magic/man2html/6/font)).
-
-As an example, this POSIX shell code uses `bdf2subf` to convert
-the [UW ttyp0](https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/)
-font from BDF, storing the resulting font and subfont files in
-`/path/to/lib/font/uw-ttyp0`:
-
-```sh
-curl -LO https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/uw-ttyp0-1.3.tar.gz
-tar xzf uw-ttyp0-1.3.tar.gz
-cd uw-ttyp0-1.3
-# Edit VARIANTS.dat to select a stylistic variant for the font...
-# Edit TARGETS.dat to set compile targets...
-./configure
-make bdf
-cd genbdf
-mkdir uw-ttyp0
-cd uw-ttyp0
-for f in ../*.bdf; do bdf2subf -f $f > $(basename $f .bdf).font; bdf2subf $f; done
-cd ..
-mkdir -p /path/to/lib/font
-mv uw-ttyp0 /path/to/lib/font
-```
 
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 

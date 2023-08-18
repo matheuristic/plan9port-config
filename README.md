@@ -465,6 +465,23 @@ a number of helper scripts available at `~/.acme/bin`:
   A copy of this patch is included in the `patches` directory, see
   `README.md` in that directory for how to apply it.
 
+  Usage:
+
+  ```sh
+  bdf2subf -f somefont.bdf > somefont.font  # generate font file
+  bdf2subf somefont.bdf                     # generate subfont files
+  ```
+
+  Example (POSIX shell):
+
+  ```sh
+  mkdir -p /path/to/lib/font/gohufont
+  cd /path/to/lib/font/gohufont
+  curl -LO https://github.com/hchargois/gohufont/raw/master/gohufont-uni-14.bdf
+  curl -LO https://github.com/hchargois/gohufont/raw/master/gohufont-uni-14b.bdf
+  for f in *.bdf; do bdf2subf -f $f > $(basename $f .bdf).font; bdf2subf $f; done
+  ```
+
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a
   dirtree window will set that directory as the new tree root. Button3
