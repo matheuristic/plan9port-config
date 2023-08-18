@@ -31,15 +31,9 @@ repository:
 
 ## Patches
 
-### Add keyboard bindings to Acme editor
+### `plan9port-acme-bindings.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-acme-bindings.patch
-```
-
-This patch adds the following keybindings:
+Add extra Acme keyboard bindings:
 
 - `C-k`: forward erase to end of line
 - `C-n`: move point one line down
@@ -54,125 +48,129 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
-### Allow round and square brackets in file and dir names in Acme
+### `plan9port-acme-bracketfilenames.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-acme-bracketfilenames.patch
-```
+Allow round and square brackets in file and dir names in Acme.
 
 Contrary to expectation, Button3 in Acme does not open files and
 directories with round and square brackets (`(`, `)`, `[`, `]`) in
 their name. This patch makes it so Acme will open them as expected.
 
-### Add `Lookb` command to Acme editor
+### `plan9port-acme-lookb.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-acme-lookb.patch
-```
-
-This patch adds a `Lookb` command to Acme, which works like the
+Add a `Lookb` command to Acme, which works like the
 `Look` command but searches backwards instead of forwards.
 
 This is adapted from an unmerged plan9port pull request by
 bd339 ([link](https://github.com/9fans/plan9port/pull/552)).
 
-### Add soft tabs to Acme editor
+### `plan9port-acme-soft-tabs.patch`
 
-To apply the patch, run from the plan9port repository root:
+Add soft tabs to Acme.
 
-```sh
-patch -p1 < /path/to/plan9port-acme-soft-tabs.patch
-```
+Specifically, this patch adds a `Spaces` command which can be used
+to toggle soft tabs (spacesindent mode), that is, expanding tabs
+to spaces. `Spaces on` and `Spaces off` turns spacesindent mode
+on and off for the current window. `Spaces ON` and `Spaces OFF`
+turns spacesindent mode on and off for existing and future windows.
 
-This patch adds a `Spaces` command, which can be used to toggle soft
-tabs (spacesindent mode). `Spaces on` and `Spaces off` turns
-spacesindent mode on and off for the current window. `Spaces ON` and
-`Spaces OFF` turns spacesindent mode on and off for existing and
-future windows.
-
-Additionally, this patch adds a command line option `-i` which causes
-each window to start in spacesindent mode (same as `Spaces ON`).
+Additionally, this patch adds an `acme` command line option `-i` that
+makes each window to start in spacesindent mode (like `Spaces ON`).
 
 Sourced with minor changes from [mkhl](https://github.com/mkhl)'s
 [acme/soft-tabs](https://github.com/mkhl/plan9port/tree/acme/soft-tabs)
 branch of [Plan 9 Port](https://github.com/9fans/plan9port)
 which ports spew's acme spaces indent mode from 9front.
 
-### Add command line option for setting window title to Acme editor
+### `plan9port-acme-windowtitle.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-acme-windowtitle.patch
-```
-
-This patch adds a command line option `-t TITLE` which sets the
-window title of the launched Acme instance to `TITLE`.
+Add an `acme` command line option `-t TITLE` that sets the window
+title of the launched Acme instance to `TITLE`.
 
 Sourced from [this](https://github.com/9fans/plan9port/pull/51)
 unmerged pull request by [afh](https://github.com/afh).
 
-### Add more keyboard compose sequences for typing runes
+### `plan9port-keyboard-addrunecomposeseq.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-keyboard-addrunecomposeseq.patch
-```
-
-Adds the following new compose sequences for runes:
+Add new keyboard compose sequences for typing runes:
 
 - `Alt-l-l` for the lozenge rune ◊
 
-### Make scaling of PPI in page optional
+### `plan9port-page-optionalscaleppi.patch`
 
-To apply the patch, run from the plan9port repository root:
+Make scaling of PPI in `page` optional.
+
+As of this
+[commit](https://github.com/9fans/plan9port/commit/940f1fd6af2c144d0db087fefa8478d2a36633d5),
+`page` will scale PPI automatically when using high-DPI screens
+like Mac retina displays. This patch makes that behavior togglable,
+so PPI is scaled only when the `-s` option is specified, i.e.,
+`page -s somefile.pdf` scales PPI while `page somefile.pdf` does not.
+
+### `plan9port-bdf2subf.patch`
+
+Add the `bdf2subf` program (for converting BDF fonts to Plan 9
+subf) to the plan9port source tree. It will be compiled along with
+the other plan9port programs when running the `INSTALL` script.
+
+Sourced from branch of plan9port by
+[bleu255](https://post.lurk.org/@320x200/102532617791988449).
+[Code](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html)
+and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html).
+
+#### Using `bdf2subf`
+
+Given a BDF font `somefont.bdf`, run
 
 ```sh
-patch -p1 < /path/to/plan9port-page-optionalscaleppi.patch
+bdf2subf -f somefont.bdf > somefont.font
+bdf2subf somefont.bdf
 ```
 
-The `page` command scales PPI automatically when using high-DPI
-screens like Mac displays (see
-[commit](https://github.com/9fans/plan9port/commit/940f1fd6af2c144d0db087fefa8478d2a36633d5)).
-This patch makes that behavior togglable, so PPI is scaled only when
-the `-s` option is specified, i.e., `page -s somefile.pdf` scales PPI
-while `page somefile.pdf` does not.
+to convert it into Plan 9 font and subfont
+files int the same directory (see the `font(6)`
+[manpage](https://plan9.io/magic/man2html/6/font)).
 
-### Don't fully hide menubar and dock when fullscreen on macOS
-
-To apply the patch, run from the plan9port repository root:
+As an example, this POSIX shell code uses `bdf2subf` to convert
+the [UW ttyp0](https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/)
+font from BDF, storing the resulting font and subfont files in
+`/path/to/lib/font/uw-ttyp0`:
 
 ```sh
-patch -p1 < /path/to/plan9port-mac-nofullscreenautohidemenu.patch
+curl -LO https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/uw-ttyp0-1.3.tar.gz
+tar xzf uw-ttyp0-1.3.tar.gz
+cd uw-ttyp0-1.3
+# Edit VARIANTS.dat to select a stylistic variant for the font...
+# Edit TARGETS.dat to set compile targets...
+./configure
+make bdf
+cd genbdf
+mkdir uw-ttyp0
+cd uw-ttyp0
+for f in ../*.bdf; do bdf2subf -f $f > $(basename $f .bdf).font; bdf2subf $f; done
+cd ..
+mkdir -p /path/to/lib/font
+mv uw-ttyp0 /path/to/lib/font
 ```
+
+### `plan9port-mac-nofullscreenautohidemenu.patch`
+
+Don't fully hide menubar and dock when fullscreen on macOS.
 
 By default, devdraw is configured so it fully hides the menu bar and
 dock when plan9port GUI program windows are full screen. This patch
 reverts those changes so window behavior is per normal.
 
-### No remapping of backticks and single quotes on macOS systems
+### `plan9port-mac-noquotemap.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-mac-noquotemap.patch
-```
+No remapping of backticks and single quotes on macOS systems.
 
 This patch removes the default behavior of remapping characters
 `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
 
-### Press shift to send Button1 when mouse button is depressed on X11
+### `plan9port-x11-shiftpressbutton1.patch`
 
-To apply the patch, run from the plan9port repository root:
-
-```sh
-patch -p1 < /path/to/plan9port-x11-shiftpressbutton1.patch
-```
+Press shift to send Button1 when mouse button is depressed on X11.
 
 This patch makes it so `Shift` sends Button1 while the mouse button is
 depressed for X11 systems. This allows for a 2-1 chord via

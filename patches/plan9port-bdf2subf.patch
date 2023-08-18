@@ -1,0 +1,1301 @@
+diff --git a/man/man1/bdf2subf.1 b/man/man1/bdf2subf.1
+new file mode 100644
+index 00000000..bec11ceb
+--- /dev/null
++++ b/man/man1/bdf2subf.1
+@@ -0,0 +1,79 @@
++.TH BDF2SUBF 1
++.SH NAME
++bdf2subf \- convert glyphs in a BDF file to Subfont format
++.SH SYNOPSIS
++.B bdf2subf [-f]
++.IB BDF-file
++.PP
++or
++.PP
++.B bdf2subf
++.IB BDF-file " [" hex-hex ]
++.SH DESCRIPTION
++.I Bdf2subf
++converts glyphs described in a BDF file to Plan9 style fonts.  It can
++print .font format file using all the contiguous ranges of the glyphs found
++in the BDF file or convert them and write
++the glyph images and a Subfont structure describing them.  When
++printing a .font file, or converting a specific range, the output
++goes to stdout.   When converting a whole BDF file, the output will
++be a number of files for each contiguous range of glyphs. The output
++file name is formed by taking the basename of the
++.I BDF-file
++and appending the hexadecimal range of the glyphs to it.
++.PP
++The hexadecimal value
++.I hex
++corresponds to the 
++.I ENCODING
++keyword value in the BDF file.  Usually this represents the Unicode
++encoding value for each glyph. When extracting a subrange from
++a file, the
++.IR hex - hex
++subrange must be present in the file.
++.PP
++Flags are:
++.PP
++.BI -f
++Print a .font file showing the contiguous subranges of glyphs in the BDF file. Subranges are
++sorted by the
++.I ENCODING
++value.
++.PP
++When only the BDF filename is given, the program converts all
++subranges found, into newly created files.  The file names for the
++subranges are created using the method described earlier.
++.SH EXAMPLES
++To generate a file suitable for use as a '.font' file:
++.IP
++.EX
++bdf2subf -f afont.bdf > afont.font
++.EE
++.LP
++Subsequently, you can use the following to actually generate
++the subfont files:
++.IP
++.EX
++bdf2subf afont.bdf
++.EE
++.LP
++In the above example the files will have the form
++.I afont.xxx-xxx
++where
++.I xxx-xxx
++is a contiguous ranges of encoding values for the glyphs found
++in the file.
++.LP
++To view the glyphs in the subrange 600-6FF in a file, use:
++.IP
++.EX
++bdf2subf afont.bdf  600-6FF | page
++.EE
++.PP
++.SH SOURCE
++bdf2subf/bdf2subf.[hc] bdf2subf/gram.y bdf2subf/lex.c
++.SH "SEE ALSO"
++subfont(2) cachechars(2) font(6) utf(6)
++.SH BUGS
++Send bugs and fixes to
++.L fst@centurytel.net
+diff --git a/src/cmd/bdf2subf/Readme b/src/cmd/bdf2subf/Readme
+new file mode 100644
+index 00000000..8ea0b968
+--- /dev/null
++++ b/src/cmd/bdf2subf/Readme
+@@ -0,0 +1,70 @@
++Release 1.1.3.1: 7/30/2019:
++
++A very minor maintenance and tweak release to have bdf2subf bundled
++in plan9port. More specifically: the mkfile has been changed to work
++with p9p's INSTALL script; the man page has been moved to
++$PLAN9/man/man1 and some minor compilation warnings have been fixed
++(from -Wincompatible-pointer-types and -Wmemset-transposed-args).
++
++Release 1.1.3: 7/23/2003:
++
++Fixed several problems thanks to excellent testing and fixes from
++Andrey Mirtchovski (mirtchov@cpsc.ucalgary.ca).  One nasty bug would
++rio to abort when using the generated font.  The man page for
++cachechar(2) clearly had stated a requirement that didn't make it into
++the code.
++
++Another change is to the flags (again!).  The '-r' flag is dropped in
++favor of a '-f' flag that generates a '.font' format file suitable for
++use with the files that are generated when bdf2subf is invoked with no
++flags.  Consequently, the utility subfsize is no longer needed.
++
++Release 1.1.2: 7/14/2003:
++
++Hopefully this will be it for a while.
++
++Based on feedback on the performance of bdf2subf for very large BDF
++files, and how this is used in real life, I took several of Andrey
++Mirtchovski's (mirtchov@cpsc.ucalgary.ca) suggestions and code fixes
++and incorporated them here.  I've added a work-around for the
++writememimage slowness (look for the word HACK in the code).  Also
++revamped the flags to make it more natural.  Andrey's suggestion to
++generate all subfonts in one pass makes sense for very large font
++files and I've added it.  I would guess that most of the time
++it wouldn't be used as heavily.  PARAMETERS TO THE PROGRAM HAVE
++CHANGED. CHECK THE NEW MAN PAGE. Also there is a new utility,
++subfsize, contributed by Andrey to ease generation of .font files.
++
++Release 1.1.1: 7/13/2003:
++
++You know what they say about "premature optimization", well, it's true.
++In order to reduce the number of calls to memimagedraw, a critical one
++was removed that didn't cause a problem when extracting all glyphs in
++a file, but when extracting a subrange, the size of the subfont bitmap
++was as large as if all the glyphs in the file were being extracted.
++This has been fixed.
++
++Release 1.1: 6/15/2003:
++
++Some efficiency fixes have been done.  Beware that handling very large
++bdf's (like efonts) in a single step will be slow and the result will
++most likely be too large to be useful.  In those cases run bdf2subf
++once to discover the contiguous subranges and then run it multiple
++times to get the fonts for each selected subrange.
++
++Release 1.0: 9/26/2002:
++
++Bdf2subf has been tested with as many BDF files as I could find on
++the Net.  It is pedantic about the syntax of the file.  I've put in
++catches for other bogus things like zero length glyphs (what's their
++use?  I really want to know.) and other surprises.  A correctly formed
++file is handled correctly.  It tolerates empty lines at the end of BDF files
++and probably should handle them everywhere, but it doesn't.
++
++to build run:
++	mk
++
++see the man page for usage.
++
++Fariborz "Skip" Tavakkolian
++fst@centurytel.net
+diff --git a/src/cmd/bdf2subf/bdf2subf.c b/src/cmd/bdf2subf/bdf2subf.c
+new file mode 100644
+index 00000000..592b5b98
+--- /dev/null
++++ b/src/cmd/bdf2subf/bdf2subf.c
+@@ -0,0 +1,320 @@
++/*
++Convert BDF to Plan9 Subfont.
++Send bugs or preferably bug fixes to: fst@centurytel.net
++
++References:
++ "Glyph Bitmap Distribution Format (BDF) Specification"
++Version 2.2, March 22nd, 1993 -- Adobe Systems Inc.
++
++Outline of the conversion process is from Rob Pike, as described in an
++email on the Plan9 mailing list:
++
++``
++It's like this, schematically:
++
++	s = allocimage(0, 0, HUGE, height);
++	x = 0;
++	for(i in number of characters) {
++		c = allocmemimage(0, 0, c.width, height);
++		convert bdf to character in c;
++		draw(s, Rect(x, 0, x+c.width, height), c, nil, ZP);
++		fontchar[i] = {...., x, ...};
++		x += c.width;
++	}
++	t = allocimage(0, 0, x, height);
++	draw(t, t->r, s, nil, ZP);
++
++Or you could calculate the subfont width before allocating s by
++adding another loop.
++''
++
++*/
++#include	<u.h>
++#include	<libc.h>
++#include	<bio.h>
++#include	<draw.h>
++#include	<memdraw.h>
++#include	<event.h>
++#include	"bdf2subf.h"
++
++void
++usage (void)
++{
++	fprint(2, "usage: bdf2subf -f font.bdf\nor\nbdf2subf font.bdf [hex-hex]\n");
++	exits("usage");
++}
++
++void
++eresized(int x)
++{
++	USED(x);
++}
++
++int
++cmpchars(const void *_1, const void *_2)
++{
++	return ((BDFchar*)_1)->enc - ((BDFchar*)_2)->enc;
++}
++
++void
++adjustrange(int *emin, int *emax)
++{
++	/* look for a contiguous range from emin to approximately emax */
++	register BDFchar *p;
++	register int i;
++	int lastenc;
++
++	for (i = 0, p = bdfont->glyphs; i < bdfont->n; i++, p++)
++		if (p->enc == *emin)
++				break;
++
++	if (i >= bdfont->n) {
++		fprint(2, "range %x-%x not in file\n", *emin, *emax);
++		exits("range not found");
++	}
++	lastenc = p->enc;
++	for (i++, p++; i < bdfont->n; i++, p++) {
++		if (p->enc == *emax)
++			break;
++
++		if (p->enc != lastenc+1) {
++			*emax = lastenc;	/* adjust maxenc */
++			break;
++		}
++		lastenc++;
++	}
++}
++
++void
++bdf2subf(int fd, int minenc, int maxenc)
++{
++	register int i, k, x, nglyphs;
++	Rectangle r;
++	Memimage *s;	/* subfont */
++	Memimage *c;	/* glyph */
++	Subfont *sf;
++	BDFchar *bdfchar;
++	Fontchar *fontchar;
++
++	nglyphs = maxenc - minenc + 1;	// inclusive
++	bdfchar = bdfont->glyphs;
++
++	/*
++	figuring out the exact size of the memimage for the output in this step,
++	saves us one call to memimagedraw later. this is a big saving when the
++	font range is huge.
++	*/
++	for (x = 0, i = 0, k = 0; i < bdfont->n; i++) {
++		if (bdfchar[i].enc < minenc || bdfchar[i].enc > maxenc)
++			continue;
++		k++;
++		x += bdfchar[i].bbx.w;
++	}
++
++	if (k != nglyphs) {
++		fprint(2, "mismatch in the number of glyphs, nglyphs=%d, k=%d\n",
++			nglyphs, k);
++		exits("glyph count mismatch");
++	}
++
++	r = Rect(0, 0, x, bdfont->fbbx.h);
++	s = allocmemimage(r, GREY1);
++
++	/* see cachechars(2) for an explanation of the extra Fontchar */
++	fontchar = malloc((nglyphs+1) * sizeof(Fontchar));
++
++	r = Rect(0, 0, bdfont->fbbx.w, bdfont->fbbx.h);
++	c = allocmemimage(r, GREY1);
++
++	for(x = 0, i = 0, k = 0; i < bdfont->n; i++) {
++		if (bdfchar[i].enc < minenc || bdfchar[i].enc > maxenc)
++			continue;
++
++		r = Rect(0, 0, bdfchar[i].bbx.w, bdfchar[i].bbx.h);
++
++		/* convert bdf to character in c; */
++		loadmemimage(c, r, bdfchar[i].bitmap, bdfchar[i].bmlen);
++
++		fontchar[k].x = x;
++		fontchar[k].top = 0;
++		fontchar[k].bottom = bdfchar[i].bbx.h;
++		fontchar[k].left = bdfchar[i].bbx.xoff;
++		fontchar[k].width = bdfchar[i].bbx.w;
++		k++;
++
++		r = Rect(x, 0, x+bdfchar[i].bbx.w, bdfchar[i].bbx.h);
++		memimagedraw(s, r, c, c->r.min, nil, ZP, SoverD);
++		x += bdfchar[i].bbx.w;
++	}
++
++	fontchar[k].x = x;		/* see cachechars(2) */
++
++	freememimage(c);
++
++	if (! (sf = malloc(sizeof(Subfont)))) {
++		fprint(2, "malloc failed\n");
++		exits("memory exhusted");
++	}
++
++	sf->name = bdfont->name;
++	sf->n = k;
++	sf->height = bdfont->fbbx.h;
++	sf->ascent = bdfont->fbbx.h+bdfont->fbbx.yoff;
++	sf->info = fontchar;
++	sf->ref = 1;
++
++	writememimage(fd, s);
++	writesubfont(fd, sf);
++
++	free(fontchar);
++	free(sf);
++	freememimage(s);
++}
++
++void
++apply(char *basename, void (*func)(char*, int, int))
++{
++	register BDFchar *p;
++	register int i;
++	int s, e;
++
++	p = bdfont->glyphs;		/* assumes glyphs are sorted by enc */
++	s = e = p->enc;			/* first one */
++	for (i = 1, p++; i <= bdfont->n; i++, p++) {
++		e++;	/* last glyphs enc value + 1 */
++
++		/* apply function to a range iff
++		the next glyph's enc value is not the same as the last+1, or
++		we are at the end of the list, or
++		(the last condition is a HACK. It gets around some problem in
++		writememimage, where it takes too long to write out the memimage)
++		the range is greater than 7FF, which was arrived at experimentally. 
++		*/
++		if (p->enc != e || (i+1) >= bdfont->n || (e-s) > 0x7ff) {
++			func(basename, s, e-1);
++			s = e = p->enc;
++		}
++	}
++}
++
++void
++genfontfile(char *basename, int min, int max)
++{
++	fprint(1, "0x%X\t0x%X\t%s.%4.4X-%4.4X\n", min, max, basename, min, max);
++}
++
++void
++gensubffile(char *basename, int min, int max)
++{
++	int fd;
++	char outf[512];
++	snprint(outf, sizeof(outf), "%s.%4.4X-%4.4X", basename, min, max);
++	if ((fd = create(outf, OWRITE, 0755)) < 0) {
++		sysfatal("can't open output file: %r");
++	}
++	bdf2subf(fd, min, max);
++	close(fd);
++}
++
++char *
++basename(char *f, char *x)	// x is the file extension; contents of f are changed
++{
++	char *b;
++	int n;
++	if (b = utfrrune(f, '/'))
++		b++;
++	else
++		b = f;
++
++	n = strlen(b)-strlen(x);
++	if(n >= 0 && !strcmp(b+n, x))
++		b[n] = 0;
++	return b;
++}
++
++void
++main(int argc, char **argv)
++{
++	char *bdfilename = 0;
++	int prfontfile = 0;
++	int minenc = 0, maxenc = 0, range = 0;
++	extern int yyparse(void);
++	extern int ishexpat(char*);
++
++	USED(range);
++
++	ARGBEGIN {
++	case 'f':
++		prfontfile = 1;
++		break;
++	default:
++		fprint(2, "bad flag %c\n", ARGC());
++		usage();
++	} ARGEND
++
++	if (! argc) {
++		fprint(2, "BDF file missing\n");
++		usage();
++	} else {
++		bdfilename = *argv++;
++		argc--;
++	}
++
++	if (prfontfile && argc) {
++		fprint(2, "unexpected argument %s\n", *argv);
++		usage();
++	}
++
++	if (argc) {
++		char *s;
++		/* expect a range like xxxx-xxxx of hex values */
++
++		if (! utfrune(*argv, '-')) {
++			fprint(2, "malformed range %s\n", *argv);
++			usage();
++		}
++		s = *argv;
++		while (*s && *s != '-')
++			s++;
++		if (*s != '-')	usage();
++		*s++ = 0;
++		if (!ishexpat(*argv) || !ishexpat(s)) usage();
++		minenc = strtoul(*argv, 0, 16);
++		maxenc = strtoul(s, 0, 16);
++		if (minenc > maxenc) {
++			fprint(2, "min > max paradox!\n");
++			usage();
++		}
++		range = 1;
++	} else {
++		range = 0;
++	}
++
++	if (! (bdf = Bopen(bdfilename, OREAD))) {
++		fprint(2, "Can't open %s\n", bdfilename);
++		exits("open failed");
++	}
++
++	memimageinit();
++	yyparse();
++
++	if (bdfont->n <= 0) {
++		fprint(2, "No glyphs found!\n");
++		exits(0);
++	}
++	qsort(bdfont->glyphs, bdfont->n, sizeof(BDFchar), cmpchars);
++
++	if (prfontfile) {
++		/* output the font height and ascent */
++		fprint(1, "%d %d\n", bdfont->fbbx.h, bdfont->fbbx.h+bdfont->fbbx.yoff);
++		apply(basename(bdfilename, ".bdf"), genfontfile);
++
++	} else if (range)  {
++		adjustrange(&minenc, &maxenc);
++		bdf2subf(1, minenc, maxenc);	// output is stdout
++	} else {
++		apply(basename(bdfilename, ".bdf"), gensubffile);
++	}
++
++	exits(0);
++}
+diff --git a/src/cmd/bdf2subf/bdf2subf.h b/src/cmd/bdf2subf/bdf2subf.h
+new file mode 100644
+index 00000000..a19fcbb7
+--- /dev/null
++++ b/src/cmd/bdf2subf/bdf2subf.h
+@@ -0,0 +1,56 @@
++/*
++BDF Font to Subfont conversion
++
++height = max(bbx.h) of all chars  or fbbx.h if given
++ascent = max(bbx.h+bbx.yoff) of all chars or fbbx.h+fbbx.yoff if given
++
++.yoff can be negative, so it will give the top of the heightest
++char to the baseline.  
++
++BDFchar to Fontchar conversion
++
++top = 0
++bottom = bbx.h
++left = bbx.xoff
++width = bbx.w
++
++*/
++
++struct Boundingbox {
++	int w, h, xoff, yoff;
++};
++typedef struct Boundingbox Boundingbox;
++struct Vector {
++	int x, y;
++};
++typedef struct Vector Vector;
++
++struct BDFchar {
++	Rune enc;		/* value signified by ENCODING keyword */
++	Boundingbox bbx;
++	Vector dw;	/* actually Δx and Δy to the baseline*/
++	/* Vector sdw;	/* same as above but for scaled size -- not used */
++	/* Vector dw1;	/* these are for writing directions 1 (e.g. vertical) */
++	/* Vector sdw1;/* these are for writing directions 1 (e.g. vertical) */
++	int bmlen;		/* size of bitmap */
++	uchar *bitmap;
++};
++typedef struct BDFchar BDFchar;
++
++struct BDFont {
++	char *name;
++	int size;
++	Boundingbox fbbx;
++	Vector dw;		/* actually x,y are Δx and Δy to the baseline*/
++	//Vector sdw;	/* same as above but for scaled size -- not used */
++	//Vector dw1;	/* these are for writing directions 1 (e.g. vertical) */
++	//Vector sdw1;	/* these are for writing directions 1 (e.g. vertical) */
++	int cur;		/* current element index into glyphs */
++	int n;
++	BDFchar *glyphs;	/* will have nchar members */
++};
++typedef struct BDFont BDFont;
++
++extern Biobuf *bdf;	/* input file */
++extern BDFont *bdfont;
++extern int yyline;
+diff --git a/src/cmd/bdf2subf/gram.y b/src/cmd/bdf2subf/gram.y
+new file mode 100644
+index 00000000..a3d10118
+--- /dev/null
++++ b/src/cmd/bdf2subf/gram.y
+@@ -0,0 +1,249 @@
++%{
++#include	<u.h>
++#include	<libc.h>
++#include	<bio.h>
++#include	<draw.h>
++#include	<memdraw.h>
++#include	<ctype.h>
++#include	"bdf2subf.h"
++
++extern int yylex(void);
++extern void yyerror(char *);
++
++BDFont *bdfont;
++%}
++
++%union {
++	char *s;
++	int i;
++};
++
++%token	STARTFONT COMMENT CONTENTVERSION FONT SIZE
++%token	FONTBOUNDINGBOX METRICSSET SWIDTH DWIDTH SWIDTH1
++%token	DWIDTH1 VVECTOR STARTPROPERTIES ENDPROPERTIES
++%token	CHARS STARTCHAR ENCODING BBX BITMAP ENDCHAR ENDFONT
++
++%token	<i>	INTEGER
++%token	<s>	STRING BUFFER HEXBUFF
++
++%%
++	/*
++	The grammar needs to handle blank lines everywhere, but it
++	doesn't. It is not obvious from the spec whether blank lines
++	are allowed everywhere for now just expect them at the end
++	of the file (based on observation)
++	*/
++bdfdesc
++	: beginning /* comments */ misc font props characters blanks
++	;
++
++blanks
++	: /* nothing: all this is for handling silly newlines at the end of a the file */
++	| '\n'
++	| blanks '\n'
++	;
++
++beginning
++	: STARTFONT STRING '\n' { free($2); }
++	;
++
++misc: /* nothing */
++	| CONTENTVERSION INTEGER '\n'
++	;
++
++font: font_id font_desc
++	;
++
++font_id
++	: FONT STRING '\n'
++	{
++		if (! bdfont && ! (bdfont = malloc(sizeof(BDFont)))) {
++			fprint(2, "memory exhusted\n");
++			exits("malloc failed");
++		}
++		bdfont->name = $2;
++	}
++	;
++
++font_desc
++	: font_attrs
++	| font_desc font_attrs
++	;
++
++font_attrs
++	: SIZE INTEGER INTEGER INTEGER '\n'
++	{
++		bdfont->size = $2;
++	}
++	| FONTBOUNDINGBOX INTEGER INTEGER INTEGER INTEGER '\n'
++	{
++		bdfont->fbbx = (Boundingbox){ $2, $3, $4, $5 };
++	}
++	| METRICSSET INTEGER '\n'
++	/* ignored */
++	| SWIDTH INTEGER INTEGER '\n'	/* ignored */
++	| DWIDTH INTEGER INTEGER '\n'
++	{
++		bdfont->dw = (Vector) { $2, $3 };
++	}
++	| SWIDTH1 INTEGER INTEGER '\n'	/* ignored */
++	| DWIDTH1 INTEGER INTEGER '\n'	/* ignored */
++	;
++
++props
++	: /* optional */
++	| STARTPROPERTIES INTEGER '\n' properties ENDPROPERTIES '\n'
++	/* ignore these */
++	;
++
++properties
++	: BUFFER			{ free($1); /* ignored */ }
++	| properties BUFFER	{ free($2); /* ignored */ }
++
++characters
++	: begin_chars char_desc_list end_chars
++	;
++
++begin_chars
++	: CHARS INTEGER  '\n'
++	{
++		BDFchar *g;
++
++		g = malloc($2*sizeof(BDFchar));
++		if (! g) {
++			fprint(2, "memory exhusted\n");
++			exits("malloc failed");
++		}
++		memset(g, $2*(int)sizeof(BDFchar), (0));
++		bdfont->glyphs = g;
++		bdfont->n = $2;
++		bdfont->cur = 0;
++	}
++	;
++
++end_chars
++	: ENDFONT '\n'
++	;
++
++char_desc_list
++	: char_desc
++	| char_desc_list char_desc
++	;
++
++char_desc
++	: STARTCHAR STRING '\n' char_attrs ENDCHAR '\n'
++	{
++		bdfont->cur++;
++		if (bdfont->cur > bdfont->n) {
++			fprint(2, "BDF file lied about number of chars (%d)\n", bdfont->n);
++			exits("parser");
++		}
++		free($2);
++	}
++	;
++
++char_attrs
++	: char_attr
++	| char_attrs char_attr
++	;
++
++char_attr
++	: ENCODING INTEGER '\n'
++	{
++		BDFchar *curchar = bdfont->glyphs+bdfont->cur;
++		curchar->enc = $2;
++		curchar->bmlen = 0;
++	}
++	| SWIDTH INTEGER INTEGER '\n'	/* ignored */
++	| DWIDTH INTEGER INTEGER '\n'
++	{
++		bdfont->glyphs[bdfont->cur].dw = (Vector){$2, $3};
++	}
++	| SWIDTH1 INTEGER INTEGER '\n'	/* ignored */
++	| DWIDTH1 INTEGER INTEGER '\n'	/* ignored */
++	| BBX INTEGER INTEGER INTEGER INTEGER '\n'
++	{
++		BDFchar *curchar = bdfont->glyphs+bdfont->cur;
++		curchar->bbx = (Boundingbox){$2,$3,$4,$5};
++		if (! ($2 && $3)) {
++			fprint(2, "line %d: bogus BBX %d %d %d %d\n", yyline, $2, $3, $4, $5);
++			exits("syntax error");
++		}
++		curchar->bitmap = malloc(sizeof(uchar)*$3*(($2+7)/8));
++		if (! curchar->bitmap) {
++			fprint(2, "memory exhusted\n");
++			exits("malloc failed");
++		}
++	}
++	| BITMAP '\n' hexbuff
++	| VVECTOR INTEGER INTEGER '\n'
++	;
++
++hexbuff
++	: HEXBUFF '\n'
++	{
++		BDFchar *cur;
++		uchar *d;
++		char *s;
++		int bmsize;
++
++		cur = bdfont->glyphs+bdfont->cur;
++		if (! cur->bitmap) {
++			fprint(2, "line %d: BITMAP out of order\n", yyline);
++			exits("syntax error");
++		}
++		bmsize = cur->bbx.h*((cur->bbx.w+7)/8);
++		d = cur->bitmap+cur->bmlen;
++		s = $1;
++		while (*s && *(s+1)) {
++			if (cur->bmlen+1 > bmsize) {
++				fprint(2, "line %d: BITMAP larger than BBX indicates\n", yyline);
++				exits("syntax error");
++			}
++			*d = ((isdigit(*s)) ? *s - '0' : ((toupper(*s) - 'A') + 10)) << 4;
++			s++;
++			*d |= ((isdigit(*s)) ? *s - '0' : ((toupper(*s) - 'A') + 10));
++			s++; d++;
++			cur->bmlen++;
++		}
++		free($1);
++	}
++	| hexbuff HEXBUFF '\n'
++	{
++		BDFchar *cur;
++		uchar *d;
++		char *s;
++		int bmsize;
++
++		cur = bdfont->glyphs+bdfont->cur;
++		if (! cur->bitmap) {
++			fprint(2, "line %d: BITMAP out of order\n", yyline);
++			exits("syntax error");
++		}
++		bmsize = cur->bbx.h*((cur->bbx.w+7)/8);
++		d = cur->bitmap+cur->bmlen;
++		s = $2;
++		while (*s && *(s+1)) {
++			if (cur->bmlen+1 > bmsize) {
++				fprint(2, "line %d: BITMAP larger than BBX indicates\n", yyline);
++				exits("syntax error");
++			}
++			*d = ((isdigit(*s)) ? *s - '0' : (toupper(*s) - 'A') + 10) << 4;
++			s++;
++			*d |= ((isdigit(*s)) ? *s - '0' : (toupper(*s) - 'A') + 10);
++			s++; d++;
++			cur->bmlen++;
++		}
++		free($2);
++	}
++	;
++
++%%
++
++void
++yyerror(char *s)
++{
++	extern char *curtok;
++	fprint(2, "line %d: %s near token %s\n", yyline, s, curtok);
++	exits("syntax error");
++}
+diff --git a/src/cmd/bdf2subf/lex.c b/src/cmd/bdf2subf/lex.c
+new file mode 100644
+index 00000000..dae24e6c
+--- /dev/null
++++ b/src/cmd/bdf2subf/lex.c
+@@ -0,0 +1,453 @@
++/****************************************************************
++Copyright (C) Lucent Technologies 1997
++All Rights Reserved
++
++Permission to use, copy, modify, and distribute this software and
++its documentation for any purpose and without fee is hereby
++granted, provided that the above copyright notice appear in all
++copies and that both that the copyright notice and this
++permission notice and warranty disclaimer appear in supporting
++documentation, and that the name Lucent Technologies or any of
++its entities not be used in advertising or publicity pertaining
++to distribution of the software without specific, written prior
++permission.
++
++LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
++INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
++IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
++SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
++IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
++ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
++THIS SOFTWARE.
++****************************************************************/
++/* an adaptation of awk/lex.c */
++
++#include <u.h>
++#include <libc.h>
++#include <bio.h>
++#include <ctype.h>
++#include "bdf2subf.h"
++#include "y.tab.h"
++
++#ifdef	YYLEXTEST
++#define	TRACE(x) fprint x
++#else
++#define	TRACE(x)
++#endif
++
++typedef struct Keyword {
++	char *name;
++	int tokid;
++} Keyword;
++
++Keyword BDF_kw[] = {
++	{"BBX", BBX},
++	{"BITMAP", BITMAP},
++	{"CHARS", CHARS},
++	{"COMMENT", COMMENT},
++	{"CONTENTVERSION", CONTENTVERSION}, 
++	{"DWIDTH", DWIDTH},
++	{"DWIDTH1", DWIDTH1},
++	{"ENCODING", ENCODING},
++	{"ENDCHAR", ENDCHAR},
++	{"ENDFONT",ENDFONT},
++	{"ENDPROPERTIES", ENDPROPERTIES},
++	{"FONT", FONT},
++	{"FONTBOUNDINGBOX", FONTBOUNDINGBOX},
++	{"METRICSSET", METRICSSET},
++	{"SIZE", SIZE},
++	{"STARTCHAR", STARTCHAR},
++	{"STARTFONT",	STARTFONT},
++	{"STARTPROPERTIES", STARTPROPERTIES},
++	{"SWIDTH", SWIDTH},
++	{"SWIDTH1", SWIDTH1},
++	{"VVECTOR", VVECTOR},
++};
++
++Keyword *lookup(char *);
++int binsearch(char *, Keyword*, int);
++
++#define	dimof(X)	(sizeof(X)/sizeof((X)[0]))
++#define	UGBUFSIZ	128
++
++Biobuf *bdf;
++static int ugbuf[UGBUFSIZ];
++static int ugtop;
++static char tokbuf[Bsize];
++
++char *curtok;
++int yyline = 0;
++
++Keyword *
++lookup(char *name)
++{
++	int i;
++
++	if ((i = binsearch(name, BDF_kw, dimof(BDF_kw))) < 0)
++		return (Keyword *) 0;
++
++	return &BDF_kw[i];
++}
++
++/* from awk/lex.c */
++int
++binsearch(char *w, Keyword *kp, int n)
++{
++	int cond, low, mid, high;
++
++	low = 0;
++	high = n - 1;
++	while (low <= high) {
++		mid = (low + high) / 2;
++		if ((cond = strcmp(w, kp[mid].name)) < 0)
++			high = mid - 1;
++		else if (cond > 0)
++			low = mid + 1;
++		else
++			return mid;
++	}
++	return -1;
++}
++
++int
++getch(void)
++{
++	int c;
++	if (ugtop > 0) {
++		if (ugbuf[--ugtop] == '\n') yyline++;
++		return ugbuf[ugtop];
++	}
++
++	c = Bgetc(bdf);
++	if (c == '\n') yyline++;
++	return c;
++}
++
++void 
++ungetch(char c)
++{
++	if (c == '\n') yyline--;
++
++	if (ugtop < UGBUFSIZ)
++		ugbuf[ugtop++] = c;
++	else {
++		fprint(2, "ungetch: unget stack full\n");
++		exits("ungetch error");
++	}
++}
++
++int
++peek(void)
++{
++	if (ugtop > 0)
++		return ugbuf[ugtop-1];
++	ugbuf[ugtop] = Bgetc(bdf);
++	return ugbuf[ugtop++];
++}
++
++void
++ungetstr(char *s)
++{
++	int i, l = strlen(s);
++
++	if (ugtop+l >= UGBUFSIZ) {
++		fprint(2, "ungetstr: unget stack full\n");
++		return;
++	}
++	for (i = l-1; i >= 0; i--)
++		ungetch(s[i]);
++}
++
++char *
++getnextoken(void)
++{
++	int c;
++	char *bp = tokbuf;
++
++	for (;;) {
++		if ((c = getch()) < 0) return 0;
++		if (c ==  ' ' || c == '\t') continue;
++		if (c == '\n') {
++			*bp++ = c;
++			*bp = 0;
++			return tokbuf;
++		}
++		/* start of something */
++		ungetch(c);
++		break;
++	}
++	
++	for (;;) {
++		if ((c = getch()) < 0) {
++			ungetch(c);
++			if (bp > tokbuf) {
++				*bp = 0;
++				return tokbuf;
++			}
++			return 0;
++		} else if (c == ' ' || c == '\t' || c == '\n') {
++			ungetch(c);
++			*bp = 0;
++			return tokbuf;
++		}
++		*bp++ = c;
++	}
++	return 0;	/* not reached */
++}
++
++char *
++readupto(char term)
++{
++	int c;
++	char *bp = tokbuf;
++
++	if (peek() < 0) {
++		return 0;
++	}
++
++	for (;;) {
++		if ((c = getch()) < 0 || c == term)  {
++			ungetch(c);
++			*bp = 0;
++			return tokbuf;
++		}
++		*bp++ = c;
++	}
++	return 0;	/* not reached */
++}
++
++char *
++estrdup(char *s)
++{
++	char *x = strdup(s);
++	if (! x) {
++		fprint(2, "no memory\n");
++		exits("can't strdup");
++	}
++	return x;
++}
++
++int
++iskwpat(char *s)
++{
++	do {
++		if (! isupper(*s)) return 0;
++	} while (*++s);
++
++	return 1;
++}
++
++int
++isintpat(char *s)
++{
++	if (isdigit(*s) || *s == '+' || *s == '-') {
++		for (s++; *s; s++)
++			if (! isdigit(*s)) return 0;
++		return 1;
++	}
++	return 0;
++}
++
++int
++ishexpat(char *s)
++{
++	do {
++		if (! isxdigit(*s)) return 0;
++	} while (*++s);
++
++	return 1;
++}
++
++int
++yylex(void)
++{
++	static enum {
++		Initial = 0,
++		Strings,
++		Comments,
++		Properties,
++		Proplist,
++		Bitmap,
++		Bitlist
++	} state = Initial;
++
++	static int skiplines = 0;
++
++	for (;;) {
++		register char *tok;
++		register Keyword *x;
++
++		switch (state) {
++		default:
++			if (! (tok = getnextoken())) {
++				/* EOF, clean up and terminate */
++				return 0;
++			}
++
++TRACE((2,"state 0: looking at %s\n", tok));
++			curtok = tok;
++			if (iskwpat(tok)) {
++				if (x = lookup(tok)) {
++					switch (x->tokid) {
++					case COMMENT:
++						state = Comments;
++TRACE((2,"state 0: tokid %d >> state %d\n", x->tokid, state));
++						break;
++
++					case STARTPROPERTIES:
++						state = Properties;
++TRACE((2,"state 0: return tokid %d >> state %d\n", x->tokid, state));
++						return x->tokid;
++
++					case STARTFONT:
++					case STARTCHAR:
++					case FONT:
++						state = Strings;
++TRACE((2,"state 0: return tokid %d >> state %d\n", x->tokid, state));
++						return x->tokid;
++
++
++					case BITMAP:
++						state = Bitmap;
++TRACE((2,"state 0: return tokid %d >> state %d\n", x->tokid, state));
++						return x->tokid;
++
++					default:
++TRACE((2,"state 0: return tokid %d >> state %d\n", x->tokid, state));
++						return x->tokid;
++					}
++				} else {
++					yylval.s = estrdup(tok);
++TRACE((2,"state 0: return STRING\n"));
++					return STRING;
++				}
++			} else if (isintpat(tok)) {
++				yylval.i = atoi(tok);
++TRACE((2, "state 0: return INTEGER\n"));
++				return INTEGER;
++			} else if (*tok == '\n') {
++TRACE((2, "state 0: return '\\n'\n"));
++				return '\n';
++			} else {
++				fprint(2, "yylex: unkown token %s\n", tok);
++				exits("lexical error");
++			}
++			break;
++
++		case Strings:
++			state = 0;
++			if (! (tok = readupto('\n'))) {
++				fprint(2, "yylex: unexpected EOF\n");
++				exits("lexical error");
++			}
++TRACE((2, "state Strings: looking at %s\n", tok));
++			curtok = tok;
++			yylval.s = estrdup(tok);
++			return STRING;
++
++		case Bitmap:
++			if (! (tok = getnextoken())) {
++				fprint(2, "yylex: unexpected EOF in Bitmap\n");
++				return 0;
++			}
++			curtok = tok;
++
++TRACE((2, "state Bitmap: looking at %s\n", (*tok == '\n')?"\\n":tok));
++			if (*tok == '\n') {
++				state = Bitlist;
++TRACE((2, "state Bitmap: return \\n >> state %d\n", state));
++				return '\n';
++			} else {
++				state = 0;
++				yylval.s = estrdup(tok);
++TRACE((2, "state Bitmap: return STRING >> state %d\n", state));
++				return STRING;	/* let yyparse take care of it */
++			}
++
++		case Bitlist:
++			if (! (tok = getnextoken())) {
++				fprint(2, "yylex: unexpected EOF in BITMAP\n");
++				return 0;
++			}
++
++TRACE((2, "state Bitlist: looking at %s\n", (*tok == '\n')?"\\n":tok));
++			curtok = tok;
++			if (ishexpat(tok)) {
++				yylval.s = estrdup(tok);
++TRACE((2, "state Bitlist: return HEXBUFF >> state %d\n", state));
++				return HEXBUFF;
++			} else if (*tok == '\n') {
++TRACE((2, "state Bitlist: return \\n >> state %d\n", state));
++				return '\n';
++			}
++			ungetstr(tok);
++			state = 0;
++			break;
++
++		case Comments:
++			if (! (tok = readupto('\n'))) {
++				fprint(2, "yylex: unexpected EOF in COMMENT\n");
++				return 0;
++			}
++			USED(tok);
++			if (peek() == '\n') getch();
++			state = 0;
++TRACE((2, "state Comments: token \"%s\" >> state %d\n", tok, state));
++			break;
++
++		case Properties:
++			if (! (tok = getnextoken())) {
++				fprint(2, "yylex: unexpected EOF in PROPERTIES\n");
++				return 0;
++			}
++
++TRACE((2, "state Properties: looking at \"%s\"\n", tok));
++			if (isintpat(tok)) {
++				skiplines = yylval.i = atoi(tok);
++TRACE((2, "state Properties: return INTEGER >> state %d\n", state));
++				return INTEGER;
++			}
++			else if (*tok == '\n') {
++				state = Proplist;
++TRACE((2, "state Properties: return \\n >> state %d\n", state));
++				return '\n';
++			}
++			/* probably an error, let yyparse sort it out */
++			fprint(2, "yylex: unknown token %s in PROPERTIES\n", tok);
++			exits("lexical error");
++
++		case Proplist:	/* property list keywords can go here */
++			if (skiplines) {
++				if (! (tok = readupto('\n'))) {
++					fprint(2, "yylex: unexpected EOF in PROPERTIES");
++					return 0;
++				}
++				yylval.s = estrdup(tok);
++				if (peek() == '\n') getch();
++
++				skiplines--;
++TRACE((2, "state Proplist: return BUFFER >> state %d\n", state));
++				return BUFFER;
++			}
++			state = 0;
++TRACE((2, "state Proplist: >> state %d\n", state));
++			break;
++		}
++	}
++	return 0;	/* not reached */
++}
++
++#ifdef	YYLEXTEST
++YYSTYPE yylval;
++
++main(int ac, char *av[])
++{
++	Biobuf bin;
++	bdf = &bin;
++	Binit(bdf, 0, OREAD);
++
++	while (yylex())
++		;
++}
++#endif
+diff --git a/src/cmd/bdf2subf/mkfile b/src/cmd/bdf2subf/mkfile
+new file mode 100644
+index 00000000..bed3f9f2
+--- /dev/null
++++ b/src/cmd/bdf2subf/mkfile
+@@ -0,0 +1,32 @@
++<$PLAN9/src/mkhdr
++
++TARG=bdf2subf
++FILES=bdf2subf.c\
++	lex.c\
++
++CFILES=$FILES y.tab.c
++OFILES=${CFILES:%.c=%.$O}
++HFILES=bdf2subf.h\
++	y.tab.h\
++
++YFILES=gram.y
++
++ALLFILES=$FILES $YFILES bdf2subf.h bdf2subf.1 mkfile Readme
++
++#BIN=/$objtype/bin
++<$PLAN9/src/mkone
++
++#clean:V:
++#	rm -f [$OS].out *.[$OS] y.tab.? y.debug $TARG
++
++#install:V:
++#	cp bdf2subf.1 /sys/man/1/bdf2subf
++
++#smoke: $O.out
++#	$O.out -f test/persian.bdf >/dev/null
++
++#bdf2subf.bundle: $O.out
++#	bundle $ALLFILES > bdf2subf.bundle
++
++#bdf2subf.tgz: $O.out
++#	tar c $ALLFILES > bdf2subf.tar && gzip bdf2subf.tar && rm bdf2subf.tar
