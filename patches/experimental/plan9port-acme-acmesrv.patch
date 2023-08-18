@@ -1,5 +1,5 @@
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index 852a8f7f..9b6e3f27 100644
+index 852a8f7f..e06c7a73 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
 @@ -23,6 +23,14 @@ acme, win, awd \- interactive text windows
@@ -17,11 +17,10 @@ index 852a8f7f..9b6e3f27 100644
  .B -l
  .I file
  |
-@@ -91,6 +99,14 @@ to mount itself at
- .IR mtpt .
- (Experimental.)
+@@ -82,6 +90,14 @@ Tab intervals are set to the width of 4 (or the value of
+ numeral zeros in the appropriate font.
  .PP
-+The
+ The
 +.B -R
 +option configures a remoting path.
 +A remote name is followed by ":"
@@ -29,9 +28,10 @@ index 852a8f7f..9b6e3f27 100644
 +Repeated options configure additonal paths.
 +(Experimental. See below section on remoting.)
 +.PP
- .SS Windows
- .I Acme
- windows are in two parts: a one-line
++The
+ .B -m
+ option instructs
+ .I acme
 @@ -744,6 +760,45 @@ programs such as
  and
  .I awd
