@@ -487,7 +487,7 @@ index 00000000..592b5b98
 +}
 diff --git a/src/cmd/bdf2subf/bdf2subf.h b/src/cmd/bdf2subf/bdf2subf.h
 new file mode 100644
-index 00000000..a19fcbb7
+index 00000000..fd53446c
 --- /dev/null
 +++ b/src/cmd/bdf2subf/bdf2subf.h
 @@ -0,0 +1,56 @@
@@ -535,9 +535,9 @@ index 00000000..a19fcbb7
 +	int size;
 +	Boundingbox fbbx;
 +	Vector dw;		/* actually x,y are Δx and Δy to the baseline*/
-+	//Vector sdw;	/* same as above but for scaled size -- not used */
-+	//Vector dw1;	/* these are for writing directions 1 (e.g. vertical) */
-+	//Vector sdw1;	/* these are for writing directions 1 (e.g. vertical) */
++	/* Vector sdw;	/* same as above but for scaled size -- not used */
++	/* Vector dw1;	/* these are for writing directions 1 (e.g. vertical) */
++	/* Vector sdw1;/* these are for writing directions 1 (e.g. vertical) */
 +	int cur;		/* current element index into glyphs */
 +	int n;
 +	BDFchar *glyphs;	/* will have nchar members */
