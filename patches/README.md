@@ -107,19 +107,6 @@ like Mac retina displays. This patch makes that behavior togglable,
 so PPI is scaled only when the `-s` option is specified, i.e.,
 `page -s somefile.pdf` scales PPI while `page somefile.pdf` does not.
 
-### `plan9port-bdf2subf.patch`
-
-Add the `bdf2subf` program, for converting
-BDF fonts to Plan 9 subf (see the `font(6)`
-[manpage](https://plan9.io/magic/man2html/6/font)), to the plan9port
-source tree. It will be compiled along with the other plan9port
-programs when running the `INSTALL` script.
-
-Sourced from branch of plan9port by
-[bleu255](https://post.lurk.org/@320x200/102532617791988449).
-[Code](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html)
-and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html).
-
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
 Don't fully hide menubar and dock when fullscreen on macOS.
