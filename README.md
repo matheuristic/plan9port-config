@@ -21,9 +21,8 @@ The shell commands here are for a POSIX-compatible shell or similar
 ### Code patches
 
 There are some patches in the `patches` subdirectory. Apply desired
-patches to the source code prior to compilation.
-
-See the `README.md` file in the subdirectory for instructions.
+patches to the source code prior to compilation. See the `README.md`
+file in the subdirectory for instructions.
 
 - `plan9port-acme-bindings.patch`: Adds `C-k`, `C-n`, `C-p`, `Cmd-a`
   and `Cmd-s` Acme key bindings for their usual Linux and macOS
@@ -38,6 +37,8 @@ See the `README.md` file in the subdirectory for instructions.
   option.
 - `plan9port-acme-windowtitle.patch`: Adds a `-t TITLE` CLI option
   for setting the window title of a launched Acme instance.
+- `plan9port-bdf2subf.patch`: Adds `bdf2subf` to the plan9port source
+  tree that will be compiled when running the `INSTALL` script.
 - `plan9port-keyboard-addrunecomposeseq.patch`: Adds new keyboard
   compose sequences for typing runes. See `patches/README.md`.
 - `plan9port-mac-nofullscreenautohidemenu.patch`: Reverts changes to
@@ -454,6 +455,32 @@ a number of helper scripts available at `~/.acme/bin`:
   webpages.  Requires [wget](https://www.gnu.org/software/wget/) and
   [rust-html2text](https://github.com/jugglerchris/rust-html2text/)
   (compile its example program `examples/html2text.rs`).
+
+- [bdf2subf](https://post.lurk.org/@320x200/102532617791988449)
+  ([source](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html),
+  [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html)):
+  Patch for plan9port that builds BDF to plan9 font converter
+  tool [bdf2subf](https://plan9.io/wiki/plan9/fonts/index.html)
+  ([alt](http://plan9.stanleylieber.com/fonts/)) during `INSTALL`.
+  A copy of this patch is included in the `patches` directory, see
+  `README.md` in that directory for how to apply it.
+
+  Usage:
+
+  ```sh
+  bdf2subf -f somefont.bdf > somefont.font  # generate font file
+  bdf2subf somefont.bdf                     # generate subfont files
+  ```
+
+  Example (POSIX shell):
+
+  ```sh
+  mkdir -p /path/to/lib/font/gohufont
+  cd /path/to/lib/font/gohufont
+  curl -LO https://github.com/hchargois/gohufont/raw/master/gohufont-uni-14.bdf
+  curl -LO https://github.com/hchargois/gohufont/raw/master/gohufont-uni-14b.bdf
+  for f in *.bdf; do bdf2subf -f $f > $(basename $f .bdf).font; bdf2subf $f; done
+  ```
 
 - [dirtree](https://github.com/sminez/acme-corp/tree/master/dirtree):
   Tree-style file explorer for Acme. Button2 on a directory in a
