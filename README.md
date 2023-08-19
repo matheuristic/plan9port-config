@@ -465,6 +465,11 @@ a number of helper scripts available at `~/.acme/bin`:
   A copy of this patch is included in the `patches` directory, see
   `README.md` in that directory for how to apply it.
 
+  There is currently a bug in the HiDPI scaling (at least on macOS),
+  where the last rune of each subfont range gets printed as a space.
+  As a workaround, disable the HiDPI scaling using Cmd-r (on macOS)
+  (in that case, it is better to use larger bitmap fonts).
+
   Usage:
 
   ```sh
