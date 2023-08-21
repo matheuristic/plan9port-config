@@ -107,6 +107,22 @@ like Mac retina displays. This patch makes that behavior togglable,
 so PPI is scaled only when the `-s` option is specified, i.e.,
 `page -s somefile.pdf` scales PPI while `page somefile.pdf` does not.
 
+### `plan9port-libdraw-scalesubfontfix.patch`
+
+There a bug in `src/libdraw/gensubfont.c` where `scalesubfont()`
+only scales n `info` fields of the resulting `Subfont` structure
+though there are n+1 of them per the cachechars(3). As a result,
+the last rune of a scaled subfont indexes into the wrong part of
+the subfont image which makes that rune unusable. For example,
+`/lib/font/bit/lucsans/euro.8.font` uses subfont `lsr.14` for range
+`0x0000` through `0x00FF`, and `0x00FF` (ÿ) displays correctly
+when unscaled (e.g., `Font 1*/lib/font/bit/lucsans/euro.8.font`
+in Acme) and shows a blank character when scaled (e.g., `Font
+2*/lib/font/bit/lucsans/euro.8.font` in Acme).
+
+This patch fixes the `scalesubfont()` function so all n+1 `info`
+fields are scaled.
+
 ### `plan9port-bdf2subf.patch`
 
 Add the `bdf2subf` program, for converting

@@ -1080,17 +1080,19 @@ see the `fontscripts` folder for scripts that leverage `fontsrv` to
 convert vector fonts to Plan 9 subf format.
 
 **Note**: There is currently a bug when scaling Plan 9 bitmap (subf)
-fonts such that when the bitmap font is scaled (more than 1x), the
-last rune of any of its subfont ranges prints an empty rune (like
-a space). For example, `/lib/font/bit/lucsans/euro.8.font` uses a
+fonts such that when the bitmap font is scaled (more than 1x),
+the last rune of any of its subfont ranges prints an incorrect
+glyph. For example, `/lib/font/bit/lucsans/euro.8.font` uses a
 subfont `lsr.14` for character range `0x0000` through `0x00FF`.
 Without scaling, the character corresponding to `0x00FF` (ÿ)
 prints correctly. However, when the bitmap font is scaled to 2x
 (Button2 on `Font 2*/lib/font/bit/lucsans/euro.8.font`), that same
-character prints as an empty character. As a workaround, don't
-use scaled bitmap fonts. That is, only load bitmap fonts using
+character prints as an empty character. To address, either don't
+use scaled bitmap fonts (that is, only load bitmap fonts using
 an explicit 1x scale like `1*/lib/font/bit/lucsans/euro.8.font`
-so switching to HiDPI will not scale the font.
+so switching to HiDPI will not scale the font) or apply the
+patch `plan9port-libdraw-scalesubfontfix.patch` in the `patches`
+subdirectory.
 
 ## Keyboard bindings
 
