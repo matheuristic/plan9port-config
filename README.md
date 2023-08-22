@@ -1242,6 +1242,13 @@ Version=1.0
 ## Ports of Plan 9 tools to other languages
 
 - [Acme Go port](https://github.com/9fans/go/tree/main/cmd/acme)
+  (recommend this
+  [fork]([pedramos](https://github.com/pedramos/9fans)),
+  or at least incorporating some of its commits, like
+  [this](https://github.com/pedramos/9fans/commit/8675b85e54e03cf16a64e07d88f91347bb12a748),
+  [this](https://github.com/pedramos/9fans/commit/f0c0e9a88de15dd69c34da6cd10eb00b80594097)
+  and
+  [this](https://github.com/pedramos/9fans/commit/c70c0dbca34fe7f2a2ce603b2387cff6a640961b))
 
 - [Edwood](https://github.com/rjkroege/edwood) (another Acme Go port)
 
