@@ -85,15 +85,10 @@ index 00000000..bec11ceb
 +.L fst@centurytel.net
 diff --git a/src/cmd/bdf2subf/Readme b/src/cmd/bdf2subf/Readme
 new file mode 100644
-index 00000000..b5c4cb00
+index 00000000..8ea0b968
 --- /dev/null
 +++ b/src/cmd/bdf2subf/Readme
-@@ -0,0 +1,75 @@
-+Release 1.1.3.2: 8/27/2023:
-+
-+Support BDF files with characters whose BBX parameters do not exactly
-+those of FONTBOUNDINGBOX.
-+
+@@ -0,0 +1,70 @@
 +Release 1.1.3.1: 7/30/2019:
 +
 +A very minor maintenance and tweak release to have bdf2subf bundled
@@ -166,10 +161,10 @@ index 00000000..b5c4cb00
 +fst@centurytel.net
 diff --git a/src/cmd/bdf2subf/bdf2subf.c b/src/cmd/bdf2subf/bdf2subf.c
 new file mode 100644
-index 00000000..3de844fe
+index 00000000..592b5b98
 --- /dev/null
 +++ b/src/cmd/bdf2subf/bdf2subf.c
-@@ -0,0 +1,328 @@
+@@ -0,0 +1,320 @@
 +/*
 +Convert BDF to Plan9 Subfont.
 +Send bugs or preferably bug fixes to: fst@centurytel.net
@@ -267,7 +262,6 @@ index 00000000..3de844fe
 +	Subfont *sf;
 +	BDFchar *bdfchar;
 +	Fontchar *fontchar;
-+	int mw, w, y0;
 +
 +	nglyphs = maxenc - minenc + 1;	// inclusive
 +	bdfchar = bdfont->glyphs;
@@ -277,14 +271,11 @@ index 00000000..3de844fe
 +	saves us one call to memimagedraw later. this is a big saving when the
 +	font range is huge.
 +	*/
-+	mw = bdfont->fbbx.w;
 +	for (x = 0, i = 0, k = 0; i < bdfont->n; i++) {
 +		if (bdfchar[i].enc < minenc || bdfchar[i].enc > maxenc)
 +			continue;
 +		k++;
-+		w = (bdfchar[i].dw.x > bdfchar[i].bbx.w) ? bdfchar[i].dw.x : bdfchar[i].bbx.w;
-+		x += w;
-+		if (mw < w) mw = w;
++		x += bdfchar[i].bbx.w;
 +	}
 +
 +	if (k != nglyphs) {
@@ -299,7 +290,7 @@ index 00000000..3de844fe
 +	/* see cachechars(2) for an explanation of the extra Fontchar */
 +	fontchar = malloc((nglyphs+1) * sizeof(Fontchar));
 +
-+	r = Rect(0, 0, mw, bdfont->fbbx.h);
++	r = Rect(0, 0, bdfont->fbbx.w, bdfont->fbbx.h);
 +	c = allocmemimage(r, GREY1);
 +
 +	for(x = 0, i = 0, k = 0; i < bdfont->n; i++) {
@@ -313,18 +304,14 @@ index 00000000..3de844fe
 +
 +		fontchar[k].x = x;
 +		fontchar[k].top = 0;
-+		fontchar[k].bottom = bdfont->fbbx.h;
++		fontchar[k].bottom = bdfchar[i].bbx.h;
 +		fontchar[k].left = bdfchar[i].bbx.xoff;
-+		w = (bdfchar[i].dw.x > bdfchar[i].bbx.w) ? bdfchar[i].dw.x : bdfchar[i].bbx.w;
-+		fontchar[k].width = w;
++		fontchar[k].width = bdfchar[i].bbx.w;
 +		k++;
 +
-+		y0 = (bdfont->fbbx.h - bdfchar[i].bbx.h) + (bdfont->fbbx.yoff - bdfchar[i].bbx.yoff);
-+		r = Rect(x, y0, x+bdfchar[i].bbx.w, y0+bdfchar[i].bbx.h);
++		r = Rect(x, 0, x+bdfchar[i].bbx.w, bdfchar[i].bbx.h);
 +		memimagedraw(s, r, c, c->r.min, nil, ZP, SoverD);
-+		x += w;
-+
-+		memfillcolor(c, GREY1);
++		x += bdfchar[i].bbx.w;
 +	}
 +
 +	fontchar[k].x = x;		/* see cachechars(2) */
