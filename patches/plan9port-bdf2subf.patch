@@ -85,14 +85,14 @@ index 00000000..bec11ceb
 +.L fst@centurytel.net
 diff --git a/src/cmd/bdf2subf/Readme b/src/cmd/bdf2subf/Readme
 new file mode 100644
-index 00000000..b5c4cb00
+index 00000000..6ccafb4c
 --- /dev/null
 +++ b/src/cmd/bdf2subf/Readme
 @@ -0,0 +1,75 @@
 +Release 1.1.3.2: 8/27/2023:
 +
 +Support BDF files with characters whose BBX parameters do not exactly
-+those of FONTBOUNDINGBOX.
++match those of FONTBOUNDINGBOX.
 +
 +Release 1.1.3.1: 7/30/2019:
 +
