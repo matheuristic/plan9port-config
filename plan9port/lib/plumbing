@@ -22,6 +22,7 @@ plumb to pdf
 plumb start rc -c 'xdg-open '''$file''' || open '''$file''''
 #plumb start rc -c 'open -a Skim.app '''$file''''
 #plumb start rc -c 'mupdf-gl '''$file''''
+#plumb start rc -c 'open -a sioyek.app '''$file''''
 
 # image files
 type is text
