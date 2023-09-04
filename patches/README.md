@@ -48,6 +48,43 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
+### `plan9port-acme-dumpfontscale.patch`
+
+Prefix `1*` scale to a window's font name in Acme dumps if it does not
+specify a scale. Specifically, `1*` is prefixed to a window's font
+name if it begins with `/` (i.e., it has no scale like `2*` or `3*`).
+
+This works around font scaling quirks when using `Dump` and `Load` in
+Acme on high-DPI screens (200 DPI or more, like macOS Retina screens).
+
+Consider the following sequence of actions:
+
+1. Open a file in Acme on a high DPI screen.
+2. Execute `Font /mnt/font/AndaleMono/15a/font` which loads
+   `/mnt/font/AndaleMono/30a/font` (Acme doubles the specified point
+   size when loading any `fontsrv`-served font specified without a
+   scaling prefix on a high-DPI screen).
+3. Execute `Dump` to save window state to a dump file.
+4. Close then start a fresh instance of Acme
+5. Execute `Load` on the dump file to restore window state.
+
+Without this patch applied, in step 3, the file window's font is saved
+as `/mnt/font/AndaleMono/30a/font` in the dump file. When `Load` is
+executed in step 5 to restore window state, Acme will double the
+font size in that file window since it is not prefixed with a scale.
+That is, it loads `/mnt/font/AndaleMono/60a/font` which is double the
+actual font size used when `Dump` was called.
+
+With this patch applied, in step 3, the file window's font is saved as
+`1*/mnt/font/AndaleMono/30a/font` in the dump file. When `Load` is
+executed in step 5 to restore window state, Acme will not double the
+font size in that file window since the font name is prefixed with a
+scale. That is, it loads `/mnt/font/AndaleMono/30a/font` which matches
+the actual font size used when `Dump` was called.
+
+This added prefix is a workaround. A better fix would be to dump the
+original window font name specified to `Font`.
+
 ### `plan9port-acme-extrafilechars.patch`
 
 Allow round and square brackets and tildes in file and dir names
