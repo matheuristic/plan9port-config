@@ -48,13 +48,15 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
-### `plan9port-acme-bracketfilenames.patch`
+### `plan9port-acme-extrafilechars.patch`
 
-Allow round and square brackets in file and dir names in Acme.
+Allow round and square brackets and tildes in file and dir names
+in Acme.
 
 Contrary to expectation, Button3 in Acme does not open files and
-directories with round and square brackets (`(`, `)`, `[`, `]`) in
-their name. This patch makes it so Acme will open them as expected.
+directories with round and square brackets (`(`, `)`, `[`, `]`)
+or tildes (`~`) in their name. This patch makes it so Acme will
+open them as expected.
 
 ### `plan9port-acme-lookb.patch`
 

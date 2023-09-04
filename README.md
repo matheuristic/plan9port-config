@@ -28,8 +28,8 @@ file in the subdirectory for instructions.
   and `Cmd-s` Acme key bindings for their usual Linux and macOS
   actions, and `Cmd-.` and `Cmd-/` bindings to execute text and
   plumb text (like Button2 and Button3).
-- `plan9port-acme-bracketfilenames.patch`: Allow round and square
-  brackets in file and directory names in Acme.
+- `plan9port-acme-extrafilechars.patch`: Allow round and square
+  brackets and tildes in file and directory names in Acme.
 - `plan9port-acme-lookb.patch`: Adds a `Lookb` command to Acme for
   backwards search.
 - `plan9port-acme-soft-tabs.patch`: Adds soft tabs support to Acme
