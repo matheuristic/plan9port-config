@@ -1,0 +1,25 @@
+diff --git a/src/cmd/acme/rows.c b/src/cmd/acme/rows.c
+index 7a64fabf..d027b39e 100644
+--- a/src/cmd/acme/rows.c
++++ b/src/cmd/acme/rows.c
+@@ -396,7 +396,10 @@ rowdump(Row *row, char *file)
+ 				}
+ 			fontname = "";
+ 			if(t->reffont->f != font)
+-				fontname = t->reffont->f->name;
++				if(t->reffont->f->hidpi == nil)
++					fontname = t->reffont->f->lodpi->name;
++				else
++					fontname = smprint("%s,%s", t->reffont->f->lodpi->name, t->reffont->f->hidpi->name);
+ 			if(t->file->nname)
+ 				a = runetobyte(t->file->name, t->file->nname);
+ 			else
+@@ -428,6 +431,8 @@ rowdump(Row *row, char *file)
+ 					100.0*(w->r.min.y-c->r.min.y)/Dy(c->r),
+ 					w->body.file->b.nc, fontname);
+ 			}
++			if(t->reffont->f!=font && t->reffont->f->hidpi!=nil)
++				free(fontname);
+ 			free(a);
+ 			winctlprint(w, buf, 0);
+ 			Bwrite(b, buf, strlen(buf));

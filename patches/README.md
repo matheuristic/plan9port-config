@@ -48,42 +48,22 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
-### `plan9port-acme-dumpfontscale.patch`
+### `plan9port-acme-dumpfontnamebothdpi.patch`
 
-Prefix `1*` scale to a window's font name in Acme dumps if it does not
-specify a scale. Specifically, `1*` is prefixed to a window's font
-name if it begins with `/` (i.e., it has no scale like `2*` or `3*`).
+Have Acme `Dump` also save a window's high DPI fontname when it is
+available.
 
-This works around font scaling quirks when using `Dump` and `Load` in
-Acme on high-DPI screens (200 DPI or more, like macOS Retina screens).
+If a window is using a font configuration different from the default
+`$font`, Acme's `Dump` saves both low DPI and high DPI font names,
+when available, in a combined form in the usual way, i.e.
+`/path/to/lodpi/font,/path/to/hidpi/font`.
 
-Consider the following sequence of actions:
+This enables dumps to better retain window font state.
 
-1. Open a file in Acme on a high DPI screen.
-2. Execute `Font /mnt/font/AndaleMono/15a/font` which loads
-   `/mnt/font/AndaleMono/30a/font` (Acme doubles the specified point
-   size when loading any `fontsrv`-served font specified without a
-   scaling prefix on a high-DPI screen).
-3. Execute `Dump` to save window state to a dump file.
-4. Close then start a fresh instance of Acme
-5. Execute `Load` on the dump file to restore window state.
-
-Without this patch applied, in step 3, the file window's font is saved
-as `/mnt/font/AndaleMono/30a/font` in the dump file. When `Load` is
-executed in step 5 to restore window state, Acme will double the
-font size in that file window since it is not prefixed with a scale.
-That is, it loads `/mnt/font/AndaleMono/60a/font` which is double the
-actual font size used when `Dump` was called.
-
-With this patch applied, in step 3, the file window's font is saved as
-`1*/mnt/font/AndaleMono/30a/font` in the dump file. When `Load` is
-executed in step 5 to restore window state, Acme will not double the
-font size in that file window since the font name is prefixed with a
-scale. That is, it loads `/mnt/font/AndaleMono/30a/font` which matches
-the actual font size used when `Dump` was called.
-
-This added prefix is a workaround. A better fix would be to dump the
-original window font name specified to `Font`.
+Especially, it addresses a `Dump` and `Load` font display quirk on
+high DPI screens where `Dump` saves a window's currently displayed
+high DPI font to the dump file, which on `Load` is treated as the low
+DPI font for the window and is doubled again for displayed.
 
 ### `plan9port-acme-extrafilechars.patch`
 

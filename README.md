@@ -28,10 +28,10 @@ file in the subdirectory for instructions.
   and `Cmd-s` Acme key bindings for their usual Linux and macOS
   actions, and `Cmd-.` and `Cmd-/` bindings to execute text and
   plumb text (like Button2 and Button3).
-- `plan9port-acme-dumpfontscale.patch`: Prefix `1*` scale to a
-  window's font name in Acme dumps if it does not specify a scale.
-  This works around quirks with font doubling behavior with `Dump`
-  and `Load` on high-DPI screens.
+- `plan9port-acme-dumpfontnamebothdpi.patch`: Have Acme `Dump` also
+  save a window's high DPI fontname when it is available. This
+  addresses quirky interaction between automatic font doubling
+  behavior, and Acme's `Dump` and `Load` on high-DPI screens.
 - `plan9port-acme-extrafilechars.patch`: Allow round and square
   brackets and tildes in file and directory names in Acme.
 - `plan9port-acme-lookb.patch`: Adds a `Lookb` command to Acme for
