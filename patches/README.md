@@ -48,23 +48,6 @@ Some portions of this patch are sourced from
 [prodhe](https://github.com/prodhe/plan9port) (`C-n` and `C-p`), and
 [ixtenu](https://github.com/ixtenu/plan9port) (`Cmd-s`).
 
-### `plan9port-acme-dumpfontnamebothdpi.patch`
-
-Have Acme `Dump` also save a window's high DPI fontname when it is
-available.
-
-If a window is using a font configuration different from the default
-`$font`, Acme's `Dump` saves both low DPI and high DPI font names,
-when available, in a combined form in the usual way, i.e.
-`/path/to/lodpi/font,/path/to/hidpi/font`.
-
-This enables dumps to better retain window font state.
-
-Especially, it addresses a `Dump` and `Load` font display quirk on
-high DPI screens where `Dump` saves a window's currently displayed
-high DPI font to the dump file, which on `Load` is treated as the low
-DPI font for the window and is doubled again for displayed.
-
 ### `plan9port-acme-extrafilechars.patch`
 
 Allow round and square brackets and tildes in file and dir names
