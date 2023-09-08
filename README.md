@@ -267,6 +267,9 @@ a number of helper scripts available at `~/.acme/bin`:
   matching the given regular expression. If no regular expression is
   provided, then all clean Acme file windows are deleted.
 - `codepv`: Preview current Acme window code file in a browser.
+- `Conf`: `Conf LANGUAGE` configures the current Acme window for the
+  specified programming LANGUAGE. Run `Conf` (without a language) for
+  supported languages.
 - `ct`: `ct COLUMNNUMBER COMMENTPREFIX` adds `COMMENTPREFIX` at
   `COLUMNNUMBER` in each line of STDIN or text piped to the command.
 - `d`: Diff the current window against the current file on disk, needs

@@ -1,0 +1,140 @@
+#!/bin/sh
+
+# Configure current Acme window for a programming language
+
+set -e
+
+BASEFONT="/mnt/font/PragmataPro-Regular/14a/font"
+BASETAGS=" Edit win"
+
+if [ "$#" -eq 0 ]; then
+	cat <<EOF
+Set up current Acme window for programming.
+
+Configures font, space or tab indentation, auto-indent,
+and tagbar for the window for the given language.
+
+Usage: $(basename $0) [bqn|lisp|py|racket|sh]
+
+Supported languages:
+bqn (BQN), lisp (Lisp), md (Markdown), py (Python),
+rkt (Racket), sh (Shell)
+
+If no option is specified, shows usage and exits.
+EOF
+	exit
+elif [ "$#" -eq 1 ]; then
+	case $1 in
+		bqn)
+			acmeexec "Font /mnt/font/BQN386/14a/font"
+			acmeexec "Tab 2"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " |s+ |s-" | 9p write acme/$winid/tag
+			# https://mlochbaum.github.io/BQN/spec/token.html
+			9 echo -n ' ⟦ ' | 9p write acme/$winid/tag
+			# Null literal
+			9 echo -n '@' | 9p write acme/$winid/tag
+			# Primitives
+			9 echo -n ' ▀ +-×÷⋆√⌊⌈|¬∧∨<>≠=≤≥≡≢⊣⊢⥊∾≍⋈↑↓↕«»⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔!' | 9p write acme/$winid/tag
+			# Primitive 1-modifiers
+			9 echo -n ' ▀ ˙˜˘¨⌜⁼´˝\`' | 9p write acme/$winid/tag
+			# Primitive 2-modifiers
+			9 echo -n ' ▀ ∘○⊸⟜⌾⊘◶⎉⚇⍟⎊' | 9p write acme/$winid/tag
+			# Special names
+			9 echo -n ' ▀ 𝕨𝕩𝕗𝕘𝕤𝕎𝕏𝔽𝔾𝕊' | 9p write acme/$winid/tag
+			# Punctuation
+			9 echo -n ' ▀ ←⇐↩(){}⟨⟩[]‿·⋄,.;:?' | 9p write acme/$winid/tag
+			9 echo -n ' ⟧' | 9p write acme/$winid/tag
+			;;
+		lisp)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 2"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " |s+ |s- |surround" | 9p write acme/$winid/tag
+			# https://github.com/ChristopherSegale/match-paren
+			if command -v mp >/dev/null 2>&1; then
+				9 echo -n " |mp" | 9p write acme/$winid/tag
+			fi
+			;;
+		md)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 2"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " |s+ |s- |w+ |w-" | 9p write acme/$winid/tag
+			9 echo -n " |mdlink mdpv" | 9p write acme/$winid/tag
+			;;
+		py)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 4"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " |c+ |c- |s+ |s-" | 9p write acme/$winid/tag
+			# https://github.com/psf/black
+			if command -v black >/dev/null 2>&1; then
+				9 echo -n " (|black -q -)" | 9p write acme/$winid/tag
+			fi
+			# https://github.com/astral-sh/ruff
+			if command -v ruff >/dev/null 2>&1; then
+				9 echo -n " (ruff check \$%)" | 9p write acme/$winid/tag
+			fi
+			;;
+		rkt)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 2"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " (|c+ ';') (|c- ';') |s+ |s- |surround" | 9p write acme/$winid/tag
+			# https://github.com/ChristopherSegale/match-paren
+			if command -v mp >/dev/null 2>&1; then
+				9 echo -n " |mp" | 9p write acme/$winid/tag
+			fi
+			# https://docs.racket-lang.org/fmt/
+			if $(raco help fmt >/dev/null 2>&1); then
+				9 echo -n " (|raco fmt)" | 9p write acme/$winid/tag
+			fi
+			# https://github.com/Bogdanp/racket-review
+			if $(raco help review >/dev/null 2>&1); then
+				9 echo -n " (raco review \$%)" | 9p write acme/$winid/tag
+			fi
+			9 echo -n " (win racket)" | 9p write acme/$winid/tag
+			;;
+		sh)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " |c+ |c-" | 9p write acme/$winid/tag
+			# https://github.com/mvdan/sh
+			if command -v shfmt >/dev/null 2>&1; then
+				9 echo -n " |shfmt" | 9p write acme/$winid/tag
+			fi
+			# https://github.com/koalaman/shellcheck
+			if command -v shellcheck >/dev/null 2>&1; then
+				9 echo -n " (shellcheck -f gcc -s sh \`{basename \$%})" | 9p write acme/$winid/tag
+			fi
+			;;
+		*)
+			9 echo "unsupported language: $1" 1>&2
+			exit 1
+	esac
+else
+	9 echo "only one language can be specified, but two or more provided: $@" 1>&2
+	exit 1
+fi
+
+# Store tag right of first '|'
+TAGRIGHT=`9p read acme/$winid/tag | 9 awk -F'|' '{ st = index($0,"|");print substr($0,st+1)}'`
+
+# Remove Cfg command from tag
+9 echo -n "nomenu" | 9p write acme/$winid/ctl   # disable menu autoupdate
+9 echo -n "cleartag" | 9p write acme/$winid/ctl # clear tag right of first '|'
+9 echo -n "$TAGRIGHT" | \sed -E "s; *[^ ]*$(basename $0) +$1;;g" | 9p write acme/$winid/tag
+                                                # write back tag with "Cfg LANG" removed
+9 echo -n "menu" | 9p write acme/$winid/ctl     # re-enable menu autoupdate
