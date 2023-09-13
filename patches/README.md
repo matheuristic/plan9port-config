@@ -98,17 +98,6 @@ Add new keyboard compose sequences for typing runes:
 
 - `Alt-l-l` for the lozenge rune ◊
 
-### `plan9port-page-optionalscaleppi.patch`
-
-Make scaling of PPI in `page` optional.
-
-As of this
-[commit](https://github.com/9fans/plan9port/commit/940f1fd6af2c144d0db087fefa8478d2a36633d5),
-`page` will scale PPI automatically when using high-DPI screens
-like Mac retina displays. This patch makes that behavior togglable,
-so PPI is scaled only when the `-s` option is specified, i.e.,
-`page -s somefile.pdf` scales PPI while `page somefile.pdf` does not.
-
 ### `plan9port-bdf2subf.patch`
 
 Add the `bdf2subf` program, for converting
