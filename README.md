@@ -52,7 +52,7 @@ file in the subdirectory for instructions.
 ### Compiling plan9port
 
 The following instructions are for a system-level install at
-`/usr/local/plan9` or a local install at `$HOME/.local/plan9port`.
+`/usr/local/plan9` or a local install at `$HOME/.local/plan9`.
 Change the target directory as desired. See `install.txt` for what
 compile-time dependencies need to be installed.
 
