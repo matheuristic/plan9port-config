@@ -5,7 +5,7 @@
 set -e
 
 BASEFONT="/mnt/font/PragmataPro-Regular/14a/font"
-BASETAGS=" Edit win"
+BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
 	cat <<EOF
