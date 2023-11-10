@@ -4,7 +4,7 @@
 
 set -e
 
-BASEFONT="/mnt/font/PragmataPro-Regular/14a/font"
+BASEFONT="/lib/font/bit/lucm/unicode.9.font,/mnt/font/PragmataProMono-Regular/28a/font"
 BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
@@ -26,7 +26,7 @@ EOF
 elif [ "$#" -eq 1 ]; then
 	case $1 in
 		bqn)
-			acmeexec "Font /mnt/font/BQN386/14a/font"
+			acmeexec "Font $home/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font"
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
