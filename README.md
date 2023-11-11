@@ -434,8 +434,8 @@ a number of helper scripts available at `~/.acme/bin`:
     `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
     and Zig code (note that no workspace paths are specified).
 
-- [AI](): Interact with [OpenAI
-  ChatGPT](https://openai.com/blog/chatgpt) endpoint from Acme.
+- [AI](https://github.com/rogpeppe/AI): Interact with the OpenAI
+  [ChatGPT](https://openai.com/blog/chatgpt) endpoint from Acme.
 
   To install:
 
@@ -449,6 +449,11 @@ a number of helper scripts available at `~/.acme/bin`:
   key. In Acme, run `AI instructions...` to ask ChatGPT to perform
   the instructions with some selected text as context,  or `AI -c
   instructions...` for the same but with the whole file as context.
+
+  An alternative is [acmegpt](https://github.com/mariusae/acmegpt).
+  Another alternative is
+  [palm](https://github.com/rsc/tmp/tree/master/palm) which uses
+  Google's [PaLM](https://developers.generativeai.google/) API.
 
 - [awww](https://github.com/cjacker/awww):
   Text web browser for Acme. Button2 or Button3 opens links in opened
@@ -507,6 +512,16 @@ a number of helper scripts available at `~/.acme/bin`:
 
   Other alternatives include [xplor](https://git.sr.ht/~mkhl/xplor) or
   its Go [port](https://github.com/mpl/xplor).
+
+- [editinacme](https://pkg.go.dev/9fans.net/go/acme/editinacme)
+  ([Github](https://github.com/9fans/go/tree/main/acme/editinacme)):
+  Command usable as the `EDITOR` environment variable, which uses
+  `plumber` to open a specified file in Acme and waits for that
+  file's window in Acme to be closed before exiting. To install:
+
+  ```sh
+  go install 9fans.net/go/acme/editinacme@latest
+  ```
 
 - [issue](https://pkg.go.dev/rsc.io/github/issue)
   ([Github](https://github.com/rsc/github)):
