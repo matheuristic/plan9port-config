@@ -42,8 +42,17 @@ if [ "$1" = "-N" ]; then
 	shift;
 fi
 startparams="$@"
+startfile=$HOME/.acme/start
+if [ "$startparams" = "" ]; then
+	if [ -f "$startfile" ]; then
+		startparams="-c 1 $startfile"
+	else
+		echo "Start file does not exist, skipping load: $startfile" 1>&2
+	fi
+fi
 visibleclicks=1 SHELL=rc \
 	$PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
 	-f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/26a/font \
 	-F /lib/font/bit/pelm/unicode.8.font,/mnt/font/PragmataPro-Regular/28a/font \
+	$titleparams \
 	$startparams
