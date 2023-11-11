@@ -2,7 +2,8 @@
 
 # Prints 1 to stdout if screen is high DPI or 0 if it is not
 
-# Prints AppleScript code to get backingScaleFactor in macOS
+# Prints AppleScript code to get backingScaleFactor of the main screen
+# (this may not be the screen containing the active application) in macOS
 # https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
 # https://stackoverflow.com/a/35049057
 _generateapplescript () {
