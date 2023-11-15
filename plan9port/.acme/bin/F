@@ -1,79 +1,82 @@
 #!/usr/bin/env rc
 
-# Change vector font in current Acme window
+# Print current Acme window's font or increase/decrease its size.
+# Usage:
+#     F -h +N
+#     F -l +N
+#     F -h -N
+#     F -l -N
+#     F -h p
+#     F -l p
+# where N is a number,
+# -h treats the current screen as a high DPI screen,
+# -l treats the current screen as a low DPI screen,
+# +N indicates increase font by N points,
+# -N indicates decrease font by N points,
+# p will print the current font to stdout.
+# Users can use convenience functions
+# F- and F+ (for low DPI screens) or
+# F-- and F++ (for high DPI screens)
+# instead of calling this script directly.
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
 	exit 1
 }
 
-if (test $#* -gt 2) {
-	9 echo 'F takes exactly one or two arguments' >[1=2]
+if (test $#* -ne 2) {
+	9 echo 'needs exactly 2 parameters' >[1=2]
+	9 echo 'usage: F (-h|-l) (+N|-N)' >[1=2]
 	exit 1
 }
 
-if (~ $1 '-h') {
-	9 cat << EOF
-	exit
+switch($1){
+case -h
+	ishidpi=1
+case -l
+	ishidpi=0
+case *
+	9 echo 'first option must be -l or -h but got '$1 >[1=2]
+	exit 1
 }
-Change font in current Acme window. Usage:
 
-    F [newfontsize [newfontname]]
-
-Sets window font to newfontsize pt and, if specified, to a host system
-font newfontname served by fontsrv (these have path
-/mnt/font/NAME/SIZE/font). Calling with no args will print the full
-path of the current window's font. Note that on macOS Retina screens,
-Acme automatically doubles the font size set by the user.
-
-newfontsize is size in points and can be suffixed with 'a' to use the
-font antialiased.
-
-newfontname must be a `fontsrv` available font.
-
-If the newfontname is not specified and the current font is not a
-host system font, exits with error code 1.
-
-Example:
-    F 23a GoMono
-
-Run `9p ls font` to list available fonts.
-EOF
+switch($2){
+case +* -*
+	delta=$2
+	printfont=0
+case p
+	printfont=1
+case *
+	9 echo 'second option must be p or +N or -N (N is an integer) but got '$2 >[1=2]
+	exit 1
+}
 
 curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
 
-# Set new font size and change to new font, if specified
-if (test $#* -gt 0) {
-	cursize=$1
-	curname=$2
-	isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
-	if (~ $#curname 0) {
-		if (test $isfontsrvfont -eq 1) {
-			curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
-		}
-		if not {
-			9 cat 'Current font is non-host system font and no new font specified'
-			exit 1
-		}
-	}
-	newfont='/mnt/font/'$curname'/'$cursize'/font'
-	9 echo font $newfont | 9p write acme/$winid/ctl
+isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
+
+fn curfontsize {
+	size=`{9 echo $curfont | 9 sed 's;.*/mnt/font/.+/([0-9]+)a?/font.*;\1;'}
+	if (~ $ishidpi 1) size=`{9 echo $size'/2' | 9 hoc}
+	echo $size
 }
-# Else print current font to stderr
-if not {
-	isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
-	if (test $isfontsrvfont -eq 1) {
-		if (~ $#cursize 0) {
-			ishighdpi=`{ishidpi}
-			curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
-			cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
-			antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
-			cursizenoaa=`{9 echo $cursize | 9 sed 's/a$//'}       # remove antialias indicator
-			if (~ $#antialias 0) antialias=''
-			if (test $ishighdpi -eq 1) cursizenoaa=`{9 echo $cursizenoaa'/2' | 9 hoc}
-			cursize=$cursizenoaa^$antialias
-			curfont='/mnt/font/'^$curname^'/'^$cursize^'/font'
-		}
-	}
+
+if (~ $printfont 1) {
+	if (~ $isfontsrvfont 1) curfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'`{curfontsize}'\2;'}
 	9 echo $curfont
+	exit 0
 }
+
+if (~ $isfontsrvfont 0) {
+	9 echo Resizing not supported for non-fontsrv font, currently $curfont >[1=2]
+	exit 2
+}
+
+if (9 echo $delta | 9 grep -s '^[+\-][0-9]+$') newsize=`{9 echo `{curfontsize}$delta | 9 hoc}
+if not {
+	9 echo Invalid point increment >[1=2]
+	exit 3
+}
+
+newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'$newsize'\2;'}
+9 echo font $newfont | 9p write acme/$winid/ctl

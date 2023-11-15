@@ -278,14 +278,17 @@ a number of helper scripts available at `~/.acme/bin`:
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
-- `F`: Show font for current Acme window or set its font to an
-  available fontsrv font in `fontsrv` (`9p ls font` to list fonts).
-- `F+`: Increment font size for the current Acme window by the given
-  number of points (defaults to 1 if called with no arg). Only works
-  if the current font is a variable font served by `fontsrv`.
-- `F-`: Decrement font size for the current Acme window by the given
-  number of points (defaults to 1 if called with no arg). Only works
-  if the current font is a variable font served by `fontsrv`.
+- `F`: Show font for current Acme window or increase/decrease it size.
+  Increasing and decreasing font size only works if the current font
+  is a variable font served by `fontsrv`.
+- `F+`: Wrapper around `F` that increases the current Acme window's
+  font size by a given number of points (defaults to 1 if called with
+  no arg), assuming the screen is a low-DPI one. Only works if the
+  current font is one served by `fontsrv`.
+- `F-`: Like `F+` but decreases font size instead of increasing it.
+- `F++`: Like `F+` but assumes the screen is a high-DPI one.
+- `F--`: Like `F+` but decreases font size instead of increasing it,
+  and assumes the screen is a high-DPI one.
 - `gb`: Wrapper for `git blame` of file in current Acme window.
 - `gl`: Wrapper for `git log` of file in current Acme window.
 - `ghurl`: Hurl the specified or current Acme window file in current

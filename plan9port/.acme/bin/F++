@@ -1,11 +1,11 @@
 #!/usr/bin/env rc
 
-# Increment font size in current Acme window (low-DPI).
+# Increment font size in current Acme window (high-DPI).
 # Usage:
-#     F+ [N]
+#     F++ [N]
 # where N is the number of points (defaults to 1 if unspecified).
 # On high DPI screens, plan9port devdraw automatically doubles
-# the font size which this script *does not* account for.
+# the font size which this script accounts for.
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
@@ -19,4 +19,4 @@ if (test $#* -gt 1) {
 
 points=$1
 if (~ $#points 0) points=1
-F -l +$points
+F -h +$points

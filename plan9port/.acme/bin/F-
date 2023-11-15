@@ -1,28 +1,15 @@
 #!/usr/bin/env rc
 
-# Decrement font size in current Acme window.
+# Decrement font size in current Acme window (low-DPI).
 # Usage:
-#     F- [-lodpi] [-hidpi] [N]
-# where N is the number of points (defaults to 1 if unspecified),
-# and -lodpi or -hidpi overrides autodetection of DPI and assumes Acme
-# is on a low DPI or high DPI screen (the script works around Acme's
-# auto-doubling of the user-specified font size on high DPI screens)
+#     F- [N]
+# where N is the number of points (defaults to 1 if unspecified).
+# On high DPI screens, plan9port devdraw automatically doubles
+# the font size which this script *does not* account for.
 
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
 	exit 1
-}
-
-ishighdpi=`{ishidpi}
-
-if ((test $#* -gt 0) && (test $1 = '-lodpi')) {
-	ishighdpi=0
-	shift
-}
-
-if ((test $#* -gt 0) && (test $1 = '-hidpi')) {
-	ishighdpi=1
-	shift
 }
 
 if (test $#* -gt 1) {
@@ -30,33 +17,6 @@ if (test $#* -gt 1) {
 	exit 1
 }
 
-curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-
-isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
-if (test $isfontsrvfont -eq 0) {
-	9 echo Resizing not supported for non-fontsrv font, currently $curfont >[1=2]
-	exit 1
-}
-
-curname=`{9 echo $curfont | 9 awk -F'/' '{print $4}'}
-cursize=`{9 echo $curfont | 9 awk -F'/' '{print $5}'}
-antialias=`{9 echo $cursize | 9 sed 's/^[0-9]+//'}    # get antialias indicator, if it exists
-cursize=`{9 echo $cursize | 9 sed 's/a$//'}           # remove antialias indicator
-delta=$1
-if (~ $#antialias 0) antialias=''
-if (~ $#delta 0) delta=1
-if (test $ishighdpi -eq 1) cursize=`{9 echo $cursize'/2' | 9 hoc}
-
-if (9 echo $delta | 9 grep -s '^[0-9]+$') newsize=`{9 echo $cursize'-'$delta | 9 hoc}
-if not {
-	9 echo Invalid point increment >[1=2]
-	exit 1
-}
-
-if (test $newsize -lt 1) {
-	9 echo Cannot decrement font size to less than 1 >[1=2]
-	exit 1
-}
-
-newfont = '/mnt/font/'$curname'/'$newsize$antialias'/font'
-9 echo font $newfont | 9p write acme/$winid/ctl
+points=$1
+if (~ $#points 0) points=1
+F -l -$points
