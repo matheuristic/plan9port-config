@@ -106,10 +106,32 @@ BDF fonts to Plan 9 subf (see the `font(6)`
 source tree. It will be compiled along with the other plan9port
 programs when running the `INSTALL` script.
 
+To convert a BDF font (replace `FONTNAME` as appropriate):
+
+```sh
+bdf2subf -f FONTNAME.bdf > FONTNAME.font
+bdf2subf FONTNAME.bdf
+```
+
+This converts the character glyphs and creates the `.font` file
+usable by Plan 9 programs.
+
 Sourced from branch of plan9port by
-[bleu255](https://post.lurk.org/@320x200/102532617791988449).
-[Code](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html)
-and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html).
+[bleu255](https://post.lurk.org/@320x200/102532617791988449)
+([code](https://git.bleu255.com/plan9port/commit/2b5318c96f51eda9e0d1078c337ca66b852cf597.html)
+and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html)),
+and adapted to support BDF font files with characters whose `BBX`
+parameters do not exactly match those of `FONTBOUNDINGBOX`.
+
+Note that some BDF fonts have problematic characters whose
+bounding boxes are much larger than other characters and
+those should be modified before converting them. For example,
+[Cozette](https://github.com/slavfox/Cozette)'s BDF file defines two
+characters at code points `u1F60A` and `u1F60E` that are 27 pixels
+tall while the all other characters are at most 13 pixels tall, so
+these two characters need to be modified (change their `BBX`  height
+from `27` to `11`, and remove the first 16 rows of their bitmaps)
+and the overall `FONTBOUNDINGBOX` height changed from `27` to `13`.
 
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
