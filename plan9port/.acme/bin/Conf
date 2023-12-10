@@ -4,7 +4,7 @@
 
 set -e
 
-BASEFONT="/lib/font/bit/lucm/unicode.9.font,/mnt/font/PragmataProMono-Regular/28a/font"
+BASEFONT="$home/lib/font/ibm3161/IBM3161-bitmap-16.font,/mnt/font/PragmataProMono-Regular/28a/font"
 BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
