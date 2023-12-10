@@ -4,7 +4,7 @@
 
 set -e
 
-BASEFONT="$home/lib/font/ibm3161/IBM3161-bitmap-16.font,/mnt/font/PragmataProMono-Regular/28a/font"
+BASEFONT="$home/lib/font/IBM3161/IBM3161-bitmap-16.font,/mnt/font/PragmataProMono-Regular/28a/font"
 BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
@@ -20,7 +20,7 @@ Supported languages:
 bqn (BQN), lisp (Lisp), md (Markdown), py (Python),
 rkt (Racket), sh (Shell)
 
-If no option is specified, shows usage and exits.
+If no option is specified, show usage and exit.
 EOF
 	exit
 elif [ "$#" -eq 1 ]; then
