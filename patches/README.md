@@ -123,15 +123,26 @@ and [usage](https://git.bleu255.com/plan9port/file/font/terminus/README.html)),
 and adapted to support BDF font files with characters whose `BBX`
 parameters do not exactly match those of `FONTBOUNDINGBOX`.
 
-Note that some BDF fonts have problematic characters whose
-bounding boxes are much larger than other characters and
-those should be modified before converting them. For example,
-[Cozette](https://github.com/slavfox/Cozette)'s BDF file defines two
-characters at code points `u1F60A` and `u1F60E` that are 27 pixels
-tall while the all other characters are at most 13 pixels tall, so
-these two characters need to be modified (change their `BBX`  height
-from `27` to `11`, and remove the first 16 rows of their bitmaps)
-and the overall `FONTBOUNDINGBOX` height changed from `27` to `13`.
+**Notes**:
+
+- Some BDF fonts have problematic characters whose
+  bounding boxes are much larger than other characters and
+  those should be modified before converting them. For example,
+  [Cozette](https://github.com/slavfox/Cozette)'s BDF file defines two
+  characters at code points `u1F60A` and `u1F60E` that are 27 pixels
+  tall while the all other characters are at most 13 pixels tall, so
+  these two characters need to be modified (change their `BBX`  height
+  from `27` to `11`, and remove the first 16 rows of their bitmaps)
+  and the overall `FONTBOUNDINGBOX` height changed from `27` to `13`.
+
+- Some BDF fonts have characters that have no encoding. These need
+  to be removed before conversion using `bdf2subf`. For example,
+  the [IBM3161](https://github.com/wyatt8740/IBM3161-font) BDF font
+  file contains three characters at the end of the file that have
+  `ENCODING -1` that should be removed (each font is defined in
+  a block that starts with a `STARTCHAR` line and ends with an
+  `ENDCHAR` line), and the `CHARS 57090` line should be changed to
+  `CHARS 57087`.
 
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
