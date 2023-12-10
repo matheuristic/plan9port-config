@@ -4,7 +4,12 @@
 
 set -e
 
-BASEFONT="$home/lib/font/IBM3161/IBM3161-bitmap-16.font,/mnt/font/PragmataProMono-Regular/28a/font"
+# Base fonts:
+# 1. UW ttyp0 - https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/
+#    Needs to be built to BDF and converted to Plan 9 subf
+# 2. PragmataPro - https://fsd.it/shop/fonts/pragmatapro/
+
+BASEFONT="$home/lib/font/uw-ttyp0/t0-16b-uni.font,/mnt/font/PragmataProMono-Regular/28a/font"
 BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
