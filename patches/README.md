@@ -125,15 +125,17 @@ parameters do not exactly match those of `FONTBOUNDINGBOX`.
 
 **Notes**:
 
-- Some BDF fonts have problematic characters whose
-  bounding boxes are much larger than other characters and
-  those should be modified before converting them. For example,
-  [Cozette](https://github.com/slavfox/Cozette)'s BDF file defines two
-  characters at code points `u1F60A` and `u1F60E` that are 27 pixels
-  tall while the all other characters are at most 13 pixels tall, so
-  these two characters need to be modified (change their `BBX`  height
-  from `27` to `11`, and remove the first 16 rows of their bitmaps)
-  and the overall `FONTBOUNDINGBOX` height changed from `27` to `13`.
+- Some BDF fonts have problematic characters whose bounding
+  boxes are much larger than other characters and those
+  should be modified before converting them. For example,
+  [Cozette](https://github.com/slavfox/Cozette)'s BDF file for
+  version `1.20.0` defines two characters at code points `u1F60A` and
+  `u1F60E` that are 27 pixels tall while the all other characters are
+  at most 13 pixels tall, so these two characters need to be modified
+  (change their `BBX`  height from `27` to `11`, and remove the first
+  16 rows of their bitmaps) and the overall `FONTBOUNDINGBOX` height
+  changed from `27` to `13` (note that `u1F60E` was fixed upstream
+  in version `1.23.0` and `u1F60A` was fixed in version `1.23.1`).
 
 - Some BDF fonts have characters that have no encoding. These need
   to be removed before conversion using `bdf2subf`. For example,
