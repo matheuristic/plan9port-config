@@ -448,12 +448,24 @@ a number of helper scripts available at `~/.acme/bin`:
   go install .
   ```
 
-  To use: Set the `OPENAI_API_KEY` environment variable with an API
-  key. In Acme, run `AI instructions...` to ask ChatGPT to perform
-  the instructions with some selected text as context,  or `AI -c
-  instructions...` for the same but with the whole file as context.
+  To use, set the `OPENAI_API_KEY` environment variable with an
+  API key. In Acme, run `AI 'instruction...'` to ask ChatGPT to
+  perform the instruction (replace `instruction...` appropriately)
+  with some selected text as context,  or `AI -c instruction...`
+  for the same but with the whole file as context.  This replaces
+  the selected text (or entire file if using the `-c` option) using
+  the first code block in the response. If working with regular
+  text or markdown, it may be necessary to end the instruction with
+  `Put your response into a markdown block` or something like it.
 
   An alternative is [acmegpt](https://github.com/mariusae/acmegpt).
+  This is a direct chat using the OpenAI API in a separate window.
+  Compared to `AI`, it does not utilize any selected text as context
+  (it has a chat UX so any extra context needs to be copy-pasted)
+  but the chat has history so answer followups and refinements
+  are possible. It also requires the `OPENAI_API_KEY` environment
+  variable to be set.
+
   Another alternative is
   [palm](https://github.com/rsc/tmp/tree/master/palm) which uses
   Google's [PaLM](https://developers.generativeai.google/) API.
