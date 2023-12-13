@@ -1,0 +1,62 @@
+#!/usr/bin/env rc
+
+# Cycles Acme window's font between a list of presets in $fontlist
+# Usage:
+# 	Fcycle [-v]
+# Specifying -v will also print the name of the new font
+# If current font is not in the presets, switch to the first preset font
+# If $fontlist is undefined or empty, uses a hardcoded list (see below)
+
+if(~ $#fontlist 0) {
+	fontlist=( \
+		/lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/26a/font \
+		/lib/font/bit/lucm/unicode.9.font,/mnt/font/ComicCode-Medium/24a/font \
+		$home/lib/font/uw-ttyp0/t0-16b-uni.font,/mnt/font/PragmataProMono-Regular/28a/font \
+		$home/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font \
+	)
+}
+
+if(~ $#winid 0) {
+	9 echo must be run from within acme >[1=2]
+	exit 1
+}
+
+if(test $#* -gt 1) {
+	9 echo 'too many options' >[1=2]
+	exit 1
+}
+
+progname=$0
+verbose=0
+if(test $#* -eq 1) {
+	switch($1) {
+		case -v
+			verbose=1
+		case -h
+			echo 'Usage: '^$0^' [-v]'
+			exit 0
+		case *
+			9 echo 'unknown option '^$1 >[1=2]
+			exit 1
+	}
+}
+
+fn setfont {
+	acmeexec 'Font '^$1
+	if(test $verbose -eq 1) echo $1
+}
+
+curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+
+for(k in `{seq `{echo $#fontlist - 1 | hoc}}) {
+	fk=$fontlist($k)
+	fkplusone=$fontlist(`{echo $k'+1' | hoc})
+	if(echo $fk | 9 grep -s $curfont) {
+		setfont $fkplusone
+		exit 0
+	}
+}
+
+# Fall back to first font if current is last or not in list
+setfont $fontlist(1)
+exit 0

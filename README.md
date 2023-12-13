@@ -289,6 +289,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - `F++`: Like `F+` but assumes the screen is a high-DPI one.
 - `F--`: Like `F+` but decreases font size instead of increasing it,
   and assumes the screen is a high-DPI one.
+- `Fcycle`: Cycles between a preset list of fonts in the `fontlist`
+  environment variable (if `$fontlist` is empty or undefined, falls
+  back to a hardcoded list of presets).
 - `gb`: Wrapper for `git blame` of file in current Acme window.
 - `gl`: Wrapper for `git log` of file in current Acme window.
 - `ghurl`: Hurl the specified or current Acme window file in current
