@@ -1,16 +1,19 @@
 #!/usr/bin/env rc
 
-# Print current Acme window's font or increase/decrease its size.
+# Print current Acme window's font or set/increase/decrease its size.
 # Usage:
-#     F -h +N
-#     F -l +N
-#     F -h -N
-#     F -l -N
-#     F -h p
-#     F -l p
+#     F h N
+#     F l N
+#     F h +N
+#     F l +N
+#     F h -N
+#     F l -N
+#     F h p
+#     F l p
 # where N is a number,
-# -h treats the current screen as a high DPI screen,
-# -l treats the current screen as a low DPI screen,
+# h treats the current screen as a high DPI screen (default),
+# l treats the current screen as a low DPI screen,
+# N indicates set font to N points,
 # +N indicates increase font by N points,
 # -N indicates decrease font by N points,
 # p will print the current font to stdout.
@@ -19,40 +22,52 @@
 # F-- and F++ (for high DPI screens)
 # instead of calling this script directly.
 
+# NOTE: the parameters are parsed character-by-character, so
+# something like 1h2+ , +12h and 12+h all correspond to treating
+# the screen as high DPI and increment font size by 12 points.
+
 if (~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
 	exit 1
 }
 
-if (test $#* -ne 2) {
-	9 echo 'needs exactly 2 parameters' >[1=2]
-	9 echo 'usage: F (-h|-l) (p|+N|-N)' >[1=2]
+if(test $#* -eq 0) {
+	9 echo 'needs at least 1 parameter' >[1=2]
+	9 echo 'usage: F [h|l] (p|N|+N|-N)' >[1=2]
 	exit 1
 }
 
-switch($1){
-case -h
-	ishidpi=1
-case -l
-	ishidpi=0
-case *
-	9 echo 'first option must be -l or -h but got '$1 >[1=2]
-	exit 1
-}
+# Defaults
+ishidpi=1
+printfont=0
+gradient=0
+magnitude=''
 
-switch($2){
-case +* -*
-	delta=$2
-	printfont=0
-case p
-	printfont=1
-case *
-	9 echo 'second option must be p or +N or -N (N is an integer) but got '$2 >[1=2]
-	exit 1
+while(test $#* -gt 0) {
+	params=`{9 echo $1 | 9 sed 's/(.)/\1\n/g'}
+	for(p in $params) {
+		switch($p) {
+			case h
+				ishidpi=1
+			case l
+				ishidpi=0
+			case p
+				printfont=1
+			case [0-9]
+				magnitude=$magnitude^$p
+			case -
+				gradient=-1
+			case +
+				gradient=1
+			case *
+				9 echo 'unsupported param '^$p >[1=2]
+				exit 1
+		}
+	}
+	shift
 }
 
 curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-
 isfontsrvfont=`{9 echo $curfont | 9 grep -s '^/mnt/font/' && 9 echo 1 || 9 echo 0}
 
 fn curfontsize {
@@ -72,11 +87,13 @@ if (~ $isfontsrvfont 0) {
 	exit 2
 }
 
-if (9 echo $delta | 9 grep -s '^[+\-][0-9]+$') newsize=`{9 echo `{curfontsize}$delta | 9 hoc}
-if not {
-	9 echo Invalid point increment >[1=2]
+if(~ $magnitude '') {
+	9 echo No size or increment specified >[1=2]
 	exit 3
 }
+if(~ $gradient 0)	newsize=$magnitude
+if not 			newsize=`{9 echo `{curfontsize}^' + ('^$gradient^'*'^$magnitude^')' | 9 hoc}
 
 newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'$newsize'\2;'}
 9 echo font $newfont | 9p write acme/$winid/ctl
+

@@ -19,4 +19,4 @@ if (test $#* -gt 1) {
 
 points=$1
 if (~ $#points 0) points=1
-F -l +$points
+F l +$points
