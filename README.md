@@ -278,9 +278,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - `ff`: Wrapper around [fzf](https://github.com/junegunn/fzf) for
   fuzzy finding files based on filename. Also requires
   [ripgrep](https://github.com/BurntSushi/ripgrep) be installed.
-- `F`: Show font for current Acme window or increase/decrease it size.
-  Increasing and decreasing font size only works if the current font
-  is a variable font served by `fontsrv`.
+- `F`: Print Acme window font or set/increase/decrease its size.
+  Setting, increasing and decreasing font size only works if the
+  current font is a variable font served by `fontsrv`.
 - `F+`: Wrapper around `F` that increases the current Acme window's
   font size by a given number of points (defaults to 1 if called with
   no arg), assuming the screen is a low-DPI one. Only works if the
