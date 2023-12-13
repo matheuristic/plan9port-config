@@ -9,8 +9,8 @@
 
 if(~ $#fontlist 0) {
 	fontlist=( \
-		/lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/26a/font \
-		/lib/font/bit/lucm/unicode.9.font,/mnt/font/ComicCode-Medium/24a/font \
+		$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/26a/font \
+		$PLAN9/font/lucm/unicode.9.font,/mnt/font/ComicCode-Medium/24a/font \
 		$home/lib/font/uw-ttyp0/t0-16b-uni.font,/mnt/font/PragmataProMono-Regular/28a/font \
 		$home/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font \
 	)
