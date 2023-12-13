@@ -146,6 +146,16 @@ parameters do not exactly match those of `FONTBOUNDINGBOX`.
   `ENDCHAR` line), and the `CHARS 57090` line should be changed to
   `CHARS 57087`.
 
+- Some BDF fonts have empty chars with zero size bounding
+  boxes like `BBX 0 0 ...`. The parser throws an error
+  on these, so these characters need to be modified to
+  have non-zero size bounding boxes. For example, the
+  [Zpix](https://github.com/SolidZORO/zpix-pixel-font)
+  font has several such characters with `BBX 0 0 0 0` bounding
+  box definition where for each of those characters the line
+  should be changed to `BBX 1 1 0 0` and a new line `00` added
+  between the consecutive `BITMAP` and `ENDCHAR` lines.
+
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
 Don't fully hide menubar and dock when fullscreen on macOS.
