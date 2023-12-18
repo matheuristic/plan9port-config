@@ -10,11 +10,11 @@
 if(~ $#fontlist 0) {
 	fontlist=( \
 		$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/26a/font \
-		$PLAN9/font/lucm/unicode.9.font,/mnt/font/Menlo-Regular/26a/font \
-		$home/lib/font/tektite/tektite.font,/mnt/font/ComicCode-Medium/24a/font \
+		$PLAN9/font/pelm/unicode.8.font,/mnt/font/Menlo-Regular/26a/font \
+		$home/lib/font/tektite/tektite.font,/mnt/font/ComicCode-Medium/26a/font \
 		$home/lib/font/uw-ttyp0/t0-16b-uni.font,/mnt/font/PragmataProMono-Regular/28a/font \
 		$home/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font \
-		$home/lib/font/zpix/zpix.font,/mnt/font/SourceHanSans-Regular/26a/font \
+		$home/lib/font/zpix/zpix.font,/mnt/font/SourceHanSans-Regular/28a/font \
 	)
 }
 
