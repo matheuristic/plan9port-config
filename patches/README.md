@@ -156,6 +156,11 @@ parameters do not exactly match those of `FONTBOUNDINGBOX`.
   should be changed to `BBX 1 1 0 0` and a new line `00` added
   between the consecutive `BITMAP` and `ENDCHAR` lines.
 
+- Some BDF fonts have empty lines and leading whitespace that need
+  to be removed before converting them.  For example, the BDF font
+  for [this](https://www.chiark.greenend.org.uk/~sgtatham/fonts/)
+  modified Tektite font has both.
+
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
 Don't fully hide menubar and dock when fullscreen on macOS.
