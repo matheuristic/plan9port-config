@@ -23,7 +23,7 @@ Usage: $(basename $0) [bqn|lisp|py|racket|sh]
 
 Supported languages:
 bqn (BQN), lisp (Lisp), md (Markdown), py (Python),
-rkt (Racket), sh (Shell)
+rkt (Racket), rs (Rust), sh (Shell)
 
 If no option is specified, show usage and exit.
 EOF
@@ -110,6 +110,18 @@ elif [ "$#" -eq 1 ]; then
 				9 echo -n " (raco review \$%)" | 9p write acme/$winid/tag
 			fi
 			9 echo -n " (win racket)" | 9p write acme/$winid/tag
+			;;
+		rs)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 4"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " (|c+ '// ') (|c- '// ') |s+ |s-" | 9p write acme/$winid/tag
+			# https://github.com/rust-lang/rustfmt
+			if command -v rustfmt >/dev/null 2>&1; then
+				9 echo -n " (|rustfmt)" | 9p write acme/$winid/tag
+			fi
 			;;
 		sh)
 			acmeexec "Font $BASEFONT"

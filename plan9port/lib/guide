@@ -89,6 +89,15 @@ Edit ,|black -q -
 # Pylint (https://github.com/PyCQA/pylint)
 condarun ENVNAME pylint -f parseable $%
 
+# Rust
+(cargo clippy --locked -- -Dwarnings -Wclippy::pedantic)
+(cargo test)
+(cargo run --bin NAME)
+(cargo build --bin NAME)
+(cargo search QUERY)
+(cargo tree)
+(cargo new PROJECT)
+
 # Plumber rules
 cat $home/lib/plumbing | 9p write plumb/rules
 
