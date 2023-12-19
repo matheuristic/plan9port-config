@@ -70,25 +70,29 @@ fn curfontsize {
 	echo $size
 }
 
-if (~ $isfontsrvfont 0) {
-	9 echo Resizing not supported for non-fontsrv font, currently $curfont >[1=2]
-	exit 2
-}
-
 if(test -z $magnitude -a $printfont -eq 0) {
 	9 echo No action p or N or +N or -N specified >[1=2]
 	exit 3
 }
 
-if(test -n $magnitude) {
-	if(~ $gradient 0)	newsize=$magnitude
-	if not 			newsize=`{9 echo `{curfontsize}^' + ('^$gradient^'*'^$magnitude^')' | 9 hoc}
-
-	newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'$newsize'\2;'}
-	9 echo font $newfont | 9p write acme/$winid/ctl
+if (~ $isfontsrvfont 0) {
+	if(test -n $magnitude) {
+		9 echo Resizing not supported for non-fontsrv font, currently $curfont >[1=2]
+		exit 2
+	}
+	if not newfont=$curfont
 }
-# No font size change, so use old font for newfont value
-if not newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'`{curfontsize}'\2;'}
+if not {
+	if(test -n $magnitude) {
+		if(~ $gradient 0)	newsize=$magnitude
+		if not 			newsize=`{9 echo `{curfontsize}^' + ('^$gradient^'*'^$magnitude^')' | 9 hoc}
+	
+		newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'$newsize'\2;'}
+		9 echo font $newfont | 9p write acme/$winid/ctl
+	}
+	# No font size change, so use old font for newfont value
+	if not newfont=`{9 echo $curfont | 9 sed 's;.*(/mnt/font/.+/)[0-9]+(a?/font).*;\1'`{curfontsize}'\2;'}
+}
 
 if (~ $printfont 1) 9 echo $newfont
 if not exit 0
