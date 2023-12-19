@@ -161,6 +161,13 @@ parameters do not exactly match those of `FONTBOUNDINGBOX`.
   for [this](https://www.chiark.greenend.org.uk/~sgtatham/fonts/)
   modified Tektite font has both.
 
+- Some BDF fonts have unsupported keywords that need to be removed
+  prior to conversion. For example, fonts converted from other bitmap
+  formats to BDF by [monobit](https://github.com/robhagemans/monobit)
+  will have lines starting with keywords `SWIDTH1` and `DWIDTH1` that
+  should be removed (one way is via the command line like running
+  `cat FONT.bdf | grep -v -e '^[DS]WIDTH1 .*$' > NEWFONT.bdf`).
+
 ### `plan9port-mac-nofullscreenautohidemenu.patch`
 
 Don't fully hide menubar and dock when fullscreen on macOS.
