@@ -36,22 +36,24 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
 			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
-			9 echo -n " |s+ |s-" | 9p write acme/$winid/tag
+			9 echo -n " (|s+ 2) (|s- 2)" | 9p write acme/$winid/tag
 			# https://mlochbaum.github.io/BQN/spec/token.html
-			9 echo -n ' ⟦ ' | 9p write acme/$winid/tag
+			9 echo 'It is recommended to copy the next symbols to a guide file for copy-pasting'
+			9 echo -n ' ⟦ '
 			# Null literal
-			9 echo -n '@' | 9p write acme/$winid/tag
+			9 echo -n '@'
 			# Primitives
-			9 echo -n ' ▀ +-×÷⋆√⌊⌈|¬∧∨<>≠=≤≥≡≢⊣⊢⥊∾≍⋈↑↓↕«»⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔!' | 9p write acme/$winid/tag
+			9 echo -n ' ▀ +-×÷⋆√⌊⌈|¬∧∨<>≠=≤≥≡≢⊣⊢⥊∾≍⋈↑↓↕«»⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔!'
 			# Primitive 1-modifiers
-			9 echo -n ' ▀ ˙˜˘¨⌜⁼´˝\`' | 9p write acme/$winid/tag
+			9 echo -n ' ▀ ˙˜˘¨⌜⁼´˝\`'
 			# Primitive 2-modifiers
-			9 echo -n ' ▀ ∘○⊸⟜⌾⊘◶⎉⚇⍟⎊' | 9p write acme/$winid/tag
+			9 echo -n ' ▀ ∘○⊸⟜⌾⊘◶⎉⚇⍟⎊'
 			# Special names
-			9 echo -n ' ▀ 𝕨𝕩𝕗𝕘𝕤𝕎𝕏𝔽𝔾𝕊' | 9p write acme/$winid/tag
+			9 echo -n ' ▀ 𝕨𝕩𝕗𝕘𝕤𝕎𝕏𝔽𝔾𝕊'
 			# Punctuation
-			9 echo -n ' ▀ ←⇐↩(){}⟨⟩[]‿·⋄,.;:?' | 9p write acme/$winid/tag
-			9 echo -n ' ⟧' | 9p write acme/$winid/tag
+			9 echo -n ' ▀ ←⇐↩(){}⟨⟩[]‿·⋄,.;:?'
+			9 echo -n ' ⟧'
+			9 echo ''
 			;;
 		lisp)
 			acmeexec "Font $BASEFONT"
@@ -59,7 +61,7 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
 			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
-			9 echo -n " |s+ |s- |surround" | 9p write acme/$winid/tag
+			9 echo -n " (|s+ 2) (|s- 2) |surround" | 9p write acme/$winid/tag
 			# https://github.com/ChristopherSegale/match-paren
 			if command -v mp >/dev/null 2>&1; then
 				9 echo -n " |mp" | 9p write acme/$winid/tag
@@ -71,7 +73,7 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
 			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
-			9 echo -n " |s+ |s- |w+ |w-" | 9p write acme/$winid/tag
+			9 echo -n " (|s+ 2) (|s- 2) |w+ |w-" | 9p write acme/$winid/tag
 			9 echo -n " |mdlink mdpv" | 9p write acme/$winid/tag
 			;;
 		py)
@@ -96,7 +98,7 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
 			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
-			9 echo -n " (|c+ ';') (|c- ';') |s+ |s- |surround" | 9p write acme/$winid/tag
+			9 echo -n " (|c+ ';') (|c- ';') (|s+ 2) (|s- 2) |surround" | 9p write acme/$winid/tag
 			# https://github.com/ChristopherSegale/match-paren
 			if command -v mp >/dev/null 2>&1; then
 				9 echo -n " |mp" | 9p write acme/$winid/tag
@@ -135,6 +137,17 @@ elif [ "$#" -eq 1 ]; then
 			# https://github.com/koalaman/shellcheck
 			if command -v shellcheck >/dev/null 2>&1; then
 				9 echo -n " (shellcheck -f gcc -s sh \`{basename \$%})" | 9p write acme/$winid/tag
+			fi
+			;;
+		zig)
+			acmeexec "Font $BASEFONT"
+			acmeexec "Tab 4"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			9 echo -n "$BASETAGS" | 9p write acme/$winid/tag
+			9 echo -n " (|c+ '// ') (|c- '// ') |s+ |s-" | 9p write acme/$winid/tag
+			if command -v zig >/dev/null 2>&1; then
+				9 echo -n " (|zig fmt --color off --stdin)" | 9p write acme/$winid/tag
 			fi
 			;;
 		*)
