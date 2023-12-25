@@ -297,7 +297,9 @@ a number of helper scripts available at `~/.acme/bin`:
 - `ghurl`: Hurl the specified or current Acme window file in current
   or given branch to a web browser.
 - `git`: Wrapper for `git` that automatically sets the `GPG_TTY`
-  environment variable when in a TTY.
+  environment variable when in a TTY. Note that the pinentry program
+  used by GPG should be set to `pinentry-tty`, see comments in the
+  script file for more info.
 - `h`: `hcount=N h STRING` shows the last `N` commands in a win window
   that contain `STRING`. If `hcount=N` is omitted then the last 10
   matching commands are shown. If `STRING` is omitted, then the most
