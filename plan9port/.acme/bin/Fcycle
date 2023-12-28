@@ -2,8 +2,9 @@
 
 # Cycles Acme window's font between a list of presets in $fontlist
 # Usage:
-# 	Fcycle [-v]
-# Specifying -v will also print the name of the new font
+# 	Fcycle [-v] [fontnum]
+# Specifying -v also prints the name of the new font
+# Specifying a number fontnum sets the font to the fontnum-th preset
 # If current font is not in the presets, switch to the first preset font
 # If $fontlist is undefined or empty, uses a hardcoded list (see below)
 
@@ -23,19 +24,26 @@ if(~ $#winid 0) {
 	exit 1
 }
 
-if(test $#* -gt 1) {
-	9 echo 'too many options' >[1=2]
-	exit 1
-}
-
-progname=$0
 verbose=0
-if(test $#* -eq 1) {
+fontnum=0
+while(test $#* -gt 0) {
 	switch($1) {
+		case [0-9]
+			if(test $fontnum -gt 0) {
+				9 echo 'more than one fontnum specified' >[1=2]
+				exit 1
+			}
+			fontnum=$1
+			if(test $fontnum -lt 1 -o $fontnum -gt $#fontlist) {
+				9 echo 'fontnum must be between 1 and '^$#fontlist^' (inclusive)' >[1=2]
+				exit 1
+			}
+			shift
 		case -v
 			verbose=1
+			shift
 		case -h
-			echo 'Usage: '^$0^' [-v]'
+			9 echo 'Usage: '^$0^' [-v] [fontnum]'
 			exit 0
 		case *
 			9 echo 'unknown option '^$1 >[1=2]
@@ -48,17 +56,22 @@ fn setfont {
 	if(test $verbose -eq 1) echo $1
 }
 
-curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-
-for(k in `{seq `{echo $#fontlist - 1 | hoc}}) {
-	fk=$fontlist($k)
-	fkplusone=$fontlist(`{echo $k'+1' | hoc})
-	if(echo $fk | 9 grep -s $curfont) {
-		setfont $fkplusone
-		exit 0
+if(test $fontnum -gt 0) {
+	setfont $fontlist($fontnum)
+	exit 0
+}
+if not {
+	curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
+	for(k in `{seq `{echo $#fontlist - 1 | hoc}}) {
+		fk=$fontlist($k)
+		fkplusone=$fontlist(`{echo $k'+1' | hoc})
+		if(echo $fk | 9 grep -s $curfont) {
+			setfont $fkplusone
+			exit 0
+		}
 	}
 }
 
-# Fall back to first font if current is last or not in list
+# Here if fontnum=0 and current font is last or not in list, fall back to first font
 setfont $fontlist(1)
 exit 0

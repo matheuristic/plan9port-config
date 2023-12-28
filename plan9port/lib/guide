@@ -3,7 +3,7 @@ Edit Font :, :0 :$ :42,49 :/[Ff]oo/ :-/[Ff]oo/ :0+/foo/ :$-/foo/
 Asave Blog Brecent EC F F- F+ d gl gb lw mdpv sp <cl-paste
 |c- |c+ |ct |s- |s+ |s2t |t- |t+ |t2s |lower |upper |surround |uline
 (Indent on) (Space on) (Tab 8) (rg+ '[Ff]oo') (rg- 'bar') (rg-- 'baz')
-Slide Slide- Slide+ (win zsh)
+Slide Slide- Slide+ (win zsh) (Conf py) (Fcycle 3)
 
 # Edit commands
 =                   # file:linenumber

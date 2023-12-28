@@ -162,9 +162,9 @@ fi
 # Store tag right of first '|'
 TAGRIGHT=`9p read acme/$winid/tag | 9 awk -F'|' '{ st = index($0,"|");print substr($0,st+1)}'`
 
-# Remove Cfg command from tag
+# Remove Conf command from tag
 9 echo -n "nomenu" | 9p write acme/$winid/ctl   # disable menu autoupdate
 9 echo -n "cleartag" | 9p write acme/$winid/ctl # clear tag right of first '|'
 9 echo -n "$TAGRIGHT" | \sed -E "s; *[^ ]*$(basename $0) +$1;;g" | 9p write acme/$winid/tag
-                                                # write back tag with "Cfg LANG" removed
+                                                # write back tag with "Conf LANG" removed
 9 echo -n "menu" | 9p write acme/$winid/ctl     # re-enable menu autoupdate
