@@ -9,7 +9,7 @@ set -e
 #    Needs to be built to BDF and converted to Plan 9 subf
 # 2. PragmataPro - https://fsd.it/shop/fonts/pragmatapro/
 
-BASEFONT="/lib/font/bit/pelm/unicode.8.font,/mnt/font/Menlo-Regular/28a/font"
+BASEFONT="/lib/font/bit/lucm/unicode.9.font,/mnt/font/Menlo-Regular/28a/font"
 BASETAGS=" :0 :$ Edit win"
 
 if [ "$#" -eq 0 ]; then
