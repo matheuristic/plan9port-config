@@ -11,7 +11,7 @@
 if(~ $#fontlist 0) {
 	fontlist=( \
 		$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font \
-		$PLAN9/font/lucm/unicode.9.font,/mnt/font/Menlo-Regular/28a/font \
+		$PLAN9/font/lucsans/boldtypeunicode.7.font,/mnt/font/Menlo-Regular/28a/font \
 		$PLAN9/font/pelm/unicode.8.font,/mnt/font/GoMono/28a/font \
 		$home/lib/font/tektite/tektite.font,/mnt/font/ComicCode-Medium/26a/font \
 		$home/lib/font/uw-ttyp0/t0-16b-uni.font,/mnt/font/PragmataProMono-Regular/30a/font \

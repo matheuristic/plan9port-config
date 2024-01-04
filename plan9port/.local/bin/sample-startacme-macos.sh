@@ -53,6 +53,6 @@ fi
 visibleclicks=1 SHELL=rc \
 	$PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
 	-f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font \
-	-F /lib/font/bit/pelm/unicode.8.font,/mnt/font/Menlo-Regular/28a/font \
+	-F /lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/Menlo-Regular/28a/font \
 	$titleparams \
 	$startparams
