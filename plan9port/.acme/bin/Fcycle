@@ -25,6 +25,12 @@ if(~ $#winid 0) {
 	exit 1
 }
 
+# Workaround so Acme window tag ends up with correct height
+fn sigexit {
+	9 echo -n 'nomenu' | 9p write acme/$winid/ctl 
+	9 echo -n 'menu' | 9p write acme/$winid/ctl 
+}
+
 verbose=0
 fontnum=0
 while(test $#* -gt 0) {
