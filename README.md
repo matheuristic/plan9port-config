@@ -471,10 +471,6 @@ a number of helper scripts available at `~/.acme/bin`:
   are possible. It also requires the `OPENAI_API_KEY` environment
   variable to be set.
 
-  Another alternative is
-  [palm](https://github.com/rsc/tmp/tree/master/palm) which uses
-  Google's [PaLM](https://developers.generativeai.google/) API.
-
 - [awww](https://github.com/cjacker/awww):
   Text web browser for Acme. Button2 or Button3 opens links in opened
   webpages.  Requires [wget](https://www.gnu.org/software/wget/) and
@@ -542,6 +538,17 @@ a number of helper scripts available at `~/.acme/bin`:
   ```sh
   go install 9fans.net/go/acme/editinacme@latest
   ```
+
+- [gemini](https://github.com/rsc/tmp/tree/master/gemini):
+  Interact with the Google
+  [Gemini](https://ai.google.dev/docs/gemini_api_overview) API
+  endpoint from Acme.
+
+  For Google's legacy
+  [PaLM](https://ai.google.dev/docs/palm_api_overview) API, use
+  [palm](https://github.com/rsc/tmp/tree/master/palm) instead.
+
+  [More info](https://developers.generativeai.google/).
 
 - [issue](https://pkg.go.dev/rsc.io/github/issue)
   ([Github](https://github.com/rsc/github)):
