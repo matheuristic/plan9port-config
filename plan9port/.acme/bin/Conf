@@ -73,8 +73,7 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
 			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			# "Comment" using workaround, https://stackoverflow.com/a/20885980
-			9 echo -n "(|c+ '[COMMENT]:: ') (|c- '[COMMENT]:: ') |s+ |s- |w+ |w- " | 9p write acme/$winid/tag
+			9 echo -n "|s+ |s- |w+ |w- " | 9p write acme/$winid/tag
 			9 echo -n "|mdlink mdpv " | 9p write acme/$winid/tag
 			;;
 		py)
