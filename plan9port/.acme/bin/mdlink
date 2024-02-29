@@ -9,7 +9,7 @@ checkcmd() {
 	fi
 }
 
-checkcmd htmlq
+checkcmd curl
 
 if [ "$1" = "-h" ]; then
 	cat >&2 <<EOF
@@ -29,10 +29,14 @@ EOF
 fi
 
 URL=$(cat)
-TITLE=$(curl -Ls "$URL" | htmlq --text title)
+PAGESOURCE=$(curl -Ls "$URL")
+
+if $(echo $PAGESOURCE | grep -q '<title>'); then
+	TITLE=$(echo $PAGESOURCE | 9 ssam -e '0,/<[Tt][Ii][Tt][Ll][Ee]>/ d' | 9 ssam -e '/<\/[Tt][Ii][Tt][Ll][Ee]>/,$ d')
+fi
 
 if [ -z "$TITLE" ]; then
 	TITLE=$URL
 fi
 
-printf "[$TITLE]($URL)"
+9 echo -n "[$TITLE]($URL)"
