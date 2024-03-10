@@ -10,7 +10,7 @@ set -e
 # 2. PragmataPro - https://fsd.it/shop/fonts/pragmatapro/
 
 BASEFONT="/lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/24a/font"
-BASETAGS="win :0 :$ Edit Fcycle F++ F--"
+BASETAGS="win :0 :$ EC Edit Fcycle F++ F--"
 
 if [ "$#" -eq 0 ]; then
 	cat <<EOF
