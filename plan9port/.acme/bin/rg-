@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Run rg on current Acme window contents with plumbable output
-# Requires ripgrep and realpath be installed on the system
+# Requires ripgrep and Python be installed on the system
 # Note that for open modified files, the unsaved version is searched
 
 if [ "$winid" = "" ]; then
@@ -14,17 +14,18 @@ if ! command -v rg >/dev/null 2>&1; then
 	exit 1
 fi
 
-# GNU version of realpath is needed, so use grealpath on macOS
-# installable via the coreutils package using MacPorts or Homebrew
-REALPATHCMD=realpath
-if [ "$(uname)" = "Darwin" ]; then
-	REALPATHCMD=grealpath
-fi
-
-if ! command -v $REALPATHCMD >/dev/null 2>&1; then
-	echo "$REALPATHCMD not installed" 1>&2
+if ! command -v python3 >/dev/null 2>&1; then
+	echo "python3 not installed" 1>&2
 	exit 1
 fi
+
+pyrealpath() {
+	if [ $# -ne 2 ]; then
+		echo 'Usage: pyrealpath PATH START' 1>&2
+		exit 2
+	fi
+	python3 -c "import sys, os.path; sys.stdout.write(os.path.relpath('$1', '$2'))"
+}
 
 if [ "$#" -eq 0 ]; then
 	cat << EOF >&2
@@ -34,7 +35,7 @@ EOF
 	exit 1
 fi
 
-RELATIVEPATH=`$REALPATHCMD --relative-to="$PWD" "$samfile"`
+RELATIVEPATH=`pyrealpath "$samfile" "$PWD"`
 
 9p read acme/$winid/body | \
   rg --no-heading --color=never --line-number "$@" | \

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Spellcheck current Acme buffer
+# Enchant and Python needs to be installed on the system
 # Supports passing '-d dict' parameter to enchant to use a specific dictionary
 
 set -e
@@ -16,17 +17,18 @@ if ! command -v $ENCHANTCMD >/dev/null 2>&1; then
 	fi
 fi
 
-# GNU version of realpath is needed, so use grealpath on macOS
-# installable via the coreutils package using MacPorts or Homebrew
-REALPATHCMD=realpath
-if [ "$(uname)" = "Darwin" ]; then
-	REALPATHCMD=grealpath
-fi
-
-if ! command -v $REALPATHCMD >/dev/null 2>&1; then
-	echo "$REALPATHCMD not installed" 1>&2
+if ! command -v python3 >/dev/null 2>&1; then
+	echo "python3 not installed" 1>&2
 	exit 1
 fi
+
+pyrealpath() {
+	if [ $# -ne 2 ]; then
+		echo 'Usage: pyrealpath PATH START' 1>&2
+		exit 2
+	fi
+	python3 -c "import sys, os.path; sys.stdout.write(os.path.relpath('$1', '$2'))"
+}
 
 if [ "$winid" = "" ]; then
 	9 echo "must be used from within acme" 1>&2
@@ -51,7 +53,7 @@ if [ "$1" = "-d" ]; then
 	ENCHANTPARAMS="$1 $2"
 fi
 
-RELATIVEPATH=`$REALPATHCMD --relative-to="$PWD" "$samfile"`
+RELATIVEPATH=`pyrealpath "$samfile" "$PWD"`
 
 {
 	set -e

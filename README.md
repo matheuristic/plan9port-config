@@ -325,11 +325,7 @@ a number of helper scripts available at `~/.acme/bin`:
   [ripgrep](https://github.com/BurntSushi/ripgrep) on the current Acme
   window's contents with output that can be plumbed. Note that this
   will search the unsaved modified contents if the window is dirty
-  (i.e., modifications made but not yet saved to file). Requires GNU
-  [realpath](https://www.gnu.org/software/coreutils/manual/html_node/realpath-invocation.html)
-  be installed (it is used to derive relative file paths). On macOS,
-  GNU realpath is installable (as `grealpath` to not conflict with the
-  system `realpath`) via the `coreutils` MacPorts or Homebrew package.
+  (i.e., modifications made but not yet saved to file).
 - `rg--`: Like `rg-` but for all Acme windows corresponding to files.
 - `runfc`: `>runfc cmd arg1 ...` will copy the text selection to a
   temporary file, run a command `cmd` that modifies the temporary file
