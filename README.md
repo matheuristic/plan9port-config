@@ -338,7 +338,7 @@ a number of helper scripts available at `~/.acme/bin`:
   change the number of spaces from the default of `$tabstop`.
 - `s2t`: Replaces leading spaces with tabs, specify an argument to
   change number of spaces to a tab from the default of `$tabstop`.
-- `sp`: Wrapper to run [Enchant](https://github.com/AbiWord/enchant)
+- `sp`: Wrapper to run [Hunspell](https://hunspell.github.io/)
   spellchecker on the current Acme window with plumbable output.
 - `Slide`: Start slideshow for current directory, where the slides are
   text files and slide sequence is given by an `index` file containing

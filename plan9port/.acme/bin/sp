@@ -1,20 +1,19 @@
 #!/bin/sh
 
 # Spellcheck current Acme buffer
-# Enchant and Python needs to be installed on the system
-# Supports passing '-d dict' parameter to enchant to use a specific dictionary
+# Supports passing '-d dict' parameter` to use a specific dictionary
+# Hunspell and Python needs to be installed on the system
+
+# Some distributions may not install Hunspell with default dictionaries
+# In that case, download some zipped dictionaries from http://wordlist.aspell.net/dicts/
+# and extract them to ~/.local/share/hunspell/ (create the directory if needed),
+# e.g., `mkdir ~/.local/share/hunspell && cd $_ && curl -LO http://downloads.sourceforge.net/wordlist/hunspell-en_US-2020.12.07.zip && unzip hunspell-en_US-2020.12.07.zip`
 
 set -e
 
-ENCHANTCMD=enchant-2
-
-if ! command -v $ENCHANTCMD >/dev/null 2>&1; then
-	9 echo "enchant-2 not installed, trying enchant" 1>&2
-	ENCHANTCMD=enchant
-	if ! command -v $ENCHANTCMD >/dev/null 2>&1; then
-		9 echo "enchant not installed" 1>&2
-		exit 1
-	fi
+if ! command -v hunspell >/dev/null 2>&1; then
+	echo "hunspell not installed" 1>&2
+	exit 1
 fi
 
 if ! command -v python3 >/dev/null 2>&1; then
@@ -35,45 +34,77 @@ if [ "$winid" = "" ]; then
 	exit 1
 fi
 
+LANG=${LANG:-en_US.UTF-8}
+
+if [ -z "${DICPATH}" -a -d "$HOME/.local/share/hunspell" ]; then
+	DICPATH="$HOME/.local/share/hunspell"
+fi
+
 if [ "$#" -gt 0 ] && ([ "$#" -ne 2 ] || [ "$1" != "-d" ]); then
 	9 cat << EOF >&2
 Usage: `basename $0` [-d dict]
 
-    If -d is specified, dict must be an \`enchant\` or \`enchant-2\` dictionary
+    Spellcheck current Acme buffer using Hunspell.
+
+    Set DICPATH to add more dict paths. (Currently: ${DICPATH})
+
+    If -d is specified, dict must be a \`hunspell\` dictionary
+    (see \`DICPATH=${DICPATH} hunspell -D\` for available dicts,
+    and \`man 5 hunspell\` for dict format if adding one).
+
+    To add 'someword' to your personal dictionary with the
+    current language settings, run:
+        \$ echo -e "*someword\\n#" | LANG=${LANG} hunspell -a
 EOF
 	exit 1
 fi
 
-ENCHANTPARAMS=""
+HUNSPELLPARAMS=""
 if [ "$1" = "-d" ]; then
 	if [ -z "$2" ]; then
 		9 echo "option -d specified but no dictionary provided" 1>&2
 		exit 1
 	fi
-	ENCHANTPARAMS="$1 $2"
+	HUNSPELLPARAMS="$1 $2"
 fi
 
 RELATIVEPATH=`pyrealpath "$samfile" "$PWD"`
 
 {
 	set -e
+	lline=0
 	IFS="
 	"
-	for l in `9p read acme/$winid/body | LANG=${LANG:-en_US.UTF-8} $ENCHANTCMD $ENCHANTPARAMS -L -a`; do
-		if [ -n "`9 echo -n "$l" | 9 grep -e '^[&#]'`" ]; then
-			lword=`9 echo -n "$l" | 9 awk '{print $3}'`
-			lline=`9 echo -n "$l" | 9 awk '{print $2}'`
-			if [ -n "`9 echo -n "$l" | 9 grep -e '^&'`" ]; then  # starts with '&'
-				lindex=5
-			else                                                 # starts with '#'
-				lindex=4
-			fi
-			lcolumn=`9 echo -n "$l" | 9 awk '{print $'${lindex}'}' | 9 sed -e 's/^([0-9]+).*/\1/'`
-			lcolumnstart=`9 hoc -e "$lcolumn + 1"`
-			llength=`9 echo -n "$lword" | 9 wc -c`
-			lcolumnend=`9 hoc -e "$lcolumnstart + $llength"`
-			lsuggest=`9 echo -n "$l" | 9 awk -F':' '{print ":" $2}'`
-			9 echo "${RELATIVEPATH}:${lline}:${lcolumnstart},${lline}:${lcolumnend}	$lword $lsuggest"
-		fi
-	done
+	9p read acme/$winid/body | \
+		LANG="${LANG}" DICPATH="${DICPATH}" hunspell $HUNSPELLPARAMS | \
+		9 tail +2 | \
+		9 awk '
+BEGIN { lline=1 }
+/^$/ { ++lline }
+/^.+$/ {
+	lsign=$1;
+	if(lsign ~ /[\*\+\-]/)
+		next;
+	else if(lsign ~ /&/) {
+		sub(/:/, "" ,$4);
+		lcolumnstart=$4 + 1;
+	}
+	else if(lsign ~ /#/)
+		lcolumnstart=$3 + 1;
+	else {
+		system("echo \"unknown sign " lsign "\" >&2");
+		exit 2
+	};
+	lword=$2;
+	llength=length(lword);
+	lcolumnend=lcolumnstart + llength;
+	printf "'$RELATIVEPATH':%s:%s,%s:%s %s", lline, lcolumnstart, lline, lcolumnend, lword;
+	if(NF > 4) {
+		printf ":"
+		for(i=5; i<=NF; i++)
+			printf " %s", $i
+	}
+	printf "%s", ORS
+
+}'
 }
