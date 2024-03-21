@@ -14,19 +14,6 @@ if ! command -v rg >/dev/null 2>&1; then
 	exit 1
 fi
 
-if ! command -v python3 >/dev/null 2>&1; then
-	echo "python3 not installed" 1>&2
-	exit 1
-fi
-
-pyrealpath() {
-	if [ $# -ne 2 ]; then
-		echo 'Usage: pyrealpath PATH START' 1>&2
-		exit 2
-	fi
-	python3 -c "import sys, os.path; sys.stdout.write(os.path.relpath('$1', '$2'))"
-}
-
 if [ "$#" -eq 0 ]; then
 	cat << EOF >&2
 Usage: rg- [OPTIONS..] PATTERN
@@ -35,8 +22,8 @@ EOF
 	exit 1
 fi
 
-RELATIVEPATH=`pyrealpath "$samfile" "$PWD"`
+FILENAME=$(basename "$samfile")
 
 9p read acme/$winid/body | \
   rg --no-heading --color=never --line-number "$@" | \
-  sed 's|^|'$RELATIVEPATH':|'
+  sed 's|^|'$FILENAME':|'

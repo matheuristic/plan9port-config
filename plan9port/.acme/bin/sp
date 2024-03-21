@@ -16,19 +16,6 @@ if ! command -v hunspell >/dev/null 2>&1; then
 	exit 1
 fi
 
-if ! command -v python3 >/dev/null 2>&1; then
-	echo "python3 not installed" 1>&2
-	exit 1
-fi
-
-pyrealpath() {
-	if [ $# -ne 2 ]; then
-		echo 'Usage: pyrealpath PATH START' 1>&2
-		exit 2
-	fi
-	python3 -c "import sys, os.path; sys.stdout.write(os.path.relpath('$1', '$2'))"
-}
-
 if [ "$winid" = "" ]; then
 	9 echo "must be used from within acme" 1>&2
 	exit 1
@@ -68,7 +55,7 @@ if [ "$1" = "-d" ]; then
 	HUNSPELLPARAMS="$1 $2"
 fi
 
-RELATIVEPATH=`pyrealpath "$samfile" "$PWD"`
+FILENAME=$(basename "$samfile")
 
 {
 	set -e
@@ -98,7 +85,7 @@ BEGIN { lline=1 }
 	lword=$2;
 	llength=length(lword);
 	lcolumnend=lcolumnstart + llength;
-	printf "'$RELATIVEPATH':%s:%s,%s:%s %s", lline, lcolumnstart, lline, lcolumnend, lword;
+	printf "'$FILENAME':%s:%s,%s:%s %s", lline, lcolumnstart, lline, lcolumnend, lword;
 	if(NF > 4) {
 		printf ":"
 		for(i=5; i<=NF; i++)
