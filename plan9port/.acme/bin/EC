@@ -32,6 +32,11 @@ if [ "$1" = "-h" ]; then
 	exit 0
 fi
 
+if [ -z "$samfile" ]; then
+	9 echo 'Current Acme window is not associated with a file' 1>&2
+	exit 2
+fi
+
 # Note: '\047' in the Awk script is "'", see the following for more info
 # https://stackoverflow.com/questions/9899001/how-to-escape-a-single-quote-inside-awk
 editorconfig $samfile | \
