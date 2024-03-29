@@ -540,10 +540,6 @@ a number of helper scripts available at `~/.acme/bin`:
   [Gemini](https://ai.google.dev/docs/gemini_api_overview) API
   endpoint from Acme.
 
-  For Google's legacy
-  [PaLM](https://ai.google.dev/docs/palm_api_overview) API, use
-  [palm](https://github.com/rsc/tmp/tree/master/palm) instead.
-
   [More info](https://developers.generativeai.google/).
 
 - [issue](https://pkg.go.dev/rsc.io/github/issue)
