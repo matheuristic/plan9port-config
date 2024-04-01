@@ -248,12 +248,12 @@ a number of helper scripts available at `~/.acme/bin`:
 - `Asave`: Saves modified (i.e. unsaved) files in the running Acme
   instance to an autosave directory intermittently. See the subsection
   _Autosaving_ above.
-- `Blog`: Monitors the Acme log, and append the name of each file as
-  it is opened to `$HOME/.acme/recentf` or specified file. If using,
+- `Arecentf`: Prints the most recently opened files logged to
+  `$HOME/.acme/recentf` by `Atrackf`, up to a specified number
+  (defaults to 20 if not specified), from least recent to most recent.
+- `Atrackf`: Monitors the Acme log, and append the name of each file
+  as it is opened to `$HOME/.acme/recentf` or specified file. If using,
   it is best to run at the start of each Acme session.
-- `Brecent`: Prints the most recently opened files logged to
-  `$HOME/.acme/recentf` by `Blog`, up to a specified number (defaults
-  to 20 if not specified), from least recent to most recent.
 - `c+`: Comment. Specify an argument to change the comment prefix from
   the default `#`.
 - `c-`: Uncomment. An argument may be specified as in `c+`.
@@ -921,10 +921,10 @@ see [here](https://gist.github.com/proudlygeek/5721498),
 
 - Launch Acme
 - Load a dump file to restore a previous session
-- Execute `Blog` to log opened files to `$HOME/.acme/recentf`
+- Execute `Atrackf` to log opened files to `$HOME/.acme/recentf`
 - Execute `Asave` to autosave dirty (i.e., modified and unsaved) files
   to `$HOME/.acme/autosave`
-- If needed, execute `Brecent` to list recently edited files
+- If needed, execute `Arecentf` to list recently edited files
 - If editing code:
   - Execute `Indent on` in a window tag if appropriate
   - Populate the window tag with useful commands, at least `Edit`,

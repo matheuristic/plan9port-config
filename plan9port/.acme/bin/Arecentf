@@ -2,7 +2,7 @@
 
 # Show recently opened files, from least to most recent
 
-# Usage: Brecent [numfiles] [cachefile]
+# Usage: Arecentf [numfiles] [cachefile]
 #     numfiles is the number of file paths to show (default: 20)
 #     cachefile is the cache file path (default: ~/.acme/recentf)
 # The cache file should contain one file path per line, with the

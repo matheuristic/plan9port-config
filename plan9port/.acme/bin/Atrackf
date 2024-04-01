@@ -13,7 +13,7 @@
 # https://unix.stackexchange.com/questions/346062/concurrent-writing-to-a-log-file-from-many-processes
 # https://www.notthewizard.com/2014/06/17/are-files-appends-really-atomic/
 
-# Usage: Blog [<path-to-cache-file>]
+# Usage: Atrackf [<path-to-cache-file>]
 
 set -e
 
