@@ -386,13 +386,13 @@ a number of helper scripts available at `~/.acme/bin`:
 - [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
   client. Two options (current preference is `acre`):
 
-  - [acme-lsp](https://github.com/fhs/acme-lsp)
+  - [acme-lsp](https://github.com/9fans/acme-lsp)
 
     Can be installed with:
 
     ```sh
-    go install github.com/fhs/acme-lsp/cmd/acme-lsp@latest
-    go install github.com/fhs/acme-lsp/cmd/L@latest
+    GO111MODULE=on go install 9fans.net/acme-lsp/cmd/acme-lsp@latest
+    GO111MODULE=on go install 9fans.net/acme-lsp/cmd/L@latest
     ```
 
     Some helper scripts for acme-lsp can be created while in the `rc`
