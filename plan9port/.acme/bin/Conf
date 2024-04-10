@@ -160,11 +160,20 @@ else
 fi
 
 # Store tag right of first '|'
-TAGRIGHT=`9p read acme/$winid/tag | 9 awk -v RS= -F'|' '{ st = index($0,"|");print substr($0,st+1)}'`
+TAGRIGHT=`9p read acme/$winid/tag | 9 awk -v RS='\0' '{ st = index($0,"|"); print substr($0,st+1)}'`
+NUMTAGRIGHTNEWLINES=`9 echo -n "$TAGRIGHT" | 9 wc -l`
 
 # Remove Conf command from tag
 9 echo -n "nomenu" | 9p write acme/$winid/ctl   # disable menu autoupdate
 9 echo -n "cleartag" | 9p write acme/$winid/ctl # clear tag right of first '|'
-9 echo -n "$TAGRIGHT" | \sed -E "s;[^ ]*$(basename $0) +$1;;g" | 9p write acme/$winid/tag
-                                                # write back tag with "Conf LANG" removed
+9 echo -n "$TAGRIGHT" | awk -v RS='\0' "
+{
+	sub(/$(basename $0) +$1/,\"\",\$0);
+	if(NR<=$NUMTAGRIGHTNEWLINES)
+		EOL=\"\n\"
+	else
+		EOL=\"\";
+	printf \"%s%s\", \$0, EOL
+}
+" | 9p write acme/$winid/tag                    # write back tag with "Conf LANG" removed
 9 echo -n "menu" | 9p write acme/$winid/ctl     # re-enable menu autoupdate
