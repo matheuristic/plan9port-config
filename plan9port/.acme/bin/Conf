@@ -5,12 +5,11 @@
 set -e
 
 # Base fonts:
-# 1. UW ttyp0 - https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/
-#    Needs to be built to BDF and converted to Plan 9 subf
-# 2. PragmataPro - https://fsd.it/shop/fonts/pragmatapro/
+# 1. lucsans (comes with plan9port)
+# 2. Comic Code - https://tosche.net/fonts/comic-code
 
 BASEFONT="/lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/24a/font"
-BASETAGS="win :0 :$ EC Edit Fcycle F++ F--"
+ADDTAGS="win :0 :$ EC Edit Fcycle F++ F--"
 
 if [ "$#" -eq 0 ]; then
 	cat <<EOF
@@ -35,8 +34,7 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ '# ') (|c- '# ') (|s+ 2) (|s- 2) " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ '# ') (|c- '# ') (|s+ 2) (|s- 2)"
 			# https://mlochbaum.github.io/BQN/spec/token.html
 			9 echo 'It is recommended to copy the next symbols to a guide file for copy-pasting'
 			9 echo -n '⟦ '
@@ -60,11 +58,10 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ ';; ') (|c- ';; ') (|s+ 2) (|s- 2) |surround " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ ';; ') (|c- ';; ') (|s+ 2) (|s- 2) |surround"
 			# https://github.com/ChristopherSegale/match-paren
 			if command -v mp >/dev/null 2>&1; then
-				9 echo -n "|mp " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS |mp"
 			fi
 			;;
 		md)
@@ -72,24 +69,22 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "|s+ |s- |w+ |w- " | 9p write acme/$winid/tag
-			9 echo -n "|mdlink mdpv " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS |s+ |s- |w+ |w-"
+			ADDTAGS="$ADDTAGS |mdlink mdpv"
 			;;
 		py)
 			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ '# ') (|c- '# ') |s+ |s- " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ '# ') (|c- '# ') |s+ |s-"
 			# https://github.com/psf/black
 			if command -v black >/dev/null 2>&1; then
-				9 echo -n "(|black -q -) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (|black -q -)"
 			fi
 			# https://github.com/astral-sh/ruff
 			if command -v ruff >/dev/null 2>&1; then
-				9 echo -n "(ruff check \$%) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (ruff check \$%)"
 			fi
 			;;
 		rkt)
@@ -97,46 +92,43 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ '; ') (|c- '; ') (|s+ 2) (|s- 2) |surround " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ '; ') (|c- '; ') (|s+ 2) (|s- 2) |surround"
 			# https://github.com/ChristopherSegale/match-paren
 			if command -v mp >/dev/null 2>&1; then
-				9 echo -n "|mp " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS |mp"
 			fi
 			# https://docs.racket-lang.org/fmt/
 			if $(raco help fmt >/dev/null 2>&1); then
-				9 echo -n "(|raco fmt) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (|raco fmt)"
 			fi
 			# https://github.com/Bogdanp/racket-review
 			if $(raco help review >/dev/null 2>&1); then
-				9 echo -n "(raco review \$%) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (raco review \$%)"
 			fi
-			9 echo -n "(win racket) " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (win racket)"
 			;;
 		rs)
 			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ '// ') (|c- '// ') |s+ |s- " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ '// ') (|c- '// ') |s+ |s-"
 			# https://github.com/rust-lang/rustfmt
 			if command -v rustfmt >/dev/null 2>&1; then
-				9 echo -n "(|rustfmt) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (|rustfmt)"
 			fi
 			;;
 		sh)
 			acmeexec "Font $BASEFONT"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "|c+ |c- " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS |c+ |c-"
 			# https://github.com/mvdan/sh
 			if command -v shfmt >/dev/null 2>&1; then
-				9 echo -n "|shfmt " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS |shfmt"
 			fi
 			# https://github.com/koalaman/shellcheck
 			if command -v shellcheck >/dev/null 2>&1; then
-				9 echo -n "(shellcheck -f gcc -s sh \`{basename \$%}) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (shellcheck -f gcc -s sh \`{basename \$%})"
 			fi
 			;;
 		zig)
@@ -144,10 +136,9 @@ elif [ "$#" -eq 1 ]; then
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
-			9 echo -n "$BASETAGS " | 9p write acme/$winid/tag
-			9 echo -n "(|c+ '// ') (|c- '// ') |s+ |s- " | 9p write acme/$winid/tag
+			ADDTAGS="$ADDTAGS (|c+ '// ') (|c- '// ') |s+ |s-"
 			if command -v zig >/dev/null 2>&1; then
-				9 echo -n "(|zig fmt --color off --stdin) " | 9p write acme/$winid/tag
+				ADDTAGS="$ADDTAGS (|zig fmt --color off --stdin)"
 			fi
 			;;
 		*)
@@ -161,19 +152,14 @@ fi
 
 # Store tag right of first '|'
 TAGRIGHT=`9p read acme/$winid/tag | 9 awk -v RS='\0' '{ st = index($0,"|"); print substr($0,st+1)}'`
-NUMTAGRIGHTNEWLINES=`9 echo -n "$TAGRIGHT" | 9 wc -l`
 
-# Remove Conf command from tag
+# Replace Conf command in tag with new tags to add
 9 echo -n "nomenu" | 9p write acme/$winid/ctl   # disable menu autoupdate
 9 echo -n "cleartag" | 9p write acme/$winid/ctl # clear tag right of first '|'
 9 echo -n "$TAGRIGHT" | awk -v RS='\0' "
 {
-	sub(/$(basename $0) +$1/,\"\",\$0);
-	if(NR<=$NUMTAGRIGHTNEWLINES)
-		EOL=\"\n\"
-	else
-		EOL=\"\";
-	printf \"%s%s\", \$0, EOL
+	sub(/$(basename $0) +$1/,\"$ADDTAGS\",\$0);
+	printf \"%s\", \$0
 }
-" | 9p write acme/$winid/tag                    # write back tag with "Conf LANG" removed
+" | 9p write acme/$winid/tag                    # write back tag with "Conf LANG" replaced
 9 echo -n "menu" | 9p write acme/$winid/ctl     # re-enable menu autoupdate

@@ -28,7 +28,7 @@ CMD="$1"
 WID=${2:-$winid}
 
 # Store original tag right of first '|'
-TAGRIGHT=`9p read acme/$WID/tag | 9 awk -F'|' '{ st = index($0,"|");print substr($0,st+1)}'`
+TAGRIGHT=`9p read acme/$WID/tag | 9 awk -v RS='\0' '{ st = index($0,"|");print substr($0,st+1)}'`
 if [ -z "$TAGRIGHT" ]; then
 	9 echo 'Error: Unable to parse tag (trying to orient on first "|")' 1>&2
 	exit 2
