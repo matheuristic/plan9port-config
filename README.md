@@ -104,7 +104,7 @@ the base configuration files and helper scripts to the corresponding
 user config locations.
 
 ```sh
-stow -t $HOME --no-folding plan9port
+stow -t $HOME --dotfiles --no-folding stow
 ```
 
 This will create the symlinks:
@@ -134,8 +134,8 @@ it is recommended to launch Acme with `$BROWSER` unset so that
 the plumbing to the web uses the default browser for the system.
 
 ```sh
-cp plan9port/.local/bin/sample-startacme.sh $HOME/.local/bin/startacme.sh
-cp plan9port/.local/bin/sample.startsam.sh $HOME/.local/bin/startsam.sh
+cp stow/dot-local/bin/sample-startacme.sh $HOME/.local/bin/startacme.sh
+cp stow/dot-local/bin/sample.startsam.sh $HOME/.local/bin/startsam.sh
 ```
 
 Edit `~/.local/bin/startacme.sh` and `~/.local/bin/startsam.sh` to
@@ -411,9 +411,9 @@ a number of helper scripts available at `~/.acme/bin`:
     Configure acme-lsp via CLI params or a [TOML](https://toml.io/) file
     `$HOME/Library/Application Support/acme-lsp/config.toml` (macOS) or
     `$HOME/.config/acme-lsp/config.toml` (Unix/Linux). A sample config
-    is provided in the repo at `plan9port/.config/acme-lsp/config.toml`.
+    is provided in the repo at `stow/dot-config/acme-lsp/config.toml`.
 
-    The `plan9port/.acme/bin/LSP` script `LSP` starts `acme-lsp` with
+    The `stow/dot-acme/bin/LSP` script `LSP` starts `acme-lsp` with
     additional workspace dirs set based on the current dir.
 
   - [acre](https://github.com/mjibson/acre)
@@ -434,7 +434,7 @@ a number of helper scripts available at `~/.acme/bin`:
     ([link](https://github.com/mjibson/acre/issues/10)) so paths to
     project workspaces should be added to the config file at
     `$HOME/.config/acre.toml` as needed. A sample config file is
-    provided in this repo at `plan9port/.config/acre.toml` that uses
+    provided in this repo at `stow/dot-config/acre.toml` that uses
     `gopls`, `ruff-lsp`, `rust-analyzer` and `zls` for Go, Python, Rust
     and Zig code (note that no workspace paths are specified).
 
