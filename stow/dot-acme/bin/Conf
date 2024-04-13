@@ -4,6 +4,11 @@
 
 set -e
 
+if [ "$winid" = "" ]; then
+	echo 'must be used from within acme' 1>&2
+	exit 1
+fi
+
 # Base fonts:
 # 1. lucsans (comes with plan9port)
 # 2. Comic Code - https://tosche.net/fonts/comic-code
