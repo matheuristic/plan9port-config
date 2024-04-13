@@ -18,6 +18,7 @@ s/[Ff]rom/to/g      # regexp replace across selected text
 X                   # list all windows
 X/^'/               # list all modified files
 X/^'/ w             # write all modified files
+X/\.log/ D          # close all clean files with '.log' in their paths
 ,|dtw               # delete all trailing whitespace in window
 -/\(/,+/\)/         # select to prev left parens and next right parens
 s/([\(\)])/\\\1/g   # escape all parentheses in selection
@@ -119,4 +120,6 @@ Edit /abc/ {
 # 4. Find line numbers of comments in a HTML file
 Edit ,x/<!--/ .;/-->/ =
 # 5. Print to stdout comment lines, and non-comments on the same line, in an HTML file
-Edit ,x/<!--/ .+-;/-->/+- > cat
+Edit ,x/<!--/ .-+,/-->/+- > cat
+# 6. Reverse order of selected lines
+Edit .|9 sed '1!G;h;$!d'

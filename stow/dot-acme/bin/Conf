@@ -115,7 +115,7 @@ elif [ "$#" -eq 1 ]; then
 			ADDTAGS="$ADDTAGS (|c+ '// ') (|c- '// ') |s+ |s-"
 			# https://github.com/rust-lang/rustfmt
 			if command -v rustfmt >/dev/null 2>&1; then
-				ADDTAGS="$ADDTAGS (|rustfmt)"
+				ADDTAGS="$ADDTAGS |rustfmt"
 			fi
 			;;
 		sh)

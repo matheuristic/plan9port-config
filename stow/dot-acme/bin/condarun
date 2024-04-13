@@ -10,7 +10,9 @@ if (test $#* -lt 2) {
 }
 
 # Find root directory of the Conda installation, either it is set
+if ((test $#condahome -eq 0) && (test $#MAMBA_ROOT_PREFIX -ne 0)) condahome=$MAMBA_ROOT_PREFIX
 if ((test $#condahome -eq 0) && (test $#CONDA_EXE -ne 0)) condahome=`{dirname `{dirname $CONDA_EXE}}
+if ((test $#condahome -eq 0) && (test -d $home/micromamba)) condahome=$home/micromamba
 if ((test $#condahome -eq 0) && (test -d $home/mambaforge)) condahome=$home/mambaforge
 if ((test $#condahome -eq 0) && (test -d $home/miniforge3)) condahome=$home/miniforge3
 if ((test $#condahome -eq 0) && (test -d $home/miniconda3)) condahome=$home/miniconda3
