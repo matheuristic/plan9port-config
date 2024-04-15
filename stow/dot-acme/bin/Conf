@@ -89,7 +89,8 @@ elif [ "$#" -eq 1 ]; then
 			fi
 			# https://github.com/astral-sh/ruff
 			if command -v ruff >/dev/null 2>&1; then
-				ADDTAGS="$ADDTAGS (ruff check \$%)"
+				ADDTAGS="$ADDTAGS (ruff check \$% | noansi)"
+				ADDTAGS="$ADDTAGS (|ruff format -)"
 			fi
 			;;
 		rkt)

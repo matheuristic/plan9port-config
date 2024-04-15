@@ -51,21 +51,29 @@ git push -u origin
 git fetch origin
 git merge origin/main
 git mergetool
-git rebase -i HEAD~3     # NOTE: oldest commit must be set to "pick"
+git rebase -i HEAD~3  # NOTE: oldest commit must be set to "pick"
 git push -u origin --force-with-lease  # NOTE: typically used after a rebase
 git checkout BRANCH
 git checkout -b BRANCH
-git bisect <cmd>         # cmd: start > bad > good COMMIT > (bad|good)* > reset [COMMIT]
+git switch BRANCH
+git switch -c BRANCH
+git bisect CMD        # CMD: start > bad > good COMMIT > (bad|good)* > reset [COMMIT]
 
 # Watch (requires 9fans.net/go/acme/Watch Go pkg)
 Watch [-r] COMMAND [ARG1] ...
 
-# acme-lsp (requires github.com/fhs/acme-lsp/cmd/{acme-lsp,L} Go pkgs)
+# acme-lsp (https://github.com/9fans/acme-lsp)
 win LSP
-Lcomp Ldef Lfmt Lhov Limpls Lrefs [Lrn SYM] Lsig Lsyns Ltype Lws+ Lws-
+Lcomp Ldef Lfmt Lhov Limpls Lrefs (Lrn SYM) Lsig Lsyns Ltype Lws+ Lws-
 
 # acre (https://github.com/mjibson/acre)
 acre
+
+# Markdown / mdformat (https://github.com/executablebooks/mdformat)
+Edit ,|mdformat --number --wrap 70 -
+
+# Pandoc (https://pandoc.org/)
+pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
 
 # DevSkim (https://github.com/microsoft/DevSkim)
 devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
@@ -73,22 +81,14 @@ devskim analyze -f text -o '%F:%L:%C,%l:%c (%S) [%R] %N' $%
 # ShellCheck (https://github.com/koalaman/shellcheck)
 shellcheck -a -f gcc $%
 
-# mdformat (https://github.com/executablebooks/mdformat)
-Edit ,|mdformat --number --wrap 70 -
-
-# Go tools gofmt and goimports
+# Go / gofmt, goimports
 Edit ,|gofmt
 Edit ,|goimports
 Edit ,|goreturns
 
-# Pandoc (https://pandoc.org/)
-pandoc -o /tmp/tmp.html FILENAME.md && { xdg-open /tmp/tmp.html || open /tmp/tmp.html } &
-
-# Python Black (https://github.com/psf/black)
-Edit ,|black -q -
-
-# Pylint (https://github.com/PyCQA/pylint)
-condarun ENVNAME pylint -f parseable $%
+# Python / Ruff (https://github.com/astral-sh/ruff)
+(ruff check | noansi)
+(ruff format --diff | noansi)
 
 # Rust
 (cargo clippy --locked -- -Dwarnings -Wclippy::pedantic)
