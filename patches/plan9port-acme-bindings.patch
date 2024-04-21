@@ -20,7 +20,7 @@ index 852a8f7f..1116ff8d 100644
  .I Win
  creates a new
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..e7bbe237 100644
+index 09422dda..abc8afd5 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
 @@ -15,6 +15,7 @@
@@ -143,7 +143,7 @@ index 09422dda..e7bbe237 100644
  	case Kcmd+'z':	/* %Z: undo */
  	 	typecommit(t);
  		undo(t, nil, nil, TRUE, 0, nil, 0);
-@@ -772,6 +853,21 @@ texttype(Text *t, Rune r)
+@@ -772,6 +853,22 @@ texttype(Text *t, Rune r)
  	 	typecommit(t);
  		undo(t, nil, nil, FALSE, 0, nil, 0);
  		return;
@@ -152,11 +152,12 @@ index 09422dda..e7bbe237 100644
 +		expanded = expand(t, t->q0, t->q1, &e);
 +		if(!expanded)
 +			return;
-+		/* work around Acme crash when executing Del, Delete and Delcol */
 +		if(texthas(t, e.q0, LDel))
++			/* Acme will crash if executing Del, Delete and Delcol from text input, so don't do it */
 +			warning(nil, "Del , Delete , Delcol , ... must be executed with mouse\n");
 +		else
-+			execute(t, e.q0, e.q1, FALSE, nil);
++			/* use original text selection to align behavior with mouse-2, as execute()'s expansion differs from expand()'s */
++			execute(t, t->q0, t->q1, FALSE, nil);
 +		return;
 +	case Kcmd+'/':	/* %/: plumb */
 +		typecommit(t);
@@ -165,7 +166,7 @@ index 09422dda..e7bbe237 100644
  
  	Tagdown:
  		/* expand tag to show all text */
-@@ -847,11 +943,20 @@ texttype(Text *t, Rune r)
+@@ -847,11 +944,20 @@ texttype(Text *t, Rune r)
  	case 0x08:	/* ^H: erase character */
  	case 0x15:	/* ^U: erase line */
  	case 0x17:	/* ^W: erase word */
