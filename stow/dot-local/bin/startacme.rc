@@ -58,7 +58,7 @@ TERM=dumb
 PAGER=nobs
 
 # Use editinacme (https://pkg.go.dev/9fans.net/go/acme/editinacme) or $PLAN9/bin/E as the default editor
-if (~ `{command -v editinacme} *editinacme) EDITOR=editinacme
+if (~ `{which editinacme} */editinacme) EDITOR=editinacme
 if not EDITOR=E
 
 # Update tag line current dir when using cd in win windows
