@@ -134,7 +134,7 @@
 #     fi
 #     visibleclicks=1 SHELL=rc BROWSER=garcon-url-handler \
 #         $PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
-#         -f /lib/font/bit/lucsans/unicode.13.font -F /mnt/font/GoMono/18a/font \
+#         -f /lib/font/bit/luc/unicode.14.font -F /mnt/font/GoMono/18a/font \
 #         $titleparams \
 #         $startparams
 
