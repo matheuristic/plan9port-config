@@ -11,7 +11,7 @@
 
 set -e
 
-EXCLUDEDIRS=("$HOME/.acme/bin")
+EXCLUDEDIRS="$HOME/.acme/bin"  # if multiple excluded dirs, separate with newlines
 
 NOPWDPATH=$PATH
 for d in $EXCLUDEDIRS; do
