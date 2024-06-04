@@ -1,21 +1,22 @@
 #!/usr/bin/env rc
 
-# Cycles Acme window's font between a list of presets in $fontlist
+# Cycles Acme window's font between a list of presets in $acmefonts
+# which should be a string with one font specified per line
+
 # Usage:
 # 	Fcycle [-v] [fontnum]
 # Specifying -v also prints the name of the new font
 # Specifying a number fontnum sets the font to the fontnum-th preset
 # If current font is not in the presets, switch to the first preset font
-# If $fontlist is undefined or empty, uses a hardcoded list (see below)
+# If $acmefonts is undefined or empty, uses a hardcoded list (see below)
 
-if(~ $#fontlist 0) {
-	fontlist=( \
-		$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font \
-		$PLAN9/font/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/24a/font \
-		$home/lib/font/uw-ttyp0/t0-18b-uni.font,/mnt/font/PragmataProMono-Regular/32a/font \
-		$home/lib/font/cozette/cozette.font,/mnt/font/BQN386/24a/font \
-	)
+if(~ $#acmefonts 0) {
+	acmefonts=`{cat <<EOF}
 }
+$font
+$home/lib/font/uw-ttyp0/t0-18b-uni.font,/mnt/font/PragmataProMono-Regular/30a/font
+EOF
+acmefonts=`{echo $acmefonts | 9 awk '{print}'} # split into array
 
 if(~ $#winid 0) {
 	9 echo must be run from within acme >[1=2]
@@ -38,8 +39,8 @@ while(test $#* -gt 0) {
 				exit 1
 			}
 			fontnum=$1
-			if(test $fontnum -lt 1 -o $fontnum -gt $#fontlist) {
-				9 echo 'fontnum must be between 1 and '^$#fontlist^' (inclusive)' >[1=2]
+			if(test $fontnum -lt 1 -o $fontnum -gt $#acmefonts) {
+				9 echo 'fontnum must be between 1 and '^$#acmefonts^' (inclusive)' >[1=2]
 				exit 1
 			}
 			shift
@@ -61,14 +62,14 @@ fn setfont {
 }
 
 if(test $fontnum -gt 0) {
-	setfont $fontlist($fontnum)
+	setfont $acmefonts($fontnum)
 	exit 0
 }
 if not {
 	curfont=`{9p read acme/$winid/ctl | 9 awk '{print $7}'}
-	for(k in `{seq `{echo $#fontlist - 1 | hoc}}) {
-		fk=$fontlist($k)
-		fkplusone=$fontlist(`{echo $k'+1' | hoc})
+	for(k in `{seq `{echo $#acmefonts - 1 | hoc}}) {
+		fk=$acmefonts($k)
+		fkplusone=$acmefonts(`{echo $k'+1' | hoc})
 		if(echo $fk | 9 grep -s $curfont) {
 			setfont $fkplusone
 			exit 0
@@ -77,5 +78,5 @@ if not {
 }
 
 # Here if fontnum=0 and current font is last or not in list, fall back to first font
-setfont $fontlist(1)
+setfont $acmefonts(1)
 exit 0

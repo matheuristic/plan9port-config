@@ -50,9 +50,18 @@ if [ "$startparams" = "" ]; then
 		echo "Start file does not exist, skipping load: $startfile" 1>&2
 	fi
 fi
-visibleclicks=1 SHELL=rc \
+
+export acmefonts=$(cat <<EOF
+$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font
+$PLAN9/font/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/26a/font
+$HOME/lib/font/uw-ttyp0/t0-18b-uni.font,/mnt/font/PragmataProMono-Regular/32a/font
+$HOME/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font
+EOF
+)
+
+visibleclicks=1 SHELL=rc BROWSER='Mullvad Browser' \
 	$PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
 	-f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font \
-	-F /lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/24a/font \
+	-F /lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/26a/font \
 	$titleparams \
 	$startparams
