@@ -119,27 +119,13 @@ This will create the symlinks:
 - `~/.local/bin/sample-pylsp`: Sample wrapper showing how to run
   [Python LSP Server](https://github.com/python-lsp/python-lsp-server)
   installed in a Conda environment. Of utility when using `acme-lsp`.
-- `~/.local/bin/sample-startacme.sh`: Sample wrapper to run
-  `startacme.rc` via `rc`.
-- `~/.local/bin/sample-startacme-macos.sh`: Sample wrapper to run
-  `startacme.rc` via `rc` that is more macOS-specific.
-- `~/.local/bin/sample-startsam.sh`: Sample wrapper to run
-  `startsam.rc` via `rc`.
+- `~/.local/bin/startacme.sh`: Wrapper to run `startacme.rc` via `rc`.
+- `~/.local/bin/startsam.sh`: Wrapper to run `startsam.rc` via `rc`.
 - `~/.acme/bin/*`: Various helper scripts for Acme.
 
-Copy `sample-startacme.sh` to `~/.local/bin/startacme.sh` and
-`sample-startsam.sh` to `~/.local/bin/startsam.sh` and modify them to
-create customized launchers for Acme and Sam. Note that for macOS,
-it is recommended to launch Acme with `$BROWSER` unset so that
-the plumbing to the web uses the default browser for the system.
-
-```sh
-cp stow/dot-local/bin/sample-startacme.sh $HOME/.local/bin/startacme.sh
-cp stow/dot-local/bin/sample.startsam.sh $HOME/.local/bin/startsam.sh
-```
-
-Edit `~/.local/bin/startacme.sh` and `~/.local/bin/startsam.sh` to
-customize the launchers as desired.
+If additional launcher customization is needed, copy `startacme.sh` to
+`~/.local/bin/startacme.sh` (or similarly for `startsam.sh`) instead
+of symlinking, and modify the copy as desired.
 
 ## Acme
 
@@ -804,9 +790,8 @@ see [here](https://gist.github.com/proudlygeek/5721498),
 
 - A start file or a bookmarks file with pre-defined Load lines or
   paths to specific files can enable quick loading of project
-  workspace dumps. The `sample-startacme.sh` sample launcher has
-  comments showing how a launcher can be set up to open this file on
-  launch when no extra options are provided. An example of a
+  workspace dumps. The `startacme.sh` launcher will open this file by
+  default when no extra options are provided. An example of a
   start/bookmarks file follows.
 
   ```text
@@ -896,8 +881,6 @@ see [here](https://gist.github.com/proudlygeek/5721498),
 
 - Follow the setup as described above, applying the desired patches
   prior to building.
-- Create `$HOME/.local/bin/startacme.sh` using the
-  `sample-startacme.sh` as a starting point.
 - Install supporting programs.
   - For the scripts in `$HOME/.acme/bin`, these would be GNU
     coreutils, Conda, `fzf`, `git`, `ripgrep`, or `mamba`, `par` if

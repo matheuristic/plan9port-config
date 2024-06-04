@@ -1,10 +1,16 @@
 #!/usr/bin/env sh
 
-# Sample ~/.local/bin/startacme.sh for macOS for launching Acme
+# ~/.local/bin/startacme.sh : Acme launcher
 # If plumbing web URLs does not work, set environment var BROWSER=none
+
+# Usage:
+#     startacme.sh
+#     startacme.sh [file]
+#     startacme.sh -N [number between 0 and 9 inclusive]
 
 set -e
 
+# Make sure PLAN9 env var and PATH are set properly
 if [ -z "$PLAN9" ]; then
 	if [ -d "$HOME/.local/plan9" ]; then
 		export PLAN9=$HOME/.local/plan9
@@ -20,6 +26,8 @@ fi
 if ! $(echo "$PATH" | grep "$HOME/.acme/bin" >/dev/null 2>&1); then
 	export PATH=$HOME/.acme/bin:$PATH
 fi
+
+# '-N' requires a patched Acme where 'acme -t someTitle' sets the window title
 titleparams=""
 if [ "$1" = "-N" ]; then
 	j=0
@@ -41,6 +49,8 @@ if [ "$1" = "-N" ]; then
 	# trap 'rm -rf "$NAMESPACE"' EXIT
 	shift;
 fi
+
+# Set start file and pass through other params
 startparams="$@"
 startfile=$HOME/.acme/start
 if [ "$startparams" = "" ]; then
@@ -51,17 +61,47 @@ if [ "$startparams" = "" ]; then
 	fi
 fi
 
-export acmefonts=$(cat <<EOF
-$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font
-$PLAN9/font/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/26a/font
+# Machine-specific settings
+case "$(uname)" in
+	Darwin)
+		if [ -z "$BROWSER" ]; then
+			BROWSER='Mullvad Browser'
+		fi
+		font="$PLAN9/font/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font"
+		altfont="$PLAN9/font/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/26a/font"
+		export acmefonts=$(cat <<EOF
+$font
+$altfont
 $HOME/lib/font/uw-ttyp0/t0-18b-uni.font,/mnt/font/PragmataProMono-Regular/32a/font
 $HOME/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font
 EOF
 )
+		;;
+	Linux)
+		if [ -z "$BROWSER" ]; then
+			if command -v garcon-url-handler >/dev/null 2>&1; then
+				BROWSER=garcon-url-handler
+			else
+				BROWSER=none
+			fi
+		fi
+		font="lib/font/bit/luc/unicode.14.font"
+		altfont="/mnt/font/PragmataPro-Regular/20a/font"
+		export acmefonts=$(cat <<EOF
+$font
+$altfont
+EOF
+)
+		;;
+	*)
+		BROWSER=none
+		;;
+esac
 
-visibleclicks=1 SHELL=rc BROWSER='Mullvad Browser' \
+# Launch Acme
+visibleclicks=1 SHELL=rc BROWSER=$BROWSER \
 	$PLAN9/bin/rc $HOME/.local/bin/startacme.rc \
-	-f /lib/font/bit/lucsans/unicode.8.font,/mnt/font/LucidaGrande/28a/font \
-	-F /lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/26a/font \
+	-f $font \
+	-F $altfont \
 	$titleparams \
 	$startparams

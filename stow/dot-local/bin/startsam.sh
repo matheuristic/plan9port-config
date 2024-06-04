@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Sample wrapper file to launch Sam from environments without the Plan 9 bin
+# Wrapper script to launch Sam from environments without the Plan 9 bin
 # directory in their search path
 
 # It is recommended to copy this file to ~/.local/bin/sam.sh and configure the
