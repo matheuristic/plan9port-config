@@ -9,25 +9,20 @@ if [ "$winid" = "" ]; then
 	exit 1
 fi
 
-# Base fonts:
-# 1. lucsans (comes with plan9port)
-# 2. Comic Code - https://tosche.net/fonts/comic-code
-
-BASEFONT="/lib/font/bit/lucsans/boldtypeunicode.7.font,/mnt/font/ComicCode-Medium/24a/font"
 ADDTAGS="win :0 :$ EC Edit Fcycle F++ F--"
 
 if [ "$#" -eq 0 ]; then
 	cat <<EOF
 Set up current Acme window for programming.
 
-Configures font, space or tab indentation, auto-indent,
+Configures space or tab indentation, auto-indent,
 and tagbar for the window for the given language.
 
-Usage: $(basename $0) [bqn|lisp|py|racket|sh]
+Usage: $(basename $0) [bqn|js|lisp|py|racket|sh]
 
 Supported languages:
-bqn (BQN), lisp (Lisp), md (Markdown), py (Python),
-rkt (Racket), rs (Rust), sh (Shell)
+bqn (BQN), js (Javascript), lisp (Lisp), md (Markdown),
+py (Python), rkt (Racket), rs (Rust), sh (Shell)
 
 If no option is specified, show usage and exit.
 EOF
@@ -35,7 +30,6 @@ EOF
 elif [ "$#" -eq 1 ]; then
 	case $1 in
 		bqn)
-			acmeexec "Font $home/lib/font/cozette/cozette.font,/mnt/font/BQN386/28a/font"
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -58,8 +52,13 @@ elif [ "$#" -eq 1 ]; then
 			9 echo -n '⟧'
 			9 echo ''
 			;;
+		js)
+			acmeexec "Tab 2"
+			acmeexec "Spaces on"
+			acmeexec "Indent on"
+			ADDTAGS="$ADDTAGS (|c+ '// ') (|c- '// ') (|s+ 2) (|s- 2) |surround"
+			;;
 		lisp)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -70,7 +69,6 @@ elif [ "$#" -eq 1 ]; then
 			fi
 			;;
 		md)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -78,7 +76,6 @@ elif [ "$#" -eq 1 ]; then
 			ADDTAGS="$ADDTAGS |mdlink mdpv"
 			;;
 		py)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -94,7 +91,6 @@ elif [ "$#" -eq 1 ]; then
 			fi
 			;;
 		rkt)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 2"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -114,7 +110,6 @@ elif [ "$#" -eq 1 ]; then
 			ADDTAGS="$ADDTAGS (win racket)"
 			;;
 		rs)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
@@ -125,7 +120,6 @@ elif [ "$#" -eq 1 ]; then
 			fi
 			;;
 		sh)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Indent on"
 			ADDTAGS="$ADDTAGS |c+ |c-"
 			# https://github.com/mvdan/sh
@@ -138,7 +132,6 @@ elif [ "$#" -eq 1 ]; then
 			fi
 			;;
 		zig)
-			acmeexec "Font $BASEFONT"
 			acmeexec "Tab 4"
 			acmeexec "Spaces on"
 			acmeexec "Indent on"
