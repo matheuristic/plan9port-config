@@ -58,14 +58,6 @@ directories with round and square brackets (`(`, `)`, `[`, `]`)
 or tildes (`~`) in their name. This patch makes it so Acme will
 open them as expected.
 
-### `plan9port-acme-lookb.patch`
-
-Add a `Lookb` command to Acme, which works like the
-`Look` command but searches backwards instead of forwards.
-
-This is adapted from an unmerged plan9port pull request by
-bd339 ([link](https://github.com/9fans/plan9port/pull/552)).
-
 ### `plan9port-acme-soft-tabs.patch`
 
 Add soft tabs to Acme.
