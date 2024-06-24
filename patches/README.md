@@ -173,11 +173,3 @@ No remapping of backticks and single quotes on macOS systems.
 
 This patch removes the default behavior of remapping characters
 `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
-
-### `plan9port-x11-shiftpressbutton1.patch`
-
-Press shift to send Button1 when mouse button is depressed on X11.
-
-This patch makes it so `Shift` sends Button1 while the mouse button is
-depressed for X11 systems. This allows for a 2-1 chord via
-`Ctrl-Click` followed by pressing `Shift` on laptops.

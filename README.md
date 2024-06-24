@@ -42,9 +42,6 @@ file in the subdirectory for instructions.
   GUI window fully hide menubar when fullscreen behavior.
 - `plan9port-mac-noquotemap.patch`: Remove the remapping of chars
   `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
-- `plan9port-x11-shiftpressbutton1.patch`: `Shift` sends Button1 while
-  a mouse button is depressed on X11 systems. This allows for 2-1
-  chords on non-macOS laptops without an external mouse.
 
 ### Compiling plan9port
 
