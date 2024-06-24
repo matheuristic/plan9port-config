@@ -1,50 +1,12 @@
 diff --git a/src/cmd/devdraw/x11-screen.c b/src/cmd/devdraw/x11-screen.c
-index 9490ab8f..1bdabbeb 100644
+index f4aa1ce9..81efa02b 100644
 --- a/src/cmd/devdraw/x11-screen.c
 +++ b/src/cmd/devdraw/x11-screen.c
-@@ -431,6 +431,12 @@ runxevent(XEvent *xev)
- 
- 		if(xev->type == KeyPress)
- 			switch(k) {
-+			case XK_Shift_L:
-+			case XK_Shift_R:
-+				kcodeshift = ke->keycode;
-+				c |= ShiftMask;
-+				modp = 1;
-+				break;
- 			case XK_Control_L:
- 			case XK_Control_R:
- 				kcodecontrol = ke->keycode;
-@@ -441,9 +447,6 @@ runxevent(XEvent *xev)
- 			case XK_Alt_R:
- 				kcodealt = ke->keycode;
- 				// fall through
--			case XK_Shift_L:
--			case XK_Shift_R:
--				kcodeshift = ke->keycode;
- 				c |= Mod1Mask;
- 				modp = 1;
- 			}
-@@ -451,9 +454,12 @@ runxevent(XEvent *xev)
- 			if(ke->keycode == kcodecontrol){
- 				c &= ~ControlMask;
- 				modp = 1;
--		        } else if(ke->keycode == kcodealt || ke->keycode == kcodeshift){
-+			} else if(ke->keycode == kcodealt){
- 				c &= ~Mod1Mask;
- 				modp = 1;
-+			} else if(ke->keycode == kcodeshift){
-+				c &= ~ShiftMask;
-+				modp = 1;
- 			}
- 		}
- 		if(modp){
-@@ -461,6 +467,8 @@ runxevent(XEvent *xev)
- 			if(m.buttons || _x.kbuttons) {
- 				_x.altdown = 0; // used alt
- 				_x.kbuttons = 0;
-+				if(c & ShiftMask)
-+					_x.kbuttons |= 1;
- 				if(c & ControlMask)
- 					_x.kbuttons |= 2;
+@@ -477,6 +477,7 @@ runxevent(XEvent *xev)
  				if(c & Mod1Mask)
+ 					_x.kbuttons |= 4;
+ 				if(c & ShiftMask)
++					_x.kbuttons |= 1;
+ 					shift = 5;
+ 				gfx_mousetrack(w->client, m.xy.x, m.xy.y, (m.buttons|_x.kbuttons)<<shift, m.msec);
+ 			}

@@ -1,8 +1,8 @@
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index 852a8f7f..1116ff8d 100644
+index bb2c89d6..5c8ce13f 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
-@@ -662,12 +662,14 @@ a chord, so that for example on Macs selecting text with the trackpad
+@@ -667,12 +667,13 @@ a chord, so that for example on Macs selecting text with the trackpad
  button and then typing Option without letting go of the button will
  cause a 1-2 chord, cutting the selection.
  On Mac systems, the usual keyboard shortcuts
@@ -14,13 +14,12 @@ index 852a8f7f..1116ff8d 100644
  as in other programs.
  Especially on Mac laptops, these keyboard shortcuts are
  typically much less awkward than the equivalent chords.
-+Also, on Mac laptops, Command-. executes text like button 2
-+and Command-/ plumbs text like button 3.
++Also, on Mac laptops, Command-. executes text like button 2.
  .SS "Support programs
  .I Win
  creates a new
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..abc8afd5 100644
+index 09422dda..a824247c 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
 @@ -15,6 +15,7 @@
@@ -143,13 +142,13 @@ index 09422dda..abc8afd5 100644
  	case Kcmd+'z':	/* %Z: undo */
  	 	typecommit(t);
  		undo(t, nil, nil, TRUE, 0, nil, 0);
-@@ -772,6 +853,22 @@ texttype(Text *t, Rune r)
+@@ -772,6 +853,18 @@ texttype(Text *t, Rune r)
  	 	typecommit(t);
  		undo(t, nil, nil, FALSE, 0, nil, 0);
  		return;
 +	case Kcmd+'.':	/* %.: execute */
 +		typecommit(t);
-+		expanded = expand(t, t->q0, t->q1, &e);
++		expanded = expand(t, t->q0, t->q1, &e, FALSE);
 +		if(!expanded)
 +			return;
 +		if(texthas(t, e.q0, LDel))
@@ -159,14 +158,10 @@ index 09422dda..abc8afd5 100644
 +			/* use original text selection to align behavior with mouse-2, as execute()'s expansion differs from expand()'s */
 +			execute(t, t->q0, t->q1, FALSE, nil);
 +		return;
-+	case Kcmd+'/':	/* %/: plumb */
-+		typecommit(t);
-+		look3(t, t->q0, t->q1, FALSE);
-+		return;
  
  	Tagdown:
  		/* expand tag to show all text */
-@@ -847,11 +944,20 @@ texttype(Text *t, Rune r)
+@@ -847,11 +940,20 @@ texttype(Text *t, Rune r)
  	case 0x08:	/* ^H: erase character */
  	case 0x15:	/* ^U: erase line */
  	case 0x17:	/* ^W: erase word */
