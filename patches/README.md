@@ -173,3 +173,17 @@ No remapping of backticks and single quotes on macOS systems.
 
 This patch removes the default behavior of remapping characters
 `` ` `` and `'` to `‘` and `’` in macOS `fontsrv`.
+
+### `plan9port-x11-ctrlb1superb2.patch`
+
+On X11, `Super-Click` (or `Windows-Click`) to send Button2, and press
+Control and Super to send Button1 and Button2 respectively when mouse
+button is depressed.
+
+This allows for a 2-1 chord via `Super-Click` followed by pressing
+`Control` on Linux/Unix laptops.
+
+**NOTE**: `Super-Click` and `Shift-Click` detection code is modified
+to look at the button state instead of tracked state, to work around
+OSes like ChromeOS not passing through `Super` key press and release
+events directly to the X server.

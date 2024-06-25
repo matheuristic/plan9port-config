@@ -1,0 +1,70 @@
+diff --git a/man/man1/acme.1 b/man/man1/acme.1
+index bb2c89d6..c86a05ab 100644
+--- a/man/man1/acme.1
++++ b/man/man1/acme.1
+@@ -658,7 +658,7 @@ the fully-qualified address of the extra argument.
+ .SS "Simulated buttons
+ For systems without a three-button mouse, the keyboard modifier
+ keys can be used to modify the effect of the main mouse button.
+-On Unix systems, the Control key changes the main button to button 2,
++On Unix systems, the Super key changes the main button to button 2,
+ and the Alt key changes it to button 3.
+ On Mac systems, the Option key changes the main button to button 2,
+ and the Command key changes it to button 3.
+diff --git a/src/cmd/devdraw/x11-screen.c b/src/cmd/devdraw/x11-screen.c
+index f4aa1ce9..3d763fd1 100644
+--- a/src/cmd/devdraw/x11-screen.c
++++ b/src/cmd/devdraw/x11-screen.c
+@@ -312,7 +312,7 @@ xloop(void)
+ 	}
+ }
+ 
+-static int kcodecontrol, kcodealt, kcodeshift;
++static int kcodecontrol, kcodealt, kcodeshift, kcodesuper;
+ 
+ /*
+  * Handle an incoming X event.
+@@ -395,9 +395,9 @@ runxevent(XEvent *xev)
+ 	case ButtonPress:
+ 		be = (XButtonEvent*)xev;
+ 		if(be->button == 1) {
+-			if(_x.kstate & ControlMask)
++			if(be->state & Mod4Mask)
+ 				be->button = 2;
+-			else if(_x.kstate & Mod1Mask)
++			else if(be->state & Mod1Mask)
+ 				be->button = 3;
+ 		}
+ 		// fall through
+@@ -441,6 +441,12 @@ runxevent(XEvent *xev)
+ 				c |= ControlMask;
+ 				modp = 1;
+ 				break;
++			case XK_Super_L:
++			case XK_Super_R:
++				kcodesuper = ke->keycode;
++				c |= Mod4Mask;
++				modp = 1;
++				break;
+ 			case XK_Alt_L:
+ 			case XK_Alt_R:
+ 				kcodealt = ke->keycode;
+@@ -458,6 +464,9 @@ runxevent(XEvent *xev)
+ 			if(ke->keycode == kcodecontrol){
+ 				c &= ~ControlMask;
+ 				modp = 1;
++			} else if(ke->keycode == kcodesuper){
++				c &= ~Mod4Mask;
++				modp = 1;
+ 		        } else if(ke->keycode == kcodealt){
+ 				c &= ~Mod1Mask;
+ 				modp = 1;
+@@ -473,6 +482,8 @@ runxevent(XEvent *xev)
+ 				_x.altdown = 0; // used alt
+ 				_x.kbuttons = 0;
+ 				if(c & ControlMask)
++					_x.kbuttons |= 1;
++				if(c & Mod4Mask)
+ 					_x.kbuttons |= 2;
+ 				if(c & Mod1Mask)
+ 					_x.kbuttons |= 4;
