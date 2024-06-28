@@ -1,5 +1,5 @@
 diff --git a/man/man1/acme.1 b/man/man1/acme.1
-index bb2c89d6..5c8ce13f 100644
+index bb2c89d6..9cdb4ed7 100644
 --- a/man/man1/acme.1
 +++ b/man/man1/acme.1
 @@ -667,12 +667,13 @@ a chord, so that for example on Macs selecting text with the trackpad
@@ -14,12 +14,12 @@ index bb2c89d6..5c8ce13f 100644
  as in other programs.
  Especially on Mac laptops, these keyboard shortcuts are
  typically much less awkward than the equivalent chords.
-+Also, on Mac laptops, Command-. executes text like button 2.
++Also, on Mac laptops, Command-E executes text like button 2.
  .SS "Support programs
  .I Win
  creates a new
 diff --git a/src/cmd/acme/text.c b/src/cmd/acme/text.c
-index 09422dda..a824247c 100644
+index 09422dda..6ebd1929 100644
 --- a/src/cmd/acme/text.c
 +++ b/src/cmd/acme/text.c
 @@ -15,6 +15,7 @@
@@ -89,7 +89,7 @@ index 09422dda..a824247c 100644
  
  	if(t->what!=Body && t->what!=Tag && r=='\n')
  		return;
-@@ -760,10 +799,52 @@ texttype(Text *t, Rune r)
+@@ -760,10 +799,64 @@ texttype(Text *t, Rune r)
  			q0++;
  		textshow(t, q0, q0, TRUE);
  		return;
@@ -135,18 +135,7 @@ index 09422dda..a824247c 100644
  		typecommit(t);
  		cut(t, t, nil, TRUE, FALSE, nil, 0);
  		return;
-+	case Kcmd+'s':	/* %S: save */
-+		typecommit(t);
-+		put(&(t->w)->body, nil, nil, XXX, XXX, nil, 0);
-+		return;
- 	case Kcmd+'z':	/* %Z: undo */
- 	 	typecommit(t);
- 		undo(t, nil, nil, TRUE, 0, nil, 0);
-@@ -772,6 +853,18 @@ texttype(Text *t, Rune r)
- 	 	typecommit(t);
- 		undo(t, nil, nil, FALSE, 0, nil, 0);
- 		return;
-+	case Kcmd+'.':	/* %.: execute */
++	case Kcmd+'e':	/* %e: execute */
 +		typecommit(t);
 +		expanded = expand(t, t->q0, t->q1, &e, FALSE);
 +		if(!expanded)
@@ -158,9 +147,13 @@ index 09422dda..a824247c 100644
 +			/* use original text selection to align behavior with mouse-2, as execute()'s expansion differs from expand()'s */
 +			execute(t, t->q0, t->q1, FALSE, nil);
 +		return;
- 
- 	Tagdown:
- 		/* expand tag to show all text */
++	case Kcmd+'s':	/* %S: save */
++		typecommit(t);
++		put(&(t->w)->body, nil, nil, XXX, XXX, nil, 0);
++		return;
+ 	case Kcmd+'z':	/* %Z: undo */
+ 	 	typecommit(t);
+ 		undo(t, nil, nil, TRUE, 0, nil, 0);
 @@ -847,11 +940,20 @@ texttype(Text *t, Rune r)
  	case 0x08:	/* ^H: erase character */
  	case 0x15:	/* ^U: erase line */
