@@ -38,10 +38,11 @@ Add extra Acme keyboard bindings:
 - `C-k`: forward erase to end of line
 - `C-n`: move point one line down
 - `C-p`: move point one line up
-- `Cmd-a`: select all content in window
-- `Cmd-s`: execute `Put` (i.e., save file) on macOS
-- `Cmd-.`: execute text (like Button2) on macOS
-- `Cmd-/`: plumb text (like Button2) on macOS
+- `Cmd-a`: select all content in window (macOS)
+- `Cmd-m`: execute text, like Button2 (macOS)
+- `Cmd-s`: execute `Put`, i.e., save file (macOS)
+- `Cmd-,`: backward-search/plumb text, like Shift-Button3 (macOS)
+- `Cmd-.`: forward-search/plumb text, like Button3 (macOS)
 
 Some portions of this patch are sourced from
 [plan9port](https://github.com/9fans/plan9port) forks by
